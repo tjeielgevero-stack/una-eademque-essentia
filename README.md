@@ -8,6 +8,9 @@ An unofficial, community-made Project Moon character and Mirror World variant bu
 - Separate searchable catalogues.
 - A Settings dialog with a draggable two-dimensional saturation/brightness square and rainbow hue slider.
 - Custom accent color saved in the browser.
+- Separate Appearance and Effects tabs in Settings, with four mix-and-match visual effects: Ambient Dust, CRT Scanlines, Accent Pulse, and Glitch Flicker.
+- Visual-effect selections are saved locally, and animated effects respect reduced-motion preferences.
+- Opening Settings keeps the page scrollable without collapsing the page scrollbar.
 - Responsive archive-inspired design with an original moon-headed archive-clerk illustration.
 
 ## Files
