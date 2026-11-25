@@ -75,28 +75,129 @@ const QUESTIONS = [
 
 const $=id=>document.getElementById(id);
 
-// Color themes are shared across the archive interface and saved for this browser.
-(function setupThemePicker(){
- const picker=document.querySelector(".theme-switcher");
- if(!picker)return;
- const validThemes=new Set(["crimson","verdigris","amber","violet"]);
- const applyTheme=theme=>{
-  const next=validThemes.has(theme)?theme:"crimson";
-  document.documentElement.dataset.theme=next;
-  picker.querySelectorAll("[data-theme-choice]").forEach(button=>{
-   const active=button.dataset.themeChoice===next;
-   button.classList.toggle("is-active",active);
-   button.setAttribute("aria-pressed",String(active));
-  });
-  try{localStorage.setItem("uee_archive_theme",next);}catch{}
- };
- let saved="crimson";
- try{saved=localStorage.getItem("uee_archive_theme")||saved;}catch{}
- applyTheme(saved);
- picker.addEventListener("click",event=>{
-  const button=event.target.closest("[data-theme-choice]");
-  if(button)applyTheme(button.dataset.themeChoice);
+// Settings dialog and custom two-dimensional HSV color picker.
+(function setupColorPicker(){
+ const overlay=$("settings-overlay");
+ const openButton=$("settings-open");
+ const closeButtons=[$("settings-close"),$("settings-close-bottom")].filter(Boolean);
+ const field=$("color-sv-field");
+ const handle=$("sv-handle");
+ const hueInput=$("hue-slider");
+ const swatch=$("color-preview-swatch");
+ const hexLabel=$("color-preview-hex");
+ const description=$("color-preview-description");
+ if(!overlay||!openButton||!field||!handle||!hueInput)return;
+
+ const root=document.documentElement;
+ const storageKey="uee_custom_theme_v1";
+ const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+ const state={h:352,s:0.68,v:0.86};
+ let dragging=false;
+
+ function hsvToRgb(h,s,v){
+  const c=v*s, hp=((h%360)+360)%360/60;
+  const x=c*(1-Math.abs((hp%2)-1));
+  let rgb;
+  if(hp<1)rgb=[c,x,0];
+  else if(hp<2)rgb=[x,c,0];
+  else if(hp<3)rgb=[0,c,x];
+  else if(hp<4)rgb=[0,x,c];
+  else if(hp<5)rgb=[x,0,c];
+  else rgb=[c,0,x];
+  const m=v-c;
+  return rgb.map(n=>Math.round((n+m)*255));
+ }
+ function hex(rgb){return "#"+rgb.map(n=>n.toString(16).padStart(2,"0")).join("").toUpperCase();}
+ function blend(rgb,amount){
+  return rgb.map(n=>Math.round(n+(255-n)*amount));
+ }
+ function applyColor(save=true){
+  const rgb=hsvToRgb(state.h,state.s,state.v);
+  const accent=hex(rgb);
+  const strong=hex(hsvToRgb(state.h,Math.min(1,state.s*0.92+0.08),Math.max(0.42,state.v*0.62)));
+  const pale=hex(blend(rgb,0.72));
+  root.dataset.theme="custom";
+  root.style.setProperty("--accent",accent);
+  root.style.setProperty("--accent-rgb",rgb.join(", "));
+  root.style.setProperty("--accent-strong",strong);
+  root.style.setProperty("--accent-text",pale);
+  field.style.setProperty("--picker-base",`hsl(${state.h} 100% 50%)`);
+  field.style.setProperty("--selector-x",`${state.s*100}%`);
+  field.style.setProperty("--selector-y",`${(1-state.v)*100}%`);
+  field.setAttribute("aria-valuenow",String(Math.round(state.s*100)));
+  field.setAttribute("aria-valuetext",`Saturation ${Math.round(state.s*100)} percent, brightness ${Math.round(state.v*100)} percent`);
+  hueInput.value=String(Math.round(state.h));
+  if(swatch)swatch.style.backgroundColor=accent;
+  if(hexLabel)hexLabel.textContent=accent;
+  if(description)description.textContent=`HUE ${Math.round(state.h)}° · SATURATION ${Math.round(state.s*100)}% · VALUE ${Math.round(state.v*100)}%`;
+  if(save){
+   try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}
+  }
+ }
+ function updateFromPointer(event){
+  const rect=field.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  state.s=clamp((event.clientX-rect.left)/rect.width,0,1);
+  state.v=1-clamp((event.clientY-rect.top)/rect.height,0,1);
+  applyColor();
+ }
+ function openSettings(){
+  overlay.hidden=false;
+  overlay.classList.remove("hidden");
+  overlay.setAttribute("aria-hidden","false");
+  openButton.setAttribute("aria-expanded","true");
+  document.body.classList.add("settings-open");
+  closeButtons[0]?.focus();
+ }
+ function closeSettings(){
+  overlay.hidden=true;
+  overlay.classList.add("hidden");
+  overlay.setAttribute("aria-hidden","true");
+  openButton.setAttribute("aria-expanded","false");
+  document.body.classList.remove("settings-open");
+  openButton.focus();
+ }
+ openButton.addEventListener("click",openSettings);
+ closeButtons.forEach(button=>button.addEventListener("click",closeSettings));
+ overlay.addEventListener("pointerdown",event=>{if(event.target===overlay)closeSettings();});
+ document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&!overlay.hidden)closeSettings();
  });
+ field.addEventListener("pointerdown",event=>{
+  dragging=true;
+  field.setPointerCapture?.(event.pointerId);
+  updateFromPointer(event);
+ });
+ field.addEventListener("pointermove",event=>{
+  if(dragging&&(event.buttons===1||event.pointerType==="touch"))updateFromPointer(event);
+ });
+ const stopDragging=()=>{dragging=false;};
+ field.addEventListener("pointerup",stopDragging);
+ field.addEventListener("pointercancel",stopDragging);
+ field.addEventListener("lostpointercapture",stopDragging);
+ field.addEventListener("keydown",event=>{
+  const step=event.shiftKey?0.1:0.02;
+  let handled=true;
+  if(event.key==="ArrowLeft")state.s=clamp(state.s-step,0,1);
+  else if(event.key==="ArrowRight")state.s=clamp(state.s+step,0,1);
+  else if(event.key==="ArrowUp")state.v=clamp(state.v+step,0,1);
+  else if(event.key==="ArrowDown")state.v=clamp(state.v-step,0,1);
+  else handled=false;
+  if(handled){event.preventDefault();applyColor();}
+ });
+ hueInput.addEventListener("input",()=>{state.h=Number(hueInput.value);applyColor();});
+ $("settings-reset")?.addEventListener("click",()=>{
+  state.h=352;state.s=0.68;state.v=0.86;applyColor();
+ });
+ try{
+  const saved=JSON.parse(localStorage.getItem(storageKey)||"null");
+  if(saved&&Number.isFinite(saved.h)&&Number.isFinite(saved.s)&&Number.isFinite(saved.v)){
+   state.h=clamp(saved.h,0,359);
+   state.s=clamp(saved.s,0,1);
+   state.v=clamp(saved.v,0,1);
+  }
+ }catch{}
+ applyColor(false);
 })();
 
 // Show the community disclaimer once per browser tab session.

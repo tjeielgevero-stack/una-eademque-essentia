@@ -30,14 +30,53 @@
     <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
     <div class="header-tools">
       <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
-      <div class="theme-switcher" role="group" aria-label="Choose archive color theme">
-        <button class="theme-choice is-active" type="button" data-theme-choice="crimson" aria-pressed="true" aria-label="Crimson theme" title="Crimson"><span class="theme-dot"></span><span>CRIMSON</span></button>
-        <button class="theme-choice" type="button" data-theme-choice="verdigris" aria-pressed="false" aria-label="Verdigris theme" title="Verdigris"><span class="theme-dot"></span><span>VERDIGRIS</span></button>
-        <button class="theme-choice" type="button" data-theme-choice="amber" aria-pressed="false" aria-label="Amber theme" title="Amber"><span class="theme-dot"></span><span>AMBER</span></button>
-        <button class="theme-choice" type="button" data-theme-choice="violet" aria-pressed="false" aria-label="Violet theme" title="Violet"><span class="theme-dot"></span><span>VIOLET</span></button>
-      </div>
+      <button id="settings-open" class="settings-open" type="button" aria-haspopup="dialog" aria-controls="settings-overlay" aria-expanded="false">
+        <span class="settings-gear" aria-hidden="true">⚙</span> SETTINGS
+      </button>
     </div>
   </header>
+
+
+  <div id="settings-overlay" class="settings-overlay hidden" hidden aria-hidden="true">
+    <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-panel-header">
+        <div>
+          <p class="settings-kicker">ARCHIVE CONFIGURATION / 01</p>
+          <h2 id="settings-title">SETTINGS</h2>
+          <p class="settings-intro">Adjust the archive's accent color. Your selection is saved on this device.</p>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" aria-label="Close settings">×</button>
+      </div>
+      <div class="color-picker-section">
+        <div class="color-picker-heading">
+          <span>ACCENT COLOR</span>
+          <span>HUE · SATURATION · VALUE</span>
+        </div>
+        <div class="color-sv-field" id="color-sv-field" role="slider" tabindex="0"
+          aria-label="Color saturation and brightness" aria-valuemin="0" aria-valuemax="100"
+          aria-valuenow="68" aria-valuetext="Saturation 68 percent, brightness 86 percent">
+          <span id="sv-handle" class="sv-handle" aria-hidden="true"></span>
+        </div>
+        <div class="hue-control">
+          <label for="hue-slider">BASE HUE</label>
+          <input id="hue-slider" class="hue-slider" type="range" min="0" max="359" step="1" value="352" aria-label="Base hue">
+        </div>
+        <div class="color-preview-row">
+          <span id="color-preview-swatch" class="color-preview-swatch" aria-hidden="true"></span>
+          <div class="color-preview-copy">
+            <strong id="color-preview-hex">#D95E6A</strong>
+            <span id="color-preview-description">CUSTOM ARCHIVE ACCENT</span>
+          </div>
+          <button id="settings-reset" class="settings-reset" type="button">RESET COLOR</button>
+        </div>
+        <p class="picker-instructions">Drag inside the large square to adjust saturation and brightness. Drag the rainbow bar to change the base hue.</p>
+      </div>
+      <div class="settings-panel-footer">
+        <span>CHANGES APPLY IMMEDIATELY</span>
+        <button id="settings-close-bottom" class="primary-button" type="button">DONE <span>✓</span></button>
+      </div>
+    </section>
+  </div>
 
   <main>
     <section id="home-screen" class="hero screen">
@@ -49,7 +88,7 @@
       <p class="intro">Infinite worlds. Different circumstances. One and the same essence.</p>
       <p class="subintro">Build Fixers, Syndicate members, Wing employees, and Mirror World characters. Create an original character, explore an alternate timeline, or build a new variant of an existing character.</p>
       <figure class="archive-meme">
-        <div class="archive-meme-image"><img src="assets/archive-clerk.webp" alt="An exhausted moon-headed archive clerk surrounded by towering stacks of paperwork." loading="lazy" width="760" height="507"></div>
+        <div class="archive-meme-image"><img src="./assets/archive-clerk.webp" alt="An exhausted moon-headed archive clerk surrounded by towering stacks of paperwork." loading="eager" decoding="async" width="620" height="414"></div>
         <figcaption>
           <span class="meme-stamp">UNOFFICIAL CITY MEMO / 004</span>
           <strong>ARCHIVE STATUS: UNDERSTAFFED.</strong>

@@ -4,17 +4,17 @@ An unofficial, community-made Project Moon character and Mirror World variant bu
 
 ## Features
 
-- Conditional character creation flow for Fixers, Syndicate members, Wing employees, and other City residents.
-- Custom answers, a full randomizer, editable results, and copyable character summaries.
-- Separate E.G.O. paths and searchable archive catalogues.
-- Four selectable color palettes: Crimson, Verdigris, Amber, and Violet.
-- Responsive archive-inspired visual design with an original humorous archive-clerk illustration.
+- Conditional character creation, custom answers, randomization, and copyable summaries.
+- Separate searchable catalogues.
+- A Settings dialog with a draggable two-dimensional saturation/brightness square and rainbow hue slider.
+- Custom accent color saved in the browser.
+- Responsive archive-inspired design with an original moon-headed archive-clerk illustration.
 
 ## Files
 
-- `index.html` — page structure and theme controls.
-- `style.css` — responsive styling, color palettes, and motion.
-- `script.js` — character creation flow, catalogue interactions, randomizer, and theme persistence.
+- `index.html` — page structure, Settings dialog, and image placement.
+- `style.css` — responsive styling, color picker, and archive design.
+- `script.js` — character creation flow, catalog interactions, randomizer, summary export, and color persistence.
 - `data.js` — editable character and catalogue data.
 - `assets/archive-clerk.webp` — original unofficial illustration used on the homepage.
 

@@ -2,24 +2,24 @@ PROJECT MOON CHARACTER ARCHIVE — DESIGN & CATALOGUE NOTES
 
 FILES
 
-- index.html — page structure, welcome notice, and theme controls.
-- style.css — responsive archive design, animations, and four color palettes.
+- index.html — page structure, welcome notice, Settings dialog, and image placement.
+- style.css — responsive archive design, color picker, and motion.
 - data.js — editable character and catalogue data.
-- script.js — conditional questions, catalogue search/filter interactions, randomizer, summary export, and saved theme preference.
+- script.js — conditional questions, catalogue search/filter interactions, randomizer, summary export, and custom color persistence.
 - assets/archive-clerk.webp — original unofficial homepage illustration.
 
-THEMES
+CUSTOM COLOR SETTINGS
 
-Visitors can switch between Crimson, Verdigris, Amber, and Violet from the header. Their selected palette is saved in the current browser.
+Visitors can open SETTINGS in the header. The 2D square adjusts saturation horizontally and brightness vertically; the rainbow slider changes hue. The selected accent is applied immediately and saved in the current browser.
 
 EDITING CATALOGUES
 
 Update the relevant arrays and records in data.js:
 - L_CORP_ABNORMALITIES and OUTSIDE_L_CORP_ABNORMALITIES control the two Synergy paths.
 - EGO_RECORDS contains documented Suit and Gift associations.
-- L_CORP_WEAPON_SOURCES maps Lobotomy Corporation E.G.O. equipment to source Abnormalities.
-- DERIVED_WEAPON_SOURCES maps derived E.G.O. to its source where confirmed.
-- LIMBUS_EGO_NAMES supplies the Sinner-issued E.G.O. searchable archive.
+- L_CORP_WEAPON_SOURCES maps the corresponding equipment catalogue to source Abnormalities.
+- DERIVED_WEAPON_SOURCES maps derived catalogue entries to their source where confirmed.
+- LIMBUS_EGO_NAMES supplies the separate searchable archive.
 
 DEPLOYMENT
 
