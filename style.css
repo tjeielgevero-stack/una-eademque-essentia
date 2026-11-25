@@ -842,11 +842,16 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 .settings-gear { font:17px/1 system-ui,sans-serif; }
 .settings-open:focus-visible,.settings-close:focus-visible,.settings-reset:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .settings-overlay {
-  position:fixed; inset:0; z-index:12000; display:grid; place-items:center;
-  padding:22px; background:rgba(3,4,7,.82);
+  position:fixed; inset:0; z-index:12000; width:100%; height:100%;
+  max-width:none; max-height:none; margin:0; padding:22px;
+  border:0; color:inherit; background:transparent; overflow:auto;
+  place-items:center;
+}
+.settings-overlay[open] { display:grid; }
+.settings-overlay::backdrop {
+  background:rgba(3,4,7,.82);
   backdrop-filter:blur(13px); -webkit-backdrop-filter:blur(13px);
 }
-.settings-overlay[hidden] { display:none !important; }
 .settings-panel {
   width:min(100%,650px); max-height:min(92vh,850px); overflow:auto;
   padding:clamp(22px,4vw,38px);
@@ -925,7 +930,7 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 .settings-panel-footer > span { color:#77747f; font:7px 'DM Mono',monospace; letter-spacing:.12em; }
 .settings-panel-footer .primary-button { padding:10px 17px; }
 /* Keep the page scrollable while the fixed Settings dialog is open. */
-body.settings-open { overflow-x:hidden; overflow-y:auto; }
+/* Native dialog keeps Settings out of document flow and prevents page reflow. */
 .archive-meme {
   width:min(720px,100%); margin:30px auto 28px;
   grid-template-columns:minmax(0,1.12fr) minmax(210px,.88fr);
