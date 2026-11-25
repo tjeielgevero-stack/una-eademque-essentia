@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261126-settings2">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true"></div>
@@ -38,7 +38,7 @@
   </header>
 
 
-  <div id="settings-overlay" class="settings-overlay hidden" hidden aria-hidden="true">
+  <dialog id="settings-overlay" class="settings-overlay" aria-labelledby="settings-title">
     <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div class="settings-panel-header">
         <div>
@@ -116,7 +116,7 @@
         <button id="settings-close-bottom" class="primary-button" type="button">DONE <span>✓</span></button>
       </div>
     </section>
-  </div>
+  </dialog>
 
   <main>
     <section id="home-screen" class="hero screen">
@@ -209,6 +209,6 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=20261126-settings2"></script>
 </body>
 </html>
