@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true"></div>
   <div id="welcome-notice" class="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-description">
     <div class="notice-panel">
       <div class="notice-kicker"><span class="notice-light"></span> COMMUNITY NOTICE / PLEASE READ</div>
@@ -43,10 +44,15 @@
         <div>
           <p class="settings-kicker">ARCHIVE CONFIGURATION / 01</p>
           <h2 id="settings-title">SETTINGS</h2>
-          <p class="settings-intro">Adjust the archive's accent color. Your selection is saved on this device.</p>
+          <p class="settings-intro">Customize the archive's appearance and visual effects. Your choices are saved on this device.</p>
         </div>
         <button id="settings-close" class="settings-close" type="button" aria-label="Close settings">×</button>
       </div>
+      <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+        <button id="settings-tab-appearance" class="settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="settings-appearance" tabindex="0" data-settings-tab="appearance">APPEARANCE</button>
+        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">04</span></button>
+      </div>
+      <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
       <div class="color-picker-section">
         <div class="color-picker-heading">
           <span>ACCENT COLOR</span>
@@ -71,6 +77,40 @@
         </div>
         <p class="picker-instructions">Drag inside the large square to adjust saturation and brightness. Drag the rainbow bar to change the base hue.</p>
       </div>
+      </section>
+      <section id="settings-effects" class="settings-tab-panel effects-tab-panel" role="tabpanel" aria-labelledby="settings-tab-effects" data-settings-panel="effects" hidden>
+        <div class="effects-heading">
+          <div>
+            <span class="effects-overline">PERSONALIZE THE ARCHIVE</span>
+            <h3>VISUAL EFFECTS</h3>
+          </div>
+          <span class="effects-count">04 EFFECTS</span>
+        </div>
+        <p class="effects-description">Combine any of these effects, or leave them all off for a quieter page. Each switch is saved on this device.</p>
+        <div class="effects-grid">
+          <label class="effect-card" for="effect-particles">
+            <span class="effect-symbol" aria-hidden="true">✧</span>
+            <span class="effect-copy"><strong>AMBIENT DUST</strong><small>Slow, drifting flecks of light across the archive.</small></span>
+            <input id="effect-particles" class="effect-switch" type="checkbox" data-effect-toggle="particles">
+          </label>
+          <label class="effect-card" for="effect-scanlines">
+            <span class="effect-symbol" aria-hidden="true">▤</span>
+            <span class="effect-copy"><strong>CRT SCANLINES</strong><small>A faint monitor texture for a terminal-like finish.</small></span>
+            <input id="effect-scanlines" class="effect-switch" type="checkbox" data-effect-toggle="scanlines">
+          </label>
+          <label class="effect-card" for="effect-glow">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>ACCENT PULSE</strong><small>A soft breathing glow that follows your chosen accent.</small></span>
+            <input id="effect-glow" class="effect-switch" type="checkbox" data-effect-toggle="glow">
+          </label>
+          <label class="effect-card" for="effect-glitch">
+            <span class="effect-symbol" aria-hidden="true">⌁</span>
+            <span class="effect-copy"><strong>GLITCH FLICKER</strong><small>Occasional, restrained signal distortion on archive details.</small></span>
+            <input id="effect-glitch" class="effect-switch" type="checkbox" data-effect-toggle="glitch">
+          </label>
+        </div>
+        <p class="effects-footnote">Animated effects respect your device's reduced-motion setting.</p>
+      </section>
       <div class="settings-panel-footer">
         <span>CHANGES APPLY IMMEDIATELY</span>
         <button id="settings-close-bottom" class="primary-button" type="button">DONE <span>✓</span></button>
