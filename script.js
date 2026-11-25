@@ -200,6 +200,56 @@ const $=id=>document.getElementById(id);
  applyColor(false);
 })();
 
+// Accessible Settings tabs and persistent visual-effect toggles.
+(function setupSettingsTabsAndEffects(){
+ const tabs=[...document.querySelectorAll("[data-settings-tab]")];
+ const panels=[...document.querySelectorAll("[data-settings-panel]")];
+ const tablist=document.querySelector(".settings-tabs");
+ function activateTab(name,focus=false){
+  tabs.forEach(tab=>{
+   const active=tab.dataset.settingsTab===name;
+   tab.classList.toggle("active",active);
+   tab.setAttribute("aria-selected",String(active));
+   tab.tabIndex=active?0:-1;
+   if(active&&focus)tab.focus();
+  });
+  panels.forEach(panel=>{panel.hidden=panel.dataset.settingsPanel!==name;});
+ }
+ tabs.forEach(tab=>tab.addEventListener("click",()=>activateTab(tab.dataset.settingsTab)));
+ tablist?.addEventListener("keydown",event=>{
+  const current=tabs.indexOf(document.activeElement);
+  let next=current;
+  if(event.key==="ArrowRight")next=(current+1)%tabs.length;
+  else if(event.key==="ArrowLeft")next=(current-1+tabs.length)%tabs.length;
+  else if(event.key==="Home")next=0;
+  else if(event.key==="End")next=tabs.length-1;
+  else return;
+  event.preventDefault();
+  activateTab(tabs[next].dataset.settingsTab,true);
+ });
+ const switches=[...document.querySelectorAll("[data-effect-toggle]")];
+ const storageKey="uee_visual_effects_v1";
+ let saved={};
+ try{
+  const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved=parsed;
+ }catch{}
+ function applyEffect(key,enabled,persist=false){
+  document.documentElement.classList.toggle("effect-"+key,enabled);
+  const control=switches.find(item=>item.dataset.effectToggle===key);
+  if(control)control.checked=enabled;
+  if(persist){
+   saved[key]=enabled;
+   try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}
+  }
+ }
+ switches.forEach(control=>{
+  const key=control.dataset.effectToggle;
+  applyEffect(key,saved[key]===true);
+  control.addEventListener("change",()=>applyEffect(key,control.checked,true));
+ });
+})();
+
 // Show the community disclaimer once per browser tab session.
 (function setupWelcomeNotice(){
  const overlay=$("welcome-notice"),button=$("notice-continue");
