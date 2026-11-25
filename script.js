@@ -142,26 +142,21 @@ const $=id=>document.getElementById(id);
   applyColor();
  }
  function openSettings(){
-  overlay.hidden=false;
-  overlay.classList.remove("hidden");
-  overlay.setAttribute("aria-hidden","false");
+  if(!overlay.open)overlay.showModal();
   openButton.setAttribute("aria-expanded","true");
-  document.body.classList.add("settings-open");
   closeButtons[0]?.focus();
  }
  function closeSettings(){
-  overlay.hidden=true;
-  overlay.classList.add("hidden");
-  overlay.setAttribute("aria-hidden","true");
+  if(overlay.open)overlay.close();
   openButton.setAttribute("aria-expanded","false");
-  document.body.classList.remove("settings-open");
   openButton.focus();
  }
+ overlay.addEventListener("close",()=>openButton.setAttribute("aria-expanded","false"));
  openButton.addEventListener("click",openSettings);
  closeButtons.forEach(button=>button.addEventListener("click",closeSettings));
- overlay.addEventListener("pointerdown",event=>{if(event.target===overlay)closeSettings();});
+ overlay.addEventListener("click",event=>{if(event.target===overlay)closeSettings();});
  document.addEventListener("keydown",event=>{
-  if(event.key==="Escape"&&!overlay.hidden)closeSettings();
+  if(event.key==="Escape"&&overlay.open)closeSettings();
  });
  field.addEventListener("pointerdown",event=>{
   dragging=true;
