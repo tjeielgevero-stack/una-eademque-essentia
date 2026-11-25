@@ -73,7 +73,31 @@ const QUESTIONS = [
 {id:"notes",category:"FINAL CHARACTER DETAILS",title:"Additional Lore Notes",description:"Add any important detail that the structured questions did not cover.",options:["Other / custom answer","Leave blank for now"]}
 ];
 
-const $=id=>document.getElementById(id);\n\n// Color themes are shared across the archive interface and saved for this browser.\n(function setupThemePicker(){\n const picker=document.querySelector(".theme-switcher");\n if(!picker)return;\n const validThemes=new Set(["crimson","verdigris","amber","violet"]);\n const applyTheme=theme=>{\n  const next=validThemes.has(theme)?theme:"crimson";\n  document.documentElement.dataset.theme=next;\n  picker.querySelectorAll("[data-theme-choice]").forEach(button=>{\n   const active=button.dataset.themeChoice===next;\n   button.classList.toggle("is-active",active);\n   button.setAttribute("aria-pressed",String(active));\n  });\n  try{localStorage.setItem("uee_archive_theme",next);}catch{}\n };\n let saved="crimson";\n try{saved=localStorage.getItem("uee_archive_theme")||saved;}catch{}\n applyTheme(saved);\n picker.addEventListener("click",event=>{\n  const button=event.target.closest("[data-theme-choice]");\n  if(button)applyTheme(button.dataset.themeChoice);\n });\n})();
+const $=id=>document.getElementById(id);
+
+// Color themes are shared across the archive interface and saved for this browser.
+(function setupThemePicker(){
+ const picker=document.querySelector(".theme-switcher");
+ if(!picker)return;
+ const validThemes=new Set(["crimson","verdigris","amber","violet"]);
+ const applyTheme=theme=>{
+  const next=validThemes.has(theme)?theme:"crimson";
+  document.documentElement.dataset.theme=next;
+  picker.querySelectorAll("[data-theme-choice]").forEach(button=>{
+   const active=button.dataset.themeChoice===next;
+   button.classList.toggle("is-active",active);
+   button.setAttribute("aria-pressed",String(active));
+  });
+  try{localStorage.setItem("uee_archive_theme",next);}catch{}
+ };
+ let saved="crimson";
+ try{saved=localStorage.getItem("uee_archive_theme")||saved;}catch{}
+ applyTheme(saved);
+ picker.addEventListener("click",event=>{
+  const button=event.target.closest("[data-theme-choice]");
+  if(button)applyTheme(button.dataset.themeChoice);
+ });
+})();
 
 // Show the community disclaimer once per browser tab session.
 (function setupWelcomeNotice(){
