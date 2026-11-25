@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
+  <title>Project Moon Variant Builder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="welcome-notice" class="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-description">
+    <div class="notice-panel">
+      <div class="notice-kicker"><span class="notice-light"></span> COMMUNITY NOTICE / PLEASE READ</div>
+      <p class="notice-ornament" aria-hidden="true">✦ ─────────── ✦</p>
+      <h2 id="notice-title">A QUICK DISCLAIMER</h2>
+      <p id="notice-description" class="notice-lead">This entire project is <strong>vibecoded and made for fun</strong>. It is an unofficial fan-made tool, so expect the occasional bug, odd choice, or bit of lore that may need correcting.</p>
+      <div class="notice-copy">
+        <p><strong>No hate, please.</strong> This is meant to be a fun, welcoming space for making characters and sharing ideas—not a reason to argue or put anyone down.</p>
+        <p>The creator is <strong>not trying to monopolize this website</strong>, character creation, or the ideas behind it. It's simply a community project for anyone who wants to use it for their own characters and have fun.</p>
+        <p>Project Moon and its works belong to their respective rights holders. This builder is unofficial and is not affiliated with or endorsed by them.</p>
+      </div>
+      <button id="notice-continue" class="primary-button notice-button" type="button">I UNDERSTAND — ENTER THE BUILDER <span>↗</span></button>
+      <p class="notice-footnote">THANK YOU FOR KEEPING THE CITY A LITTLE LESS HOSTILE.</p>
+    </div>
+  </div>
+  <div class="ornament ornament-top" aria-hidden="true">✦ ───────────────────────── ✦</div>
+  <header class="site-header">
+    <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
+    <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
+  </header>
+
+  <main>
+    <section id="home-screen" class="hero screen">
+      <div class="archive-system-bar"><span class="system-light"></span><span>MIRROR ENGINE ONLINE</span><i>///</i><span>COMMUNITY CLEARANCE</span><i>///</i><span>FILE STATUS: OPEN</span></div>
+      <div class="archive-seal" aria-hidden="true"><span>U</span><i>✦</i><span>E</span></div>
+      <p class="eyebrow">A PROJECT MOON CHARACTER CREATION SYSTEM</p>
+      <h1>PROJECT MOON<br><span>VARIANT BUILDER</span></h1>
+      <div class="rule"><i></i></div>
+      <p class="intro">Infinite worlds. Different circumstances. One and the same essence.</p>
+      <p class="subintro">Build Fixers, Syndicate members, Wing employees, and Mirror World characters. Made for Sephrus variants—and anyone else who wants to create a Project Moon-inspired character.</p>
+      <div class="feature-grid" aria-label="Archive sections">
+        <div class="feature-card"><span class="feature-number">I</span><strong>THE CITY</strong><small>Districts · Nests · Wings</small></div>
+        <div class="feature-card"><span class="feature-number">II</span><strong>THE INDIVIDUAL</strong><small>Origins · Affiliations · History</small></div>
+        <div class="feature-card"><span class="feature-number">III</span><strong>THE E.G.O. ARCHIVE</strong><small>Manifestations · Equipment records</small></div>
+      </div>
+      <div class="hero-details"><span>INFINITE MIRROR WORLDS</span><span>✦</span><span>ONE SHARED ESSENCE</span></div>
+      <div class="hero-actions">
+        <button id="begin-button" class="primary-button">BEGIN CREATION <span>↗</span></button>
+        <button id="randomize-button" class="secondary-button">RANDOMIZE ALL <span>✦</span></button>
+      </div>
+      <p class="small-note">A COMMUNITY CHARACTER BUILDER · YOUR STORY, YOUR MIRROR WORLD</p>
+      <p class="sponsor-joke">Sponsored by The Head. Your data is probably being monitored.</p>
+    </section>
+
+    <section id="picker-screen" class="picker screen hidden" aria-live="polite">
+      <div class="section-frame" aria-hidden="true"><span>ARCHIVE RECORD</span><span>U.E.E. / 001</span></div>
+      <div class="picker-layout">
+      <aside class="archive-index" aria-label="City district reference">
+        <p class="index-kicker">REFERENCE INDEX / 01</p>
+        <h3>THE CITY</h3>
+        <p class="index-note">Districts correspond alphabetically to their Nest and Wing letters.</p>
+        <div class="district-index">
+          <span>01 <b>A</b></span><span>02 <b>B</b></span><span>03 <b>C</b></span><span>04 <b>D</b></span><span>05 <b>E</b></span><span>06 <b>F</b></span><span>07 <b>G</b></span><span>08 <b>H</b></span><span>09 <b>I</b></span><span>10 <b>J</b></span><span>11 <b>K</b></span><span>12 <b>L</b></span><span>13 <b>M</b></span><span>14 <b>N</b></span><span>15 <b>O</b></span><span>16 <b>P</b></span><span>17 <b>Q</b></span><span>18 <b>R</b></span><span>19 <b>S</b></span><span>20 <b>T</b></span><span>21 <b>U</b></span><span>22 <b>V</b></span><span>23 <b>W</b></span><span>24 <b>X</b></span><span>25 <b>Y</b></span><span class="extrapolated">26 <b>Z</b></span>
+        </div>
+        <p class="index-footnote">26 / Z is the archive’s alphabetical extension; it is not confirmed in released story material.</p>
+      </aside>
+      <div class="picker-main">
+      <div class="record-stamp"><span>SUBJECT / SEPHRUS AZTILUTH</span><span>RECORD TYPE / MIRROR WORLD VARIANT</span><span>ARCHIVE STATUS / OPEN</span></div>
+      <div class="picker-topline">
+        <span class="eyebrow">VARIANT CREATION</span>
+        <button id="home-button" class="text-button">← EXIT PICKER</button>
+      </div>
+      <div class="progress-meta"><span id="page-count">PAGE 01 / 09</span><span id="progress-percent">11%</span></div>
+      <div class="progress-track"><div id="progress-fill"></div></div>
+      <p id="step-category" class="eyebrow category"></p>
+      <h2 id="step-title">Origin</h2>
+      <p id="step-description" class="step-description"></p>
+      <div class="selection-heading"><span>AVAILABLE RECORDS</span><span>SELECT ONE · AUTO-ADVANCES</span></div>
+      <div id="choice-list" class="choice-list"></div>
+      <div id="custom-wrap" class="custom-wrap hidden">
+        <label id="custom-label" for="custom-answer">Your answer</label>
+        <input id="custom-answer" type="text" maxlength="180" placeholder="Enter a custom answer...">
+      </div>
+      <div class="picker-actions">
+        <button id="back-button" class="secondary-button">← BACK</button>
+        <button id="next-button" class="primary-button">SUBMIT & CONTINUE <span>→</span></button>
+      </div>
+      <p id="validation-message" class="validation" role="alert"></p>
+      </div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="result screen hidden">
+      <div class="section-frame" aria-hidden="true"><span>ARCHIVE RECORD</span><span>SEALED</span></div>
+      <p class="eyebrow">CREATION COMPLETE</p>
+      <h2>YOUR VARIANT<br><span>TAKES FORM.</span></h2>
+      <p class="intro">Review the choices you made. You can return to any page and revise your answers.</p>
+      <div class="record-stamp result-stamp"><span>RECORD SEALED FOR REVIEW</span><span>UNA EADEMQUE ESSENTIA / ARCHIVE</span></div>
+      <div id="summary-list" class="summary-list"></div>
+      <div class="picker-actions">
+        <button id="edit-button" class="secondary-button">← EDIT ANSWERS</button>
+        <button id="copy-button" class="primary-button">COPY SUMMARY <span>↗</span></button>
+      </div>
+      <p id="copy-status" class="small-note" aria-live="polite"></p>
+      <button id="restart-button" class="text-button restart">START A NEW VARIANT</button>
+    </section>
+  </main>
+
+  <footer>
+    <span>PROJECT MOON VARIANT BUILDER</span>
+    <span>UNOFFICIAL FAN-MADE CREATION TOOL</span>
+  </footer>
+  <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
