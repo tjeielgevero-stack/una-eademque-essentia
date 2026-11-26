@@ -1663,81 +1663,156 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
  window.ueeEasterEggAudio={beginGrim,endGrim};
  if(musicEnabled&&status)status.textContent="MUSIC SAVED · ENABLE TO START";
 })();
-/* VIBE CODED UPDATE 1.0.1 — reliable, device-local background image handling. */
+/* VIBE CODED UPDATE 1.0.2 — resilient background image loading and persistence. */
 (function setupCustomBackground(){
  const input=$("background-image-input"),drop=$("background-dropzone"),status=$("background-upload-status"),previewWrap=$("background-image-preview-wrap"),preview=$("background-image-preview"),remove=$("background-image-remove");
  if(!input||!drop||!status||!previewWrap||!preview||!remove)return;
- const dbName="uee-personalization-v1",storeName="backgrounds",recordKey="home-background";
+
+ const dbName="uee-personalization-v1",storeName="backgrounds",recordKey="home-background",maxBytes=12*1024*1024;
  let objectUrl=null,dbPromise=null;
+
  function openDb(){
   if(dbPromise)return dbPromise;
   dbPromise=new Promise((resolve,reject)=>{
-   if(!("indexedDB" in window)){reject(new Error("Local image storage is unavailable in this browser."));return;}
-   const request=indexedDB.open(dbName,1);
-   request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(storeName))request.result.createObjectStore(storeName);};
-   request.onsuccess=()=>resolve(request.result);
-   request.onerror=()=>{dbPromise=null;reject(request.error||new Error("Could not open local image storage."));};
-   request.onblocked=()=>{dbPromise=null;reject(new Error("Please close other archive tabs and try again."));};
-  });
+   if(!("indexedDB" in window)){reject(new Error("This browser does not support local image storage."));return;}
+   let request;
+   try{request=indexedDB.open(dbName,1);}catch(error){reject(error);return;}
+   request.onupgradeneeded=()=>{
+    const db=request.result;
+    if(!db.objectStoreNames.contains(storeName))db.createObjectStore(storeName);
+   };
+   request.onsuccess=()=>{
+    const db=request.result;
+    db.onversionchange=()=>db.close();
+    resolve(db);
+   };
+   request.onerror=()=>reject(request.error||new Error("Could not open local image storage."));
+   request.onblocked=()=>reject(new Error("Close other archive tabs, then try again."));
+  }).catch(error=>{dbPromise=null;throw error;});
   return dbPromise;
  }
- function transaction(mode,action){
+
+ function runTransaction(mode,action){
   return openDb().then(db=>new Promise((resolve,reject)=>{
    let result;
-   const tx=db.transaction(storeName,mode),store=tx.objectStore(storeName);
-   let request;
-   try{request=action(store);}catch(error){reject(error);return;}
-   if(request){request.onsuccess=()=>{result=request.result;};request.onerror=()=>reject(request.error||new Error("Image storage failed."));}
-   tx.oncomplete=()=>resolve(result);
-   tx.onerror=()=>reject(tx.error||new Error("Image storage failed."));
-   tx.onabort=()=>reject(tx.error||new Error("Image storage was interrupted."));
+   let tx;
+   try{
+    tx=db.transaction(storeName,mode);
+    const request=action(tx.objectStore(storeName));
+    request.onsuccess=()=>{result=request.result;};
+    request.onerror=()=>reject(request.error||new Error("Image storage request failed."));
+    tx.oncomplete=()=>resolve(result);
+    tx.onabort=()=>reject(tx.error||new Error("Image storage was interrupted."));
+    tx.onerror=()=>reject(tx.error||new Error("Image storage failed."));
+   }catch(error){reject(error);}
   }));
  }
+
+ function validateImage(blob){
+  return new Promise((resolve,reject)=>{
+   const testUrl=URL.createObjectURL(blob),image=new Image();
+   let finished=false;
+   const finish=(error)=>{
+    if(finished)return;
+    finished=true;
+    image.onload=null;image.onerror=null;
+    URL.revokeObjectURL(testUrl);
+    if(error)reject(error);else resolve();
+   };
+   image.onload=()=>image.naturalWidth>0&&image.naturalHeight>0?finish():finish(new Error("The selected file is not a readable image."));
+   image.onerror=()=>finish(new Error("The selected image could not be opened. Try a JPG, PNG, or WEBP file."));
+   image.src=testUrl;
+   if(typeof image.decode==="function"){
+    image.decode().then(()=>finish()).catch(()=>finish(new Error("The selected image could not be decoded. Try a JPG, PNG, or WEBP file.")));
+   }
+  });
+ }
+
+ function setStatus(message){status.textContent=message;}
+
  function applyBlob(blob){
   if(!(blob instanceof Blob)||!blob.size)throw new Error("The saved image could not be read.");
+  const nextUrl=URL.createObjectURL(blob);
+  document.documentElement.style.setProperty("--user-background-image",'url("'+nextUrl+'")');
   if(objectUrl)URL.revokeObjectURL(objectUrl);
-  objectUrl=URL.createObjectURL(blob);
-  const imageLayer='url("'+objectUrl+'")';
-  document.documentElement.style.setProperty("--user-background-image",imageLayer);
-  if(document.body){
-   document.body.style.backgroundImage='linear-gradient(rgba(5,5,7,.28),rgba(5,5,7,.38)),'+imageLayer+',radial-gradient(ellipse at 50% 8%,rgba(var(--accent-rgb),.15),transparent 43%),repeating-linear-gradient(0deg,transparent 0 39px,rgba(255,255,255,.012) 40px),linear-gradient(145deg,#111218,#090a0e 70%)';
-   document.body.style.backgroundSize="cover,cover,auto,auto,auto";
-   document.body.style.backgroundPosition="center,center,center,center,center";
-   document.body.style.backgroundAttachment="fixed,fixed,scroll,scroll,scroll";
-  }
-  preview.src=objectUrl;previewWrap.hidden=false;status.textContent="BACKGROUND APPLIED";
+  objectUrl=nextUrl;
+  preview.src=nextUrl;
+  previewWrap.hidden=false;
+  status.textContent="BACKGROUND APPLIED";
  }
- function clearAppliedBackground(){
-  document.documentElement.style.removeProperty("--user-background-image");
-  if(document.body){
-   document.body.style.removeProperty("background-image");
-   document.body.style.removeProperty("background-size");
-   document.body.style.removeProperty("background-position");
-   document.body.style.removeProperty("background-attachment");
-  }
- }
- function setStatus(message){status.textContent=message;}
+
  async function saveFile(file){
   if(!file)return;
-  if(!file.type.startsWith("image/")){setStatus("PLEASE CHOOSE AN IMAGE");return;}
-  if(file.size>12*1024*1024){setStatus("IMAGE TOO LARGE · MAX 12 MB");return;}
-  setStatus("SAVING IMAGE…");
-  try{await transaction("readwrite",store=>store.put(file,recordKey));applyBlob(file);}
-  catch(error){setStatus(error?.message||"COULD NOT SAVE IMAGE");}
+  const knownImageType=/^image\//i.test(file.type);
+  const knownImageExtension=/\.(avif|gif|jpe?g|png|svg|webp)$/i.test(file.name||"");
+  if(!knownImageType&&!knownImageExtension){
+   setStatus("PLEASE CHOOSE AN IMAGE FILE");
+   return;
+  }
+  if(file.size>maxBytes){
+   setStatus("IMAGE TOO LARGE · MAX 12 MB");
+   return;
+  }
+  if(!file.size){
+   setStatus("THE SELECTED FILE IS EMPTY");
+   return;
+  }
+
+  setStatus("CHECKING IMAGE…");
+  try{
+   await validateImage(file);
+   setStatus("SAVING IMAGE…");
+   await runTransaction("readwrite",store=>store.put(file,recordKey));
+   applyBlob(file);
+  }catch(error){
+   setStatus(error?.message||"COULD NOT SAVE IMAGE");
+  }
  }
- input.addEventListener("change",()=>{saveFile(input.files?.[0]);input.value="";});
- ["dragenter","dragover"].forEach(type=>drop.addEventListener(type,event=>{event.preventDefault();drop.classList.add("dragover");}));
- ["dragleave","drop"].forEach(type=>drop.addEventListener(type,event=>{event.preventDefault();drop.classList.remove("dragover");}));
- drop.addEventListener("drop",event=>saveFile(event.dataTransfer?.files?.[0]));
- drop.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();input.click();}});
- remove.addEventListener("click",async()=>{
-  try{await transaction("readwrite",store=>store.delete(recordKey));}
-  catch(error){setStatus(error?.message||"COULD NOT REMOVE IMAGE");return;}
-  clearAppliedBackground();
-  if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}
-  preview.removeAttribute("src");previewWrap.hidden=true;setStatus("NO IMAGE SELECTED");
+
+ input.addEventListener("change",()=>{
+  const file=input.files&&input.files[0];
+  input.value="";
+  saveFile(file);
  });
- transaction("readonly",store=>store.get(recordKey)).then(blob=>{
-  if(blob instanceof Blob&&blob.size)applyBlob(blob);
- }).catch(error=>setStatus(error?.message||"LOCAL IMAGE STORAGE UNAVAILABLE"));
+
+ ["dragenter","dragover"].forEach(type=>drop.addEventListener(type,event=>{
+  event.preventDefault();
+  drop.classList.add("dragover");
+ }));
+ ["dragleave","drop"].forEach(type=>drop.addEventListener(type,event=>{
+  event.preventDefault();
+  drop.classList.remove("dragover");
+ }));
+ drop.addEventListener("drop",event=>{
+  const file=event.dataTransfer&&event.dataTransfer.files&&event.dataTransfer.files[0];
+  saveFile(file);
+ });
+ drop.addEventListener("keydown",event=>{
+  if(event.key==="Enter"||event.key===" "){
+   event.preventDefault();
+   input.click();
+  }
+ });
+
+ remove.addEventListener("click",async()=>{
+  try{
+   await runTransaction("readwrite",store=>store.delete(recordKey));
+   document.documentElement.style.removeProperty("--user-background-image");
+   if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}
+   preview.removeAttribute("src");
+   previewWrap.hidden=true;
+   setStatus("NO IMAGE SELECTED");
+  }catch(error){
+   setStatus(error?.message||"COULD NOT REMOVE IMAGE");
+  }
+ });
+
+ runTransaction("readonly",store=>store.get(recordKey)).then(async blob=>{
+  if(blob instanceof Blob&&blob.size){
+   await validateImage(blob);
+   applyBlob(blob);
+  }
+ }).catch(error=>{
+  setStatus(error?.message||"LOCAL IMAGE STORAGE UNAVAILABLE");
+ });
 })();
