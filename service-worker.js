@@ -1,4 +1,4 @@
-const CACHE_NAME = "uee-app-shell-v1";
+const CACHE_NAME = "uee-app-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -30,6 +30,15 @@ self.addEventListener("activate", event => {
   );
 });
 
+async function cachedFallback(request) {
+  const exact = await caches.match(request);
+  if (exact) return exact;
+  const url = new URL(request.url);
+  url.search = "";
+  url.hash = "";
+  return (await caches.match(url.href)) || (await caches.match("./index.html")) || (await caches.match("./offline.html"));
+}
+
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -38,31 +47,33 @@ self.addEventListener("fetch", event => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response && response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy));
-          }
-          return response;
-        })
-        .catch(async () => (await caches.match("./index.html")) || (await caches.match("./offline.html")))
-    );
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(new Request(request, { cache: "no-cache" }));
+        if (response && response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put("./index.html", response.clone());
+        }
+        return response;
+      } catch {
+        return (await caches.match("./index.html")) || (await caches.match("./offline.html"));
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(request, { ignoreSearch: true }).then(cached => {
-      const fresh = fetch(request).then(response => {
-        if (response && response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
-        }
-        return response;
-      }).catch(() => cached);
-
-      return cached || fresh;
-    })
-  );
+  // Versioned URLs must never be answered by an older asset with a different
+  // ?v= query string. Prefer the network, then use exact/offline cache fallback.
+  event.respondWith((async () => {
+    try {
+      const response = await fetch(new Request(request, { cache: "no-cache" }));
+      if (response && response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    } catch {
+      return cachedFallback(request);
+    }
+  })());
 });
