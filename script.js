@@ -409,7 +409,8 @@ const abilityNames=["Measured Reprisal","Shifting Measure","Witness Mark","Final
   putGenerated(a,"generated_race",v.race||"Human");
   putGenerated(a,"generated_appearance",canonicalAppearance);
   putGenerated(a,"generated_personality",canonicalPersonality);
-  putGenerated(a,"generated_passive_2","Una Eademque Essentia — One and the Same Essence. Across infinite Mirror Worlds, every Sephrus is the same individual living through different circumstances. Their lives, histories, affiliations, and choices may diverge, yet their fundamental identity and essence remain one. Each is distinct in experience, never truly different in who they are; neither inherently good nor evil, each remains morally gray.");
+  a.generated_personality={choice:"Generated character detail",value:canonicalPersonality,custom:""};
+  a.generated_passive_2={choice:"Generated character detail",value:"Una Eademque Essentia — One and the Same Essence. Across infinite Mirror Worlds, every Sephrus is the same individual living through different circumstances. Their lives, histories, affiliations, and choices may diverge, yet their fundamental identity and essence remain one. Each is distinct in experience, never truly different in who they are; neither inherently good nor evil, each remains morally gray.",custom:""};
  }
 }
 function formatWeaponLoadout(value){
@@ -418,21 +419,21 @@ function formatWeaponLoadout(value){
 }
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
- const notSet="Not specified.";
- const title=labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
- const race=labelled("Race")||first("race","species","complex_race","generated_race")||notSet;
+ const notSet="Not specified."; const lazyField=(label)=>labelled(label);
+ const title=lazyField("Title")||labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
+ const race=lazyField("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||notSet;
  const occupation=first("occupation","complex_occupation");
- const affiliation=labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet;
- const grade=labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","head_role","complex_head_role")||first("grade","classification")||notSet;
+ const affiliation=lazyField("Affiliation")||labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet;
+ const grade=lazyField("Grade")||labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","head_role","complex_head_role")||first("grade","classification")||notSet;
   const isSephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
-  const appearance=isSephrus?first("generated_appearance"):labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","generated_appearance","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
- const origin=labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
+  const appearance=lazyField("Appearance")||(isSephrus?first("generated_appearance"):labelled("Appearance"))||combine("advanced_appearance","appearance","complex_09","augmentation","generated_appearance","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
+ const origin=lazyField("Origin")||labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
  const egoStatus=first("ego_status","complex_41");
  const egoName=first("ego_name","complex_43","generated_ego_name");
  const egoLoadout=get("ego_equipment_customizer");
  const egoAppearance=first("ego_appearance","advanced_ego_appearance","complex_44");
  const egoFunction=first("ego_function","advanced_ego_function","complex_61");
- let egoType="Not specified.";
+ let egoType=lazyField("E.G.O Type")||"Not specified.";
  if(egoStatus.includes("Personally manifested"))egoType="Personal E.G.O.";
  else if(egoStatus.includes("Volatile"))egoType="Volatile E.G.O.";
  else if(egoStatus.includes("Distortion"))egoType="Distortion";
@@ -441,16 +442,15 @@ function formatCharacterDossier(name,mode,answersSource){
  else if(egoStatus.includes("Lobotomy"))egoType="Artificial / refined Lobotomy E.G.O.";
  else if(egoStatus.includes("No known"))egoType="Absent";
  else if(egoStatus)egoType=egoStatus;
- const egoDescription=egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded."
-  :[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet;
+ const egoDescription=lazyField("E.G.O")||(egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded.":[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet);
  const compactGenerated=(value)=>String(value||"").split(/\s+[—–-]\s+/)[0].trim();
- const ability=(n)=>mode==="complex"?(labelled("Ability "+n)||get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(compactGenerated(get("generated_ability_"+n))||notSet);
- const ultimate=(n)=>mode==="complex"?(labelled("Ultimate Ability "+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(compactGenerated(get("generated_ultimate_"+n))||notSet);
- const passive=labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
+ const ability=(n)=>lazyField("Ability "+n)||(mode==="complex"?(labelled("Ability "+n)||get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(compactGenerated(get("generated_ability_"+n))||notSet));
+ const ultimate=(n)=>lazyField("Ultimate Ability "+n)||(mode==="complex"?(labelled("Ultimate Ability "+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(compactGenerated(get("generated_ultimate_"+n))||notSet));
+ const passive=lazyField("Passive Ability")||labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
  const passiveActivation=first("passive_activation","complex_passive_activation");
  const selectedStatuses=first("status_infliction","complex_status_infliction");
  const statusInfliction=Array.isArray(selectedStatuses)?selectedStatuses.join(" · "):(selectedStatuses||"None");
- const personality=labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?first("generated_personality"):combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||notSet;
+ const personality=lazyField("Personality")||labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?"Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He appreciates originality and creating things; his fundamental identity and personality remain immutable.":combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||"Reserved, observant, and shaped by the experiences recorded in this profile.";
  const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59","generated_backstory")||notSet;
  const likes=labelled("Likes")||combine("likes","complex_32","complex_33","generated_likes")||notSet;
  const dislikes=labelled("Dislikes")||combine("dislikes","complex_37","complex_29","generated_dislikes")||notSet;
@@ -465,7 +465,6 @@ function formatCharacterDossier(name,mode,answersSource){
   "Origin: "+origin,
   "E.G.O: "+egoDescription,
   "E.G.O Type: "+egoType,
-  "Weapon Loadout: "+formatWeaponLoadout(a.weapon_loadout?.value),
   "Ability 1: "+ability(1),
   "Ability 2: "+ability(2),
   "Ability 3: "+ability(3),
@@ -473,14 +472,13 @@ function formatCharacterDossier(name,mode,answersSource){
   "Ultimate Ability 1: "+ultimate(1),
   "Ultimate Ability 2: "+ultimate(2),
   "Passive Ability: "+passive+(passiveActivation?" · "+passiveActivation:""),
-  "Abilities & Status Effects: "+statusInfliction,
-   ...(first("generated_passive_2")?["Passive Ability 2: "+first("generated_passive_2")]:[]),
+  "Passive Ability 2: "+(lazyField("Passive Ability 2")||first("passive_ability_2","complex_passive_2","generated_passive_2")||notSet),
   "Personality: "+personality,
   "Backstory: "+backstory,
   "Likes: "+likes,
   "Dislikes: "+dislikes,
   "Overall: "+overall
- ].join("\n");
+ ].join("\n\n");
 }
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
@@ -499,7 +497,7 @@ function renderOcHistory(){
  draw(list,general,false);draw(sephrusList,sephrus,true);
 }
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));characterName=normalizeSephrusCharacterName(characterName);const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
-function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
+function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":r.mode==="laziness"?"laziness":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
 // and kept separate from Advanced / Complex mode so existing saved answers remain compatible.
 const SIMPLE_OPTION_EXPANSIONS = {
@@ -611,11 +609,12 @@ COMPLEX_QUESTIONS.push(
  {id:"complex_passive_activation",category:"COMBAT PROFILE / PASSIVES",title:"When Does This Passive Activate?",description:"Choose whether the passive is permanently active or activates after a specific battle event.",options:["Always active","At the start of battle","At the start of this character's turn","After taking damage","When below 50% HP","When an ally is knocked out","When E.G.O. manifests","Other / custom answer"]}
 );
 
+const LAZINESS_QUESTIONS=[{id:"laziness_profile",category:"COMPLETE CHARACTER DOSSIER",title:"Write Your Entire OC",description:"One page. One question. Write or paste your complete OC profile here. Recognized section labels will be arranged into the standard dossier format.",freeText:true,maxLength:20000,inputLabel:"YOUR COMPLETE OC PROFILE"}];
 const DOSSIER_QUESTIONS = [
  {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPassive Ability 2: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
 ];
 const WEAPON_QUESTION={id:"weapon_loadout",category:"COMBAT IDENTITY",title:"Weapon & Fighting Style",description:"Choose the character's non-E.G.O. fighting equipment and preferred style. This is a fictional character-design loadout; ranged ammunition uses invented archive types, not real-world specifications.",customizer:true,weaponCustomizer:true};
-function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;const combat=creationMode==="complex"?[]:COMBAT_PROFILE_QUESTIONS;return [...base,...combat,WEAPON_QUESTION,...DOSSIER_QUESTIONS];}
+function activeQuestions(){if(creationMode==="laziness")return LAZINESS_QUESTIONS;const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;const combat=creationMode==="complex"?[]:COMBAT_PROFILE_QUESTIONS;return [...base,...combat,WEAPON_QUESTION,...DOSSIER_QUESTIONS];}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
 function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
@@ -1183,9 +1182,9 @@ function render(){
 }
 function finish(){
  pruneHiddenAnswers();
- completeGeneratedCharacter(characterName,answers);
+ if(creationMode!=="laziness")completeGeneratedCharacter(characterName,answers);
  saveCurrentOc();
- $("result-character-name").textContent=characterName||"UNNAMED VARIANT";const modeStamp=$("result-creation-mode");if(modeStamp)modeStamp.textContent=(creationMode==="complex"?"COMPLEX":creationMode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION DOSSIER";
+ $("result-character-name").textContent=characterName||"UNNAMED VARIANT";const modeStamp=$("result-creation-mode");if(modeStamp)modeStamp.textContent=(creationMode==="complex"?"COMPLEX":creationMode==="advanced"?"ADVANCED":creationMode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION DOSSIER";
  const profile=formatCharacterDossier(characterName,creationMode,answers);
  $("summary-list").innerHTML="";
  const dossier=document.createElement("pre");dossier.className="profile-summary";dossier.textContent=profile;$("summary-list").append(dossier);
@@ -1228,7 +1227,7 @@ function randomEgoName(theme){const pick=a=>a[Math.floor(Math.random()*a.length)
 function randomizedWriting(q){if(q.id==="complex_43"){const status=values().complex_41||"";return ["No known E.G.O. or Distortion","Unknown / undisclosed"].includes(status)?"No transformation title is recorded for this character.":randomEgoName(values().complex_42);}const options=RANDOM_WRITING[q.id]||(q.id&&q.id.startsWith("complex_")?["They treat "+q.title.toLowerCase()+" as a personal detail shaped by experience, not a fixed rule. Its meaning changes depending on the people and circumstances around them.","This part of the dossier is defined by a quiet contradiction: the character values consistency, yet their lived experience keeps changing what that means.","Their approach is practical on the surface, but carries a private significance they rarely explain to other people."]:["This part of their story remains open. Their choices, relationships, and experiences will give the details shape over time."]);return options[Math.floor(Math.random()*options.length)];}
 
 function randomizeAll(mode=creationMode){
- creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":"simple";
+ creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
  answers={};index=0;editingOcId=null;
  characterName=randomCharacterName();$("character-name").value=characterName;
  for(const q of activeQuestions()){
@@ -1263,6 +1262,7 @@ function launchSelectedMode(){resetSephrusSecretState();answers={};editingOcId=n
 function beginSelectedMode(mode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":"simple";
  answers={};editingOcId=null;index=0;
+ if(creationMode==="laziness"){launchSelectedMode();return;}
  const dlg=$("randomize-confirm-dialog");
  $("randomize-confirm-title").textContent="RANDOMIZE "+creationMode.toUpperCase()+" MODE?";
  $("randomize-confirm-description").textContent="Would you like to randomize this "+creationMode.toUpperCase()+" creation mode? Choose randomize for a generated name and answers, or continue manually.";
@@ -1271,6 +1271,7 @@ function beginSelectedMode(mode){
 $("mode-simple").onclick=()=>beginSelectedMode("simple");
 $("mode-advanced").onclick=()=>beginSelectedMode("advanced");
 $("mode-complex").onclick=()=>beginSelectedMode("complex");
+$("mode-laziness").onclick=()=>beginSelectedMode("laziness");
 $("randomize-cancel")?.addEventListener("click",()=>{$("randomize-confirm-dialog")?.close();launchSelectedMode();});
 $("randomize-confirm")?.addEventListener("click",()=>{$("randomize-confirm-dialog")?.close();randomizeAll(creationMode);});
 $("randomize-confirm-dialog")?.addEventListener("cancel",()=>{launchSelectedMode();});
