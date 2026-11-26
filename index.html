@@ -656,7 +656,7 @@
       function showDashboard() {
         root.classList.add("desktop-dashboard-active");
         dashboard.hidden = false;
-        window.scrollTo({ top: 0, behavior: "instant" });
+        window.scrollTo({ top: 0, behavior: "auto" });
       }
       function showApplication() {
         root.classList.remove("desktop-dashboard-active");
@@ -665,7 +665,7 @@
       function openAction(action) {
         showApplication();
         if (action === "create") document.getElementById("begin-button")?.click();
-        if (action === "archive") document.getElementById("oc-archive-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (action === "archive") { document.getElementById("home-button")?.click(); document.getElementById("simulator-back-button")?.click(); document.getElementById("oc-archive-title")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
         if (action === "lore") document.getElementById("lore-book-open")?.click();
         if (action === "simulator") document.getElementById("open-simulator-button")?.click();
         if (action === "multiplayer") document.getElementById("open-multiplayer-button")?.click();
