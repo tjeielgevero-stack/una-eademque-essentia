@@ -1,0 +1,14 @@
+{
+  "$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
+  "name": "uee-multiplayer",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-26",
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "RoomHub" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["RoomHub"] }
+  ]
+}
