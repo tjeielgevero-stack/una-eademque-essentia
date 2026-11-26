@@ -522,7 +522,8 @@ function formatCharacterDossier(name,mode,answersSource){
  };
  const likes=lazyField("Likes")||labelled("Likes")||first("complex_32","complex_33")||preference(combine("likes","generated_likes"),"Likes");
  const dislikes=lazyField("Dislikes")||labelled("Dislikes")||first("complex_37","complex_29")||preference(combine("dislikes","generated_dislikes"),"Dislikes");
- const overall=lazyField("Overall")||labelled("Overall")||first("complex_60","generated_overall")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation?"working as "+occupation:"",egoStatus&&!egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
+ const complexOverview="This dossier presents "+(name||"the character")+" through the history, personal relationships, and inner conflicts recorded across the profile. Its emotional and symbolic direction is "+(first("complex_42")||"developed through the character's recorded memories, principles, and experiences")+". The E.G.O. manifestation and abilities provide another expression of those themes, while the character's choices and consequences define their current place in the story.";
+ const overall=lazyField("Overall")||labelled("Overall")||first("complex_60")||(mode==="complex"?complexOverview:first("generated_overall"))||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation?"working as "+occupation:"",egoStatus&&!egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
  return [
   "Name: "+(lazyField("Name")||name||"Unnamed Variant"),
   "Title: "+title,
@@ -1392,7 +1393,7 @@ function simStatusInfliction(record){
 function simPassiveProfile(record){
  const a=record.answers||{};
  const raw=a.passive_ability?.value||a.complex_passive?.value||a.generated_passive?.value||"";
- const text=a.generated_passive?.value?String(raw).split(/\\s+[—–-]\\s+/)[0].trim():raw;
+ const text=a.generated_passive?.value?String(raw).split(/\s+[—–-]\s+/)[0].trim():raw;
  return {text,activation:a.passive_activation?.value||a.complex_passive_activation?.value||"Always active"};
 }
 function simApplyStatusInfliction(actor,target,basePotency){
