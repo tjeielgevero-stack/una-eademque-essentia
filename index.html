@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-vibe103">
+  <link rel="stylesheet" href="style.css?v=20261127-vibe104">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -300,9 +300,11 @@
       </div>
       <div class="hero-details"><span>INFINITE MIRROR WORLDS</span><span>✦</span><span>ONE SHARED ESSENCE</span></div>
       <section class="update-log" aria-labelledby="update-log-title">
-        <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 001</p><h2 id="update-log-title">VIBE CODED UPDATE 1.0.3</h2></div><span class="update-log-version">VERSION 1.0.3</span></div>
+        <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 001</p><h2 id="update-log-title">VIBE CODED UPDATE 1.0.4</h2></div><span class="update-log-version">VERSION 1.0.4</span></div>
         <p class="update-log-intro">A fresh batch of features and quality-of-life improvements for the archive.</p>
         <ul class="update-log-list">
+          <li><strong>One-page OC creation</strong><span>Added Laziness mode for writing or pasting a complete character dossier in a single question.</span></li>
+          <li><strong>Standardized character dossiers</strong><span>Restored blank-line spacing between every section, added the second passive field, and ensured Personality is populated.</span></li>
           <li><strong>Streamlined combat setup</strong><span>Simple and Advanced now use generated abilities with a compact multi-select for status effects; Complex retains custom ability descriptions.</span></li>
           <li><strong>Background and cache reliability</strong><span>Corrected offline asset caching so updated scripts and styles are refreshed, and improved image loading and saved-background recovery.</span></li>
           <li><strong>Custom background fix</strong><span>Improved image saving, restoring, and display, with a live accent-lit dropzone indicator.</span></li>
@@ -339,7 +341,8 @@
             <span class="mode-card-description">Everything in Simple Creation, followed by detailed written prompts for concept, appearance, personality, motives, relationships, abilities, and story direction.</span>
             <span class="mode-card-action">USE ADVANCED CREATION <b>→</b></span>
           </button>
-        <button id="mode-complex" class="creation-mode-card complex-mode-card" type="button"><span class="mode-card-number">03 / UNRESTRICTED PROFILE</span><strong>COMPLEX CREATION</strong><span class="mode-card-description">A completely separate 60-question character dossier. It does not reuse the Simple or Advanced question sets.</span><span class="mode-card-action">USE COMPLEX CREATION <b>→</b></span></button></div>
+        <button id="mode-complex" class="creation-mode-card complex-mode-card" type="button"><span class="mode-card-number">03 / UNRESTRICTED PROFILE</span><strong>COMPLEX CREATION</strong><span class="mode-card-description">A completely separate 60-question character dossier. It does not reuse the Simple or Advanced question sets.</span><span class="mode-card-action">USE COMPLEX CREATION <b>→</b></span></button>
+          <button id="mode-laziness" class="creation-mode-card laziness-mode-card" type="button"><span class="mode-card-number">04 / ONE-PAGE PROFILE</span><strong>LAZINESS</strong><span class="mode-card-description">One page. One question. Write or paste your entire OC dossier yourself instead of answering the guided questions.</span><span class="mode-card-action">USE LAZINESS MODE <b>→</b></span></button></div>
         
         <button id="mode-back" class="text-button mode-back" type="button">← BACK TO MAIN MENU</button>
       </div>
@@ -468,7 +471,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261127-vibe103"></script>
+  <script src="script.js?v=20261127-vibe104"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
   <script>
     (() => {
@@ -534,7 +537,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261127-vibe103", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261127-vibe104", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
