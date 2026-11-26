@@ -44,6 +44,7 @@
     <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
     <div class="header-tools">
       <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
+      <button id="app-install-button" class="settings-open app-install-button hidden" type="button">INSTALL APP</button>
       <button id="settings-open" class="settings-open" type="button" aria-haspopup="dialog" aria-controls="settings-overlay" aria-expanded="false">
         <span class="settings-gear" aria-hidden="true">⚙</span> SETTINGS
       </button>
@@ -420,6 +421,38 @@
   <script src="data.js"></script>
   <script src="script.js?v=20261126-status-passives6"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
+  <script>
+    (() => {
+      const installButton = document.getElementById("app-install-button");
+      if (!installButton) return;
+      let installPrompt = null;
+
+      window.addEventListener("beforeinstallprompt", event => {
+        event.preventDefault();
+        installPrompt = event;
+        installButton.classList.remove("hidden");
+      });
+
+      window.addEventListener("appinstalled", () => {
+        installPrompt = null;
+        installButton.classList.add("hidden");
+      });
+
+      installButton.addEventListener("click", async () => {
+        if (installPrompt) {
+          installPrompt.prompt();
+          await installPrompt.userChoice;
+          installPrompt = null;
+          installButton.classList.add("hidden");
+          return;
+        }
+        const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        window.alert(isAppleMobile
+          ? "To install: tap the Share button in Safari, then choose Add to Home Screen."
+          : "To install: open your browser menu and choose Install app or Add to Home Screen. If that option is missing, reload the page once while online.");
+      });
+    })();
+  </script>
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
