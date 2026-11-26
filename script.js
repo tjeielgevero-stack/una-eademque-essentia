@@ -555,7 +555,7 @@ $("name-back").onclick=()=>screen("home");
 $("name-continue").onclick=()=>{
  const entered=$("character-name").value.trim();
  if(!entered){$("name-validation").textContent="PLEASE ENTER A NAME TO BEGIN YOUR RECORD."; $("character-name").focus(); return;}
- characterName=entered;screen("mode-screen");
+ characterName=entered;screen("mode");
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>{ $("character-name").value=characterName;screen("name"); };
@@ -566,7 +566,7 @@ $("mode-simple").onclick=()=>beginSelectedMode("simple");
 $("mode-advanced").onclick=()=>beginSelectedMode("advanced");
 $("randomize-button").onclick=randomizeAll;
 $("home-button").onclick=()=>screen("home");
-$("back-button").onclick=()=>{if(index>0){index--;render();}else{screen("mode-screen");}};
+$("back-button").onclick=()=>{if(index>0){index--;render();}else{screen("mode");}};
 $("next-button").onclick=submit;
 $("edit-button").onclick=()=>{index=0;render();screen("picker");};
 $("restart-button").onclick=()=>{answers={};characterName="";creationMode="simple";index=0;$("character-name").value="";screen("home");};
