@@ -279,7 +279,8 @@ export class RoomHub extends DurableObject {
 
   async getState(request) {
     if (!this.room) return json({ error: "Room not found." }, 404);
-    if (!this.auth(request)) return json({ error: "Invalid room credentials." }, 403);
+    const player = this.auth(request);
+    if (!player) return json({ error: "Invalid room credentials." }, 403);
     return json({ room: this.publicState(player.id) });
   }
 
