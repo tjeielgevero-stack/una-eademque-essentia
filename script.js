@@ -515,7 +515,7 @@ function returnHomeFromSephrusSecret(){
   renderOcHistory();
   screen("home");
   requestAnimationFrame(()=>overlay.classList.remove("active"));
-  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();},1900);
+  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();},2250);
  },2100);
 }
 function renderSinnerEgo(saved){
