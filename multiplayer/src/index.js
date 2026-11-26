@@ -328,8 +328,14 @@ export class RoomHub extends DurableObject {
       : null;
 
     this.room.log.push({ at: Date.now(), text: player.name + " left the room." });
-    if (this.room.status === "lobby") this.room.players = this.room.players.filter(item => item.id !== player.id);
-    else player.hp = 0;
+    if (this.room.status === "lobby") {
+      this.room.players = this.room.players.filter(item => item.id !== player.id);
+      this.room.players.forEach((item, index) => {
+        item.team = teamFor(this.room.mode, index);
+      });
+    } else {
+      player.hp = 0;
+    }
 
     if (!this.room.players.length) {
       this.room.status = "closed";
