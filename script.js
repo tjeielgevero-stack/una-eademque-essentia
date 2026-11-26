@@ -333,7 +333,7 @@ function profileFieldsFromAnswers(a){
   return profileAnswerText(item.value??item.custom);
  };
  const first=(...ids)=>ids.map(get).find(Boolean)||"";
- const combine=(...ids)=>[...new Set(ids.map(get).filter(Boolean))].join(" · ");
+ const combine=(...ids)=>[...new Set(ids.map(get).filter(value=>value&&value!=="Not affiliated with the Head"))].join(" · ");
  const detailText=first("dossier_details","profile_details","advanced_abilities","complex_abilities");
  const labelled=(label,source=detailText)=>{
   if(!source)return "";
