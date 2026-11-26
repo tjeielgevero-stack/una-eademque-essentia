@@ -1572,3 +1572,17 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @keyframes sim-heavy-shake{0%,100%{transform:translateX(0)}22%{transform:translateX(-5px)}46%{transform:translateX(4px)}68%{transform:translateX(-2px)}}
 @keyframes sim-fatal-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-6px)}38%{transform:translateX(5px)}58%{transform:translateX(-3px)}}
 @media(prefers-reduced-motion:reduce){.sim-hit-overlay.sim-hit-heavy,.sim-hit-overlay.sim-hit-fatal,.simulator-match.sim-hit-heavy,.simulator-match.sim-hit-fatal{animation:none!important}}
+
+
+/* Structured mirror-world character dossier shown after record completion. */
+.profile-summary{
+  margin:18px 0;padding:clamp(16px,3vw,26px);
+  border:1px solid rgba(188,164,124,.34);
+  background:linear-gradient(145deg,rgba(34,30,26,.88),rgba(10,10,10,.96));
+  color:#ded3c2;
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  font:clamp(11px,1.2vw,13px)/1.75 'DM Mono',monospace;
+  letter-spacing:.015em;
+  box-shadow:0 16px 44px rgba(0,0,0,.24);
+}
+@media(max-width:620px){.profile-summary{padding:14px;font-size:10px;line-height:1.65}}
