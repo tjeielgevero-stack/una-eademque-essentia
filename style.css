@@ -1259,7 +1259,7 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
   .effect-borderflow .feature-card:hover,.effect-borderflow .creation-mode-card:hover,
   .effect-idlefloat .site-header .header-tag,
   .effect-buttonbounce .primary-button:hover,.effect-buttonbounce .secondary-button:hover,
-  .effect-hoverwiggle .feature-card:hover,.effect-hoverwiggle .choice:hover,
+  .effect-hoverwiggle .feature-card:hover,
   .effect-hoverwiggle .creation-mode-card:hover,.effect-sparkle .settings-gear {
     animation:none!important;
   }
