@@ -563,7 +563,7 @@ function renderOcHistory(){
  if(sephrusSection)sephrusSection.hidden=false;
  function draw(target,items,isSpecial){
   if(!items.length){const p=document.createElement("p");p.className="oc-empty";p.textContent=isSpecial?"NO SEPHRUS VARIANTS RECORDED YET.":"NO CHARACTER RECORDS YET.";target.append(p);return;}
-  items.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");const recordTitle=r.answers?.title?.value||r.answers?.epithet?.value||r.answers?.color_title?.value||r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";name.textContent=isSpecial?"Sephrus Aztiluth ("+recordTitle+")":(r.name||"Unnamed Variant");const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);target.append(card);});}
+  items.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");const recordTitle=r.answers?.title?.value||r.answers?.epithet?.value||r.answers?.color_title?.value||r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";name.textContent=isSpecial?"Sephrus Aztiluth ("+recordTitle+")":(r.name||"Unnamed Variant");const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":r.mode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);target.append(card);});}
  draw(list,general,false);draw(sephrusList,sephrus,true);
 }
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));characterName=normalizeSephrusCharacterName(characterName);const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
@@ -1375,14 +1375,14 @@ function simProfileField(record,label){
 }
 function simAbilityOptions(record){
  const answers=record.answers||{};
- const values=[1,2,3,4].map(n=>record.mode==="complex"?(answers["complex_ability_"+n]?.value||simProfileField(record,"Ability "+n)):(String(answers["generated_ability_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
+ const values=[1,2,3,4].map(n=>(record.mode==="complex"||record.mode==="laziness")?(answers["complex_ability_"+n]?.value||simProfileField(record,"Ability "+n).split(/\s+[—–-]\s+/)[0].trim()):(String(answers["generated_ability_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
  if(values.length)return values;
 
  return SIM_MOVES.slice();
 }
 function simUltimateOptions(record){
  const answers=record.answers||{};
- const values=[1,2].map(n=>record.mode==="complex"?(answers["complex_ultimate_"+n]?.value||simProfileField(record,"Ultimate Ability "+n)):(String(answers["generated_ultimate_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
+ const values=[1,2].map(n=>(record.mode==="complex"||record.mode==="laziness")?(answers["complex_ultimate_"+n]?.value||simProfileField(record,"Ultimate Ability "+n).split(/\s+[—–-]\s+/)[0].trim()):(String(answers["generated_ultimate_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
  return values.length?values:["Limit Break","Final Resonance"];
 }
 function simStatusInfliction(record){
@@ -1392,8 +1392,8 @@ function simStatusInfliction(record){
 }
 function simPassiveProfile(record){
  const a=record.answers||{};
- const raw=a.passive_ability?.value||a.complex_passive?.value||a.generated_passive?.value||"";
- const text=a.generated_passive?.value?String(raw).split(/\s+[—–-]\s+/)[0].trim():raw;
+ const raw=a.passive_ability?.value||a.complex_passive?.value||a.generated_passive?.value||(record.mode==="laziness"?simProfileField(record,"Passive Ability"):"")||"";
+ const text=(a.generated_passive?.value||record.mode==="laziness")?String(raw).split(/\s+[—–-]\s+/)[0].trim():raw;
  return {text,activation:a.passive_activation?.value||a.complex_passive_activation?.value||"Always active"};
 }
 function simApplyStatusInfliction(actor,target,basePotency){
