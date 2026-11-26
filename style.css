@@ -1220,8 +1220,8 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 .effect-idlefloat .site-header .header-tag { animation:archive-idle-float 4.8s ease-in-out infinite; }
 .effect-buttonbounce .primary-button:hover,
 .effect-buttonbounce .secondary-button:hover { animation:archive-button-bounce .42s ease; }
+/* Interactive creator choices keep their own entrance animation; wiggle only static cards. */
 .effect-hoverwiggle .feature-card:hover,
-.effect-hoverwiggle .choice:hover,
 .effect-hoverwiggle .creation-mode-card:hover { animation:archive-hover-wiggle .38s ease; }
 .effect-sparkle .settings-gear { display:inline-block; animation:archive-gear-twinkle 3.6s ease-in-out infinite; }
 
@@ -1604,10 +1604,6 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @media(prefers-reduced-motion:reduce){.sim-hit-overlay.sim-hit-ego{animation:none!important}}
 
 
-/* HOVER VISIBILITY FIX — hover effects must not cancel choice entrance visibility. */
-.effect-hoverwiggle .choice:hover {
-  opacity:1!important;
-}
 /* Keep the dramatic bobble inside the hovered button's hit area. */
 @keyframes super-necessary-bobble {
   0%,100% { transform:scale(1.16); }
