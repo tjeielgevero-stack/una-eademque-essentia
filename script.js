@@ -1663,7 +1663,7 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
  window.ueeEasterEggAudio={beginGrim,endGrim};
  if(musicEnabled&&status)status.textContent="MUSIC SAVED · ENABLE TO START";
 })();
-/* VIBE CODED UPDATE 1.0.0 — persistent, device-local background image. */
+/* VIBE CODED UPDATE 1.0.1 — reliable, device-local background image handling. */
 (function setupCustomBackground(){
  const input=$("background-image-input"),drop=$("background-dropzone"),status=$("background-upload-status"),previewWrap=$("background-image-preview-wrap"),preview=$("background-image-preview"),remove=$("background-image-remove");
  if(!input||!drop||!status||!previewWrap||!preview||!remove)return;
@@ -1675,22 +1675,46 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
    if(!("indexedDB" in window)){reject(new Error("Local image storage is unavailable in this browser."));return;}
    const request=indexedDB.open(dbName,1);
    request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains(storeName))request.result.createObjectStore(storeName);};
-   request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error||new Error("Could not open local image storage."));
+   request.onsuccess=()=>resolve(request.result);
+   request.onerror=()=>{dbPromise=null;reject(request.error||new Error("Could not open local image storage."));};
+   request.onblocked=()=>{dbPromise=null;reject(new Error("Please close other archive tabs and try again."));};
   });
   return dbPromise;
  }
  function transaction(mode,action){
   return openDb().then(db=>new Promise((resolve,reject)=>{
-   const tx=db.transaction(storeName,mode),store=tx.objectStore(storeName),request=action(store);
-   request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error||new Error("Image storage failed."));
+   let result;
+   const tx=db.transaction(storeName,mode),store=tx.objectStore(storeName);
+   let request;
+   try{request=action(store);}catch(error){reject(error);return;}
+   if(request){request.onsuccess=()=>{result=request.result;};request.onerror=()=>reject(request.error||new Error("Image storage failed."));}
+   tx.oncomplete=()=>resolve(result);
+   tx.onerror=()=>reject(tx.error||new Error("Image storage failed."));
    tx.onabort=()=>reject(tx.error||new Error("Image storage was interrupted."));
   }));
  }
  function applyBlob(blob){
+  if(!(blob instanceof Blob)||!blob.size)throw new Error("The saved image could not be read.");
   if(objectUrl)URL.revokeObjectURL(objectUrl);
   objectUrl=URL.createObjectURL(blob);
-  document.documentElement.style.setProperty("--user-background-image",'url("'+objectUrl+'")');
+  const imageLayer='url("'+objectUrl+'")';
+  document.documentElement.style.setProperty("--user-background-image",imageLayer);
+  if(document.body){
+   document.body.style.backgroundImage='linear-gradient(rgba(5,5,7,.28),rgba(5,5,7,.38)),'+imageLayer+',radial-gradient(ellipse at 50% 8%,rgba(var(--accent-rgb),.15),transparent 43%),repeating-linear-gradient(0deg,transparent 0 39px,rgba(255,255,255,.012) 40px),linear-gradient(145deg,#111218,#090a0e 70%)';
+   document.body.style.backgroundSize="cover,cover,auto,auto,auto";
+   document.body.style.backgroundPosition="center,center,center,center,center";
+   document.body.style.backgroundAttachment="fixed,fixed,scroll,scroll,scroll";
+  }
   preview.src=objectUrl;previewWrap.hidden=false;status.textContent="BACKGROUND APPLIED";
+ }
+ function clearAppliedBackground(){
+  document.documentElement.style.removeProperty("--user-background-image");
+  if(document.body){
+   document.body.style.removeProperty("background-image");
+   document.body.style.removeProperty("background-size");
+   document.body.style.removeProperty("background-position");
+   document.body.style.removeProperty("background-attachment");
+  }
  }
  function setStatus(message){status.textContent=message;}
  async function saveFile(file){
@@ -1709,9 +1733,11 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
  remove.addEventListener("click",async()=>{
   try{await transaction("readwrite",store=>store.delete(recordKey));}
   catch(error){setStatus(error?.message||"COULD NOT REMOVE IMAGE");return;}
-  document.documentElement.style.removeProperty("--user-background-image");
+  clearAppliedBackground();
   if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}
   preview.removeAttribute("src");previewWrap.hidden=true;setStatus("NO IMAGE SELECTED");
  });
- transaction("readonly",store=>store.get(recordKey)).then(blob=>{if(blob instanceof Blob&&blob.size)applyBlob(blob);}).catch(()=>setStatus("LOCAL IMAGE STORAGE UNAVAILABLE"));
+ transaction("readonly",store=>store.get(recordKey)).then(blob=>{
+  if(blob instanceof Blob&&blob.size)applyBlob(blob);
+ }).catch(error=>setStatus(error?.message||"LOCAL IMAGE STORAGE UNAVAILABLE"));
 })();
