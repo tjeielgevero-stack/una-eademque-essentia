@@ -1350,11 +1350,11 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 }
 
 
-/* IMPACT FRAME — cursor-anchored monochrome manga burst. */
+/* IMPACT FRAME — cursor-centered manga burst. */
 .effect-impactframe .fx-impact.impact-hit{z-index:30;opacity:1}
 .effect-impactframe .fx-impact.impact-hit:before,.effect-impactframe .fx-impact.impact-hit:after{content:"";position:absolute;inset:0;display:block;pointer-events:none}
-.effect-impactframe .fx-impact.impact-hit:before{background:radial-gradient(circle at var(--impact-x,50%) var(--impact-y,50%),transparent 0 2%,rgba(255,255,255,.96) 3% 9%,rgba(0,0,0,.92) 10% 13%,transparent 14%),repeating-conic-gradient(from 0deg at var(--impact-x,50%) var(--impact-y,50%),rgba(0,0,0,.96) 0deg 1.2deg,transparent 1.2deg 5deg);animation:archive-impact-flash .48s steps(1,end) both}
-.effect-impactframe .fx-impact.impact-hit:after{background:radial-gradient(ellipse 18% 12% at var(--impact-x,50%) var(--impact-y,50%),rgba(0,0,0,.94),transparent 78%),radial-gradient(circle at var(--impact-x,50%) var(--impact-y,50%),transparent 0 7%,rgba(255,255,255,.96) 7.5% 8.4%,transparent 9%),repeating-conic-gradient(from 12deg at var(--impact-x,50%) var(--impact-y,50%),rgba(255,255,255,.9) 0deg 1deg,transparent 1deg 4.8deg);mix-blend-mode:difference;animation:archive-impact-ink .48s steps(1,end) both}
+.effect-impactframe .fx-impact.impact-hit:before{background:radial-gradient(circle at var(--impact-x,50%) var(--impact-y,50%),transparent 0 2%,rgba(255,255,255,.96) 3% 9%,rgba(0,0,0,.92) 10% 13%,transparent 14%),repeating-conic-gradient(at var(--impact-x,50%) var(--impact-y,50%),rgba(0,0,0,.96) 0deg 1.2deg,transparent 1.2deg 5deg);animation:archive-impact-flash .48s steps(1,end) both}
+.effect-impactframe .fx-impact.impact-hit:after{background:radial-gradient(ellipse 18% 12% at var(--impact-x,50%) var(--impact-y,50%),rgba(0,0,0,.94),transparent 78%),radial-gradient(circle at var(--impact-x,50%) var(--impact-y,50%),transparent 0 7%,rgba(255,255,255,.96) 7.5% 8.4%,transparent 9%),repeating-conic-gradient(at var(--impact-x,50%) var(--impact-y,50%),rgba(255,255,255,.9) 0deg 1deg,transparent 1deg 4.8deg);mix-blend-mode:difference;animation:archive-impact-ink .48s steps(1,end) both}
 @keyframes archive-impact-flash{0%,100%{opacity:0}12%{opacity:.98;background-color:#050505}25%{opacity:1;background-color:#f8f4ec}43%{opacity:.92;background-color:#080808}61%{opacity:.68;background-color:#f8f4ec}78%{opacity:.3;background-color:#080808}}
 @keyframes archive-impact-ink{0%,100%{opacity:0}18%{opacity:1}38%{opacity:.95}62%{opacity:.72}82%{opacity:.2}}
 
@@ -1419,6 +1419,20 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 /* Lighter default motion: avoid continuously repainting decorative overlays. */
 .effect-particles .visual-effects-layer:before{animation:none!important}
 .effect-glow .site-header .wordmark,.effect-glow .hero .eyebrow,.effect-glow .feature-card strong,.effect-glow .record-stamp,.effect-glow .result h2{animation-duration:9s}
+.effect-onepiecepacing *,.effect-onepiecepacing *:before,.effect-onepiecepacing *:after{transition-duration:1.2s!important}
+.oc-archive{width:min(100%,900px);margin:42px auto 0;padding:24px;border:1px solid rgba(188,164,124,.3);background:rgba(8,8,8,.5);text-align:left}
+.oc-archive-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.oc-archive-heading h2{margin:4px 0;font-family:Georgia,serif;font-size:clamp(24px,4vw,34px);color:var(--pm-ivory)}
+.oc-archive-note,.oc-empty{color:#a99d8b;font-size:12px;line-height:1.7}
+.oc-history-list{display:grid;gap:10px;margin-top:16px}
+.oc-history-card{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px;border:1px solid rgba(188,164,124,.2);background:rgba(255,255,255,.025)}
+.oc-history-info{display:grid;gap:6px;min-width:0}.oc-history-info strong{color:#e9e1d4;overflow-wrap:anywhere}.oc-history-info small{color:#9b8d78;font:9px monospace;letter-spacing:.08em}
+.oc-history-actions,.effects-bulk-actions{display:flex;gap:8px;flex-wrap:wrap}.oc-history-actions button,.effects-bulk-actions button{font-size:10px;padding:9px 12px}
+.effects-bulk-actions{margin:14px 0 20px}
+@media(max-width:560px){.oc-history-card{align-items:flex-start;flex-direction:column}.oc-history-actions{width:100%}.oc-history-actions button{flex:1}}
+
+/* Performance trims: reduce expensive infinite paint work on the decorative overlay. */
+.effect-particles .visual-effects-layer:before{animation:none!important}
 .effect-onepiecepacing *,.effect-onepiecepacing *:before,.effect-onepiecepacing *:after{transition-duration:1.2s!important}
 .oc-archive{width:min(100%,900px);margin:42px auto 0;padding:24px;border:1px solid rgba(188,164,124,.3);background:rgba(8,8,8,.5);text-align:left}
 .oc-archive-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}
