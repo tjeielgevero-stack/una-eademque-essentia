@@ -1300,8 +1300,7 @@ function simAbilityOptions(record){
  const answers=record.answers||{};
  const values=[1,2,3,4].map(n=>record.mode==="complex"?(answers["complex_ability_"+n]?.value||simProfileField(record,"Ability "+n)):(String(answers["generated_ability_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
  if(values.length)return values;
- const source=answers.advanced_abilities?.value||answers.complex_47?.value||"";
- if(typeof source==="string"&&source.trim())return source.split(/\n+|;(?=\s*[A-Z])/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+
  return SIM_MOVES.slice();
 }
 function simUltimateOptions(record){
