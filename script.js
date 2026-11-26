@@ -498,8 +498,25 @@ function setAnswer(q,choice,value,custom=""){
  answers[q.id]={choice,value,custom};
  pruneHiddenAnswers();
 }
-function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
+function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");if(n==="home")applyEssentiaMainTitle();window.scrollTo({top:0,behavior:"smooth"});}
 function resetSephrusSecretState(){sephrusBrokenClickCount=0;sephrusEscapeRunning=false;}
+const ESSENTIA_TITLE_STORAGE_KEY="uee_essentia_title_unlocked_v1";
+function applyEssentiaMainTitle(){
+ let unlocked=false;
+ try{unlocked=localStorage.getItem(ESSENTIA_TITLE_STORAGE_KEY)==="true";}catch{}
+ if(!unlocked)return;
+ const heading=$("#home-screen h1");
+ if(heading){
+  heading.innerHTML="UNA EADEMQUE<br><span>ESSENTIA</span>";
+  heading.setAttribute("aria-label","Una Eademque Essentia");
+ }
+ document.title="Una Eademque Essentia";
+}
+function unlockEssentiaMainTitle(){
+ try{localStorage.setItem(ESSENTIA_TITLE_STORAGE_KEY,"true");}catch{}
+ applyEssentiaMainTitle();
+}
+applyEssentiaMainTitle();
 function sephrusSecretKey(name){
  const normalized=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
  const messages={
@@ -551,17 +568,29 @@ function showSephrusAfterimage(messageText){
   shard.dataset.shard=String(i+1);
   frame.append(shard);
  }
+ const chainPositions=["top-left","top-right","bottom-left","bottom-right","left-upper","left-lower","right-upper","right-lower"];
+ chainPositions.forEach(position=>{
+  const chain=document.createElement("span");
+  chain.className="sephrus-pull-chain";
+  chain.dataset.chain=position;
+  chain.textContent="⛓ ⛓ ⛓";
+  chain.setAttribute("aria-hidden","true");
+  frame.append(chain);
+ });
  notice.append(frame);
  document.body.append(notice);
  requestAnimationFrame(()=>notice.classList.add("visible"));
  window.setTimeout(()=>{
   if(!notice.isConnected)return;
   notice.classList.add("shattering");
-  window.setTimeout(()=>notice.remove(),1450);
+  window.setTimeout(()=>notice.remove(),1850);
  },5000);
 }
 function returnHomeFromSephrusSecret(){
  if(sephrusEscapeRunning)return;
+ const secretKey=sephrusSecretKey(characterName);
+ const afterimageMessage=sephrusSecretMessage(characterName);
+ const unlockTitle=secretKey==="sephrus zephyrus aztiluth";
  sephrusEscapeRunning=true;
  const overlay=document.createElement("div");
  overlay.className="sephrus-void-transition";
@@ -574,6 +603,7 @@ function returnHomeFromSephrusSecret(){
   $("validation-message").textContent="";
   renderOcHistory();
   screen("home");
+  if(unlockTitle)unlockEssentiaMainTitle();
   requestAnimationFrame(()=>overlay.classList.remove("active"));
   window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage(afterimageMessage);},2250);
  },2100);
