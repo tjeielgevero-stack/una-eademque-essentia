@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-ambient-brokenletters1">
+  <link rel="stylesheet" href="style.css?v=20261126-jukebox-sounddesign1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -60,9 +60,21 @@
       </div>
       <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
       <div class="ambient-music-setting">
-        <div class="ambient-music-copy"><strong>AMBIENT ARCHIVE MUSIC</strong><span>Original, quiet atmospheric drone. Starts only when enabled.</span><small id="ambient-music-status" aria-live="polite">AMBIENT MUSIC OFF</small></div>
+        <div class="ambient-music-copy"><strong>AMBIENT ARCHIVE MUSIC</strong><span>A livelier original soundtrack with layered melodies and a gentle pulse.</span><small id="ambient-music-status" aria-live="polite">AMBIENT MUSIC OFF</small></div>
         <label class="ambient-music-switch" for="ambient-music-toggle"><input id="ambient-music-toggle" type="checkbox"><span class="ambient-music-track" aria-hidden="true"></span><span class="sr-only">Enable ambient music</span></label>
       </div>
+      <section class="jukebox-panel" aria-labelledby="jukebox-title">
+        <div class="jukebox-heading"><div><span class="jukebox-kicker">PERSONAL SOUNDTRACK</span><h3 id="jukebox-title">THE JUKEBOX</h3></div><span class="jukebox-live">♪ ORIGINAL AUDIO</span></div>
+        <label class="jukebox-field" for="jukebox-track"><span>SELECT A SOUNDTRACK</span><select id="jukebox-track">
+          <option value="city">The City Never Sleeps — lively, rhythmic</option>
+          <option value="archive">Archive Drift — calm, atmospheric</option>
+          <option value="cathedral">Glass Cathedral — spacious, haunting</option>
+          <option value="backstreets">Backstreets Afterhours — mellow, pulsing</option>
+        </select></label>
+        <div class="jukebox-volume-row"><label for="jukebox-volume">MUSIC VOLUME</label><input id="jukebox-volume" type="range" min="0" max="100" value="68"><output id="jukebox-volume-value" for="jukebox-volume">68%</output></div>
+        <label class="jukebox-sfx-toggle" for="interface-sounds-toggle"><span><strong>INTERFACE SOUND DESIGN</strong><small>Button clicks, selections, opening, closing, and confirmation tones.</small></span><input id="interface-sounds-toggle" type="checkbox" checked></label>
+        <p class="jukebox-note">All tracks are generated in-browser and are original to this archive. Your choices are saved on this device. Audio begins after you interact with the page.</p>
+      </section>
       <div class="color-picker-section">
         <div class="color-picker-heading">
           <span>ACCENT COLOR</span>
@@ -385,7 +397,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-ambient-brokenletters1"></script>
+  <script src="script.js?v=20261126-jukebox-sounddesign1"></script>
   <script src="multiplayer.js?v=20261126-parry-ultimate1"></script>
 </body>
 </html>
