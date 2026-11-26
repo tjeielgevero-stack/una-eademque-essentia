@@ -426,6 +426,12 @@
       const installButton = document.getElementById("app-install-button");
       if (!installButton) return;
       let installPrompt = null;
+      const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      if (isAppleMobile && navigator.standalone !== true) {
+        installButton.classList.remove("hidden");
+      }
+      if (navigator.standalone === true) installButton.classList.add("hidden");
 
       window.addEventListener("beforeinstallprompt", event => {
         event.preventDefault();
