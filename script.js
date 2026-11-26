@@ -458,44 +458,53 @@ function formatWeaponLoadout(value){
 }
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
- const notSet="Not specified."; const lazyField=(label)=>labelled(label);
+ const notSet="Not specified.",isLazy=mode==="laziness";
+ const lazyField=label=>isLazy?labelled(label):"";
+ const isSephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
  const title=lazyField("Title")||labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
- const race=lazyField("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||notSet;
+ const raceRaw=lazyField("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||"Human";
+ const race=raceRaw==="Human"?"Human — A human individual whose identity and capabilities are shaped by personal history, training, choices, and any recorded E.G.O. manifestation.":raceRaw;
  const occupation=first("occupation","complex_occupation");
- const affiliation=lazyField("Affiliation")||labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet;
- const grade=lazyField("Grade")||labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","head_role","complex_head_role")||first("grade","classification")||notSet;
-  const isSephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
-  const appearance=lazyField("Appearance")||(isSephrus?first("generated_appearance"):labelled("Appearance"))||combine("advanced_appearance","appearance","complex_09","augmentation","generated_appearance","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
- const origin=lazyField("Origin")||labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
+ const affiliation=lazyField("Affiliation")||labelled("Affiliation")||first("generated_affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet;
+ const grade=lazyField("Grade")||labelled("Grade")||first("generated_grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","head_role","complex_head_role")||first("grade","classification")||notSet;
+ const appearance=lazyField("Appearance")||labelled("Appearance")||first("advanced_appearance","appearance","complex_09","generated_appearance","augmentation")||notSet;
+ const origin=lazyField("Origin")||labelled("Origin")||first("generated_origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
  const egoStatus=first("ego_status","complex_41");
  const egoName=first("ego_name","complex_43","generated_ego_name");
  const egoLoadout=get("ego_equipment_customizer");
  const egoAppearance=first("ego_appearance","advanced_ego_appearance","complex_44");
  const egoFunction=first("ego_function","advanced_ego_function","complex_61");
- let egoType=lazyField("E.G.O Type")||"Not specified.";
- if(egoStatus.includes("Personally manifested"))egoType="Personal E.G.O.";
- else if(egoStatus.includes("Volatile"))egoType="Volatile E.G.O.";
- else if(egoStatus.includes("Distortion"))egoType="Distortion";
- else if(egoStatus.includes("Abnormality-derived"))egoType="Abnormality-derived";
- else if(egoStatus.includes("Sinner-issued"))egoType="Abnormality-based (Sinner-issued)";
- else if(egoStatus.includes("Lobotomy"))egoType="Artificial / refined Lobotomy E.G.O.";
- else if(egoStatus.includes("No known"))egoType="Absent";
- else if(egoStatus)egoType=egoStatus;
- const egoDescription=lazyField("E.G.O")||(egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded.":[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet);
- const compactGenerated=(value)=>String(value||"").split(/\s+[—–-]\s+/)[0].trim();
- const ability=(n)=>lazyField("Ability "+n)||(mode==="complex"?(labelled("Ability "+n)||get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(compactGenerated(get("generated_ability_"+n))||notSet));
- const ultimate=(n)=>lazyField("Ultimate Ability "+n)||(mode==="complex"?(labelled("Ultimate Ability "+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(compactGenerated(get("generated_ultimate_"+n))||notSet));
+ let fallbackEgoType="Not specified.";
+ if(egoStatus.includes("Personally manifested"))fallbackEgoType="Personal E.G.O.";
+ else if(egoStatus.includes("Volatile"))fallbackEgoType="Volatile E.G.O.";
+ else if(egoStatus.includes("Distortion"))fallbackEgoType="Distortion";
+ else if(egoStatus.includes("Abnormality-derived"))fallbackEgoType="Abnormality-derived";
+ else if(egoStatus.includes("Sinner-issued"))fallbackEgoType="Abnormality-based (Sinner-issued)";
+ else if(egoStatus.includes("Lobotomy"))fallbackEgoType="Artificial / refined Lobotomy E.G.O.";
+ else if(egoStatus.includes("No known"))fallbackEgoType="Absent";
+ else if(egoStatus)fallbackEgoType=egoStatus;
+ const egoType=lazyField("E.G.O Type")||labelled("E.G.O Type")||first("generated_ego_type")||fallbackEgoType;
+ const egoDescription=lazyField("E.G.O")||labelled("E.G.O")||first("generated_ego_description")||(egoStatus.includes("No known")?"No personal E.G.O. or Distortion is recorded.": [egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | "))||notSet;
+ const ability=n=>lazyField("Ability "+n)||labelled("Ability "+n)||(mode==="complex"?(get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(first("generated_ability_"+n)||notSet));
+ const ultimate=n=>lazyField("Ultimate Ability "+n)||labelled("Ultimate Ability "+n)||(mode==="complex"?(get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(first("generated_ultimate_"+n)||notSet));
  const passive=lazyField("Passive Ability")||labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
  const passiveActivation=first("passive_activation","complex_passive_activation");
- const selectedStatuses=first("status_infliction","complex_status_infliction");
- const statusInfliction=Array.isArray(selectedStatuses)?selectedStatuses.join(" · "):(selectedStatuses||"None");
- const personality=lazyField("Personality")||labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?"Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He appreciates originality and creating things; his fundamental identity and personality remain immutable.":combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||"Reserved, observant, and shaped by the experiences recorded in this profile.";
- const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59","generated_backstory")||notSet;
- const likes=labelled("Likes")||combine("likes","complex_32","complex_33","generated_likes")||notSet;
- const dislikes=labelled("Dislikes")||combine("dislikes","complex_37","complex_29","generated_dislikes")||notSet;
- const overall=labelled("Overall")||first("advanced_concept","complex_60","notes","generated_overall")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
+ const passiveLine=passive+(passiveActivation&&!passive.includes(passiveActivation)?" · Activation: "+passiveActivation:"");
+ const passive2=lazyField("Passive Ability 2")||labelled("Passive Ability 2")||first("passive_ability_2","complex_passive_2","generated_passive_2")||notSet;
+ const personality=lazyField("Personality")||labelled("Personality")||first("advanced_personality","complex_03","generated_personality")||(isSephrus?"Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he appreciates originality and the act of creating things. He is morally gray rather than inherently good or evil, and his fundamental identity remains unchanged across every Mirror World.":combine("personality","advanced_personality","complex_03","complex_21","complex_24"))||"Reserved and observant, the character tends to understand a situation before deciding how much of themself to reveal. Their behavior is shaped by experience rather than a simple division between kindness and cruelty.";
+ const storyParts=["advanced_concept","advanced_motivation","advanced_conflict","advanced_code","advanced_relationships","advanced_arc","advanced_extra_lore","backstory","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59"].map(get).filter(Boolean);
+ const backstory=lazyField("Backstory")||labelled("Backstory")||(storyParts.length?storyParts.join("\n\n"):first("generated_backstory"))||"Not specified.";
+ const preference=(value,type)=>{
+  if(!value||value===notSet)return notSet;
+  if(value.length>180&&/[.!?]/.test(value))return value;
+  if(type==="Likes")return "The character enjoys "+value+". These interests offer moments of comfort, curiosity, or personal expression amid the demands of their circumstances, and reveal the small details they choose to value beyond their professional identity.";
+  return "The character dislikes "+value+". These are more than passing irritations: they mark the behavior, attitudes, and situations they are least willing to accept, even when resisting them creates additional complications.";
+ };
+ const likes=lazyField("Likes")||labelled("Likes")||first("complex_32","complex_33")||preference(combine("likes","generated_likes"),"Likes");
+ const dislikes=lazyField("Dislikes")||labelled("Dislikes")||first("complex_37","complex_29")||preference(combine("dislikes","generated_dislikes"),"Dislikes");
+ const overall=lazyField("Overall")||labelled("Overall")||first("complex_60","generated_overall")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation?"working as "+occupation:"",egoStatus&&!egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
  return [
-  "Name: "+(name||"Unnamed Variant"),
+  "Name: "+(lazyField("Name")||name||"Unnamed Variant"),
   "Title: "+title,
   "Race: "+race,
   "Affiliation: "+affiliation,
@@ -510,8 +519,8 @@ function formatCharacterDossier(name,mode,answersSource){
   "Ability 4: "+ability(4),
   "Ultimate Ability 1: "+ultimate(1),
   "Ultimate Ability 2: "+ultimate(2),
-  "Passive Ability: "+passive+(passiveActivation?" · "+passiveActivation:""),
-  "Passive Ability 2: "+(lazyField("Passive Ability 2")||first("passive_ability_2","complex_passive_2","generated_passive_2")||notSet),
+  "Passive Ability: "+passiveLine,
+  "Passive Ability 2: "+passive2,
   "Personality: "+personality,
   "Backstory: "+backstory,
   "Likes: "+likes,
@@ -519,6 +528,7 @@ function formatCharacterDossier(name,mode,answersSource){
   "Overall: "+overall
  ].join("\n\n");
 }
+
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
  const rows=readOcArchive();
