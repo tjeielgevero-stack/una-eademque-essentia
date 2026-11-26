@@ -2287,3 +2287,10 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 .background-image-preview-wrap button{font-size:9px}
 body{background-image:linear-gradient(rgba(5,5,7,.68),rgba(5,5,7,.76)),var(--user-background-image,none),radial-gradient(ellipse at 50% 8%,rgba(var(--accent-rgb),.15),transparent 43%),repeating-linear-gradient(0deg,transparent 0 39px,rgba(255,255,255,.012) 40px),linear-gradient(145deg,#111218,#090a0e 70%);background-size:cover,cover,auto,auto,auto;background-position:center,center,center,center,center;background-attachment:fixed,fixed,scroll,scroll,scroll}
 @media(max-width:560px){.update-log{padding:18px;margin-top:25px}.update-log-heading,.background-upload-heading{align-items:flex-start;flex-direction:column}.update-log-list li{grid-template-columns:1fr;gap:5px}.background-image-preview-wrap{grid-template-columns:1fr}}
+
+
+/* Readability correction: keep update-log copy visibly separated and wrap normally. */
+.update-log-list li{min-width:0;align-items:start}
+.update-log-list strong,.update-log-list span{display:block;min-width:0;white-space:normal;overflow-wrap:normal;word-break:normal;word-spacing:.12em;line-height:1.7}
+.update-log-list strong{letter-spacing:.045em}
+.update-log-intro{word-spacing:.08em;line-height:1.8}
