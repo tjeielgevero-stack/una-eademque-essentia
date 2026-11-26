@@ -104,6 +104,29 @@
   </header>
 
 
+  <dialog id="app-install-choice" class="app-install-choice" aria-labelledby="app-install-choice-title">
+    <section class="app-install-choice-panel" role="dialog" aria-modal="true" aria-labelledby="app-install-choice-title">
+      <div class="app-install-choice-heading">
+        <p class="eyebrow">CHOOSE YOUR EXPERIENCE</p>
+        <h2 id="app-install-choice-title">INSTALL U.E.E.</h2>
+        <p>Choose how you want to access the archive.</p>
+      </div>
+      <div class="app-install-choice-options">
+        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases" target="_blank" rel="noopener noreferrer">
+          <span class="app-install-option-icon" aria-hidden="true">▣</span>
+          <span><strong>DESKTOP APP</strong><small>Windows installer · Dedicated desktop experience</small></span>
+          <span class="app-install-option-arrow" aria-hidden="true">↗</span>
+        </a>
+        <button class="app-install-option app-install-website" id="app-install-website" type="button">
+          <span class="app-install-option-icon" aria-hidden="true">⌂</span>
+          <span><strong>WEBSITE APP</strong><small>Install in your browser · Works like an app</small></span>
+          <span class="app-install-option-arrow" aria-hidden="true">↗</span>
+        </button>
+      </div>
+      <button class="app-install-choice-close" id="app-install-choice-close" type="button">CLOSE</button>
+    </section>
+  </dialog>
+
   <dialog id="info-overlay" class="info-overlay" aria-labelledby="info-title">
     <section class="info-panel" role="dialog" aria-modal="true" aria-labelledby="info-title">
       <div class="info-panel-header">
@@ -596,7 +619,10 @@
   <script>
     (() => {
       const installButton = document.getElementById("app-install-button");
-      if (!installButton) return;
+      const choiceDialog = document.getElementById("app-install-choice");
+      const websiteButton = document.getElementById("app-install-website");
+      const closeButton = document.getElementById("app-install-choice-close");
+      if (!installButton || !choiceDialog || !websiteButton) return;
       let installPrompt = null;
       const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent)
         || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -616,7 +642,18 @@
         installButton.classList.add("hidden");
       });
 
-      installButton.addEventListener("click", async () => {
+      installButton.addEventListener("click", () => {
+        choiceDialog.showModal();
+      });
+
+      const closeChoice = () => choiceDialog.close();
+      closeButton?.addEventListener("click", closeChoice);
+      choiceDialog.addEventListener("click", event => {
+        if (event.target === choiceDialog) closeChoice();
+      });
+
+      websiteButton.addEventListener("click", async () => {
+        closeChoice();
         if (installPrompt) {
           installPrompt.prompt();
           await installPrompt.userChoice;
@@ -624,10 +661,9 @@
           installButton.classList.add("hidden");
           return;
         }
-        const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent);
         window.alert(isAppleMobile
-          ? "To install: tap the Share button in Safari, then choose Add to Home Screen."
-          : "To install: open your browser menu and choose Install app or Add to Home Screen. If that option is missing, reload the page once while online.");
+          ? "To install the website app: tap the Share button in Safari, then choose Add to Home Screen."
+          : "To install the website app: open your browser menu and choose Install app or Add to Home Screen. If that option is missing, reload the page once while online.");
       });
     })();
   </script>
