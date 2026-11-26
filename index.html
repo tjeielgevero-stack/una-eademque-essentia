@@ -1,14 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="crimson">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111111">
+  <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261126-settings2">
 </head>
 <body>
+  <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true"></div>
   <div id="welcome-notice" class="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-description">
     <div class="notice-panel">
       <div class="notice-kicker"><span class="notice-light"></span> COMMUNITY NOTICE / PLEASE READ</div>
@@ -27,8 +29,94 @@
   <div class="ornament ornament-top" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <header class="site-header">
     <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
-    <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
+    <div class="header-tools">
+      <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
+      <button id="settings-open" class="settings-open" type="button" aria-haspopup="dialog" aria-controls="settings-overlay" aria-expanded="false">
+        <span class="settings-gear" aria-hidden="true">⚙</span> SETTINGS
+      </button>
+    </div>
   </header>
+
+
+  <dialog id="settings-overlay" class="settings-overlay" aria-labelledby="settings-title">
+    <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-panel-header">
+        <div>
+          <p class="settings-kicker">ARCHIVE CONFIGURATION / 01</p>
+          <h2 id="settings-title">SETTINGS</h2>
+          <p class="settings-intro">Customize the archive's appearance and visual effects. Your choices are saved on this device.</p>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" aria-label="Close settings">×</button>
+      </div>
+      <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+        <button id="settings-tab-appearance" class="settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="settings-appearance" tabindex="0" data-settings-tab="appearance">APPEARANCE</button>
+        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">04</span></button>
+      </div>
+      <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
+      <div class="color-picker-section">
+        <div class="color-picker-heading">
+          <span>ACCENT COLOR</span>
+          <span>HUE · SATURATION · VALUE</span>
+        </div>
+        <div class="color-sv-field" id="color-sv-field" role="slider" tabindex="0"
+          aria-label="Color saturation and brightness" aria-valuemin="0" aria-valuemax="100"
+          aria-valuenow="68" aria-valuetext="Saturation 68 percent, brightness 86 percent">
+          <span id="sv-handle" class="sv-handle" aria-hidden="true"></span>
+        </div>
+        <div class="hue-control">
+          <label for="hue-slider">BASE HUE</label>
+          <input id="hue-slider" class="hue-slider" type="range" min="0" max="359" step="1" value="352" aria-label="Base hue">
+        </div>
+        <div class="color-preview-row">
+          <span id="color-preview-swatch" class="color-preview-swatch" aria-hidden="true"></span>
+          <div class="color-preview-copy">
+            <strong id="color-preview-hex">#D95E6A</strong>
+            <span id="color-preview-description">CUSTOM ARCHIVE ACCENT</span>
+          </div>
+          <button id="settings-reset" class="settings-reset" type="button">RESET COLOR</button>
+        </div>
+        <p class="picker-instructions">Drag inside the large square to adjust saturation and brightness. Drag the rainbow bar to change the base hue.</p>
+      </div>
+      </section>
+      <section id="settings-effects" class="settings-tab-panel effects-tab-panel" role="tabpanel" aria-labelledby="settings-tab-effects" data-settings-panel="effects" hidden>
+        <div class="effects-heading">
+          <div>
+            <span class="effects-overline">PERSONALIZE THE ARCHIVE</span>
+            <h3>VISUAL EFFECTS</h3>
+          </div>
+          <span class="effects-count">04 EFFECTS</span>
+        </div>
+        <p class="effects-description">Combine any of these effects, or leave them all off for a quieter page. Each switch is saved on this device.</p>
+        <div class="effects-grid">
+          <label class="effect-card" for="effect-particles">
+            <span class="effect-symbol" aria-hidden="true">✧</span>
+            <span class="effect-copy"><strong>AMBIENT DUST</strong><small>Slow, drifting flecks of light across the archive.</small></span>
+            <input id="effect-particles" class="effect-switch" type="checkbox" data-effect-toggle="particles">
+          </label>
+          <label class="effect-card" for="effect-scanlines">
+            <span class="effect-symbol" aria-hidden="true">▤</span>
+            <span class="effect-copy"><strong>CRT SCANLINES</strong><small>A faint monitor texture for a terminal-like finish.</small></span>
+            <input id="effect-scanlines" class="effect-switch" type="checkbox" data-effect-toggle="scanlines">
+          </label>
+          <label class="effect-card" for="effect-glow">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>ACCENT PULSE</strong><small>A soft breathing glow that follows your chosen accent.</small></span>
+            <input id="effect-glow" class="effect-switch" type="checkbox" data-effect-toggle="glow">
+          </label>
+          <label class="effect-card" for="effect-glitch">
+            <span class="effect-symbol" aria-hidden="true">⌁</span>
+            <span class="effect-copy"><strong>GLITCH FLICKER</strong><small>Occasional, restrained signal distortion on archive details.</small></span>
+            <input id="effect-glitch" class="effect-switch" type="checkbox" data-effect-toggle="glitch">
+          </label>
+        </div>
+        <p class="effects-footnote">Animated effects respect your device's reduced-motion setting.</p>
+      </section>
+      <div class="settings-panel-footer">
+        <span>CHANGES APPLY IMMEDIATELY</span>
+        <button id="settings-close-bottom" class="primary-button" type="button">DONE <span>✓</span></button>
+      </div>
+    </section>
+  </dialog>
 
   <main>
     <section id="home-screen" class="hero screen">
@@ -38,7 +126,15 @@
       <h1>PROJECT MOON<br><span>VARIANT BUILDER</span></h1>
       <div class="rule"><i></i></div>
       <p class="intro">Infinite worlds. Different circumstances. One and the same essence.</p>
-      <p class="subintro">Build Fixers, Syndicate members, Wing employees, and Mirror World characters. Made for Sephrus variants—and anyone else who wants to create a Project Moon-inspired character.</p>
+      <p class="subintro">Build Fixers, Syndicate members, Wing employees, and Mirror World characters. Create an original character, explore an alternate timeline, or build a new variant of an existing character.</p>
+      <figure class="archive-meme">
+        <div class="archive-meme-image"><img src="./assets/archive-clerk.webp" alt="An exhausted moon-headed archive clerk surrounded by towering stacks of paperwork." loading="eager" decoding="async" width="620" height="414"></div>
+        <figcaption>
+          <span class="meme-stamp">UNOFFICIAL CITY MEMO / 004</span>
+          <strong>ARCHIVE STATUS: UNDERSTAFFED.</strong>
+          <span>One moon-headed clerk. Twelve stacks of forms. Zero approved leave requests.</span>
+        </figcaption>
+      </figure>
       <div class="feature-grid" aria-label="Archive sections">
         <div class="feature-card"><span class="feature-number">I</span><strong>THE CITY</strong><small>Districts · Nests · Wings</small></div>
         <div class="feature-card"><span class="feature-number">II</span><strong>THE INDIVIDUAL</strong><small>Origins · Affiliations · History</small></div>
@@ -66,7 +162,7 @@
         <p class="index-footnote">26 / Z is the archive’s alphabetical extension; it is not confirmed in released story material.</p>
       </aside>
       <div class="picker-main">
-      <div class="record-stamp"><span>SUBJECT / SEPHRUS AZTILUTH</span><span>RECORD TYPE / MIRROR WORLD VARIANT</span><span>ARCHIVE STATUS / OPEN</span></div>
+      <div class="record-stamp"><span>SUBJECT / USER-DEFINED CHARACTER</span><span>RECORD TYPE / MIRROR WORLD VARIANT</span><span>ARCHIVE STATUS / OPEN</span></div>
       <div class="picker-topline">
         <span class="eyebrow">VARIANT CREATION</span>
         <button id="home-button" class="text-button">← EXIT PICKER</button>
@@ -108,11 +204,11 @@
   </main>
 
   <footer>
-    <span>PROJECT MOON VARIANT BUILDER</span>
+    <span>PROJECT MOON CHARACTER ARCHIVE</span>
     <span>UNOFFICIAL FAN-MADE CREATION TOOL</span>
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=20261126-settings2"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /*
- UNA EADEMQUE ESSENTIA — lore-conscious Sephrus variant archive.
+ UNA EADEMQUE ESSENTIA — lore-conscious character and Mirror World archive.
  District / Corp. labels follow the alphabetical sequence; District 26 / Z is an archive extrapolation.
 */
 const DISTRICT_CORP = Object.fromEntries(Array.from({length:26},(_,i)=>{
@@ -67,13 +67,183 @@ const QUESTIONS = [
 {id:"ego_name",category:"E.G.O. & DISTORTION",title:"Personal E.G.O. Name & Description",description:"Name and describe this variant's own manifested E.G.O. This page is only relevant to personal or volatile E.G.O.; equipment extracted from Abnormalities is recorded in its loadout instead.",showIf:a=>a.ego_status==="Personally manifested E.G.O. (Effloresced E.G.O.)"||a.ego_status==="Volatile E.G.O. (unstable manifestation)",options:["Other / custom answer","Leave blank for now"]},
 {id:"distortion_theme",category:"E.G.O. & DISTORTION",title:"Distortion Theme",description:"If distorted, what craving, fixation, or emotional contradiction does the transformation embody?",showIf:a=>a.ego_status==="Has become a Distortion",options:["A consuming desire","An unresolved regret","A need for recognition","Fear of abandonment","Obsession with control","A fractured sense of identity","Other / custom answer"]},
 
-{id:"moral_outlook",category:"PERSONAL IDENTITY",title:"Moral Outlook",description:"Sephrus variants are morally gray by shared setting premise; choose the principles and contradictions that shape this individual.",options:["Pragmatic survivor","Follows a strict personal code","Loyal to chosen people, not institutions","Idealistic but disillusioned","Self-interested without being needlessly cruel","Protective of a particular community","Cynical toward the City's systems","Contradictory and situational","Other / custom answer"]},
+{id:"moral_outlook",category:"PERSONAL IDENTITY",title:"Moral Outlook",description:"Choose the principles, compromises, and contradictions that shape this individual. Characters can be morally complex without being strictly heroic or villainous.",options:["Pragmatic survivor","Follows a strict personal code","Loyal to chosen people, not institutions","Idealistic but disillusioned","Self-interested without being needlessly cruel","Protective of a particular community","Cynical toward the City's systems","Contradictory and situational","Other / custom answer"]},
 {id:"relationships",category:"PERSONAL IDENTITY",title:"Important Relationships",description:"Which relationships most shape this variant's story?",options:["Family or former guardians","Fixer Office colleagues","Association mentor or superior","Syndicate associates","Wing colleagues","Workshop connections","A rival or former opponent","A close friend or confidant","No defining relationship","Other / custom answer"]},
 {id:"backstory",category:"FINAL CHARACTER DETAILS",title:"Defining Backstory Event",description:"Choose a broad starting point for the event that most changed this variant's life.",options:["A family legacy or inheritance","A failed Fixer assignment","A Wing-related incident","A Syndicate conflict","A Workshop or technology incident","An Abnormality-related incident","A personal betrayal","A major moral choice","A career-defining achievement","Other / custom answer"]},
 {id:"notes",category:"FINAL CHARACTER DETAILS",title:"Additional Lore Notes",description:"Add any important detail that the structured questions did not cover.",options:["Other / custom answer","Leave blank for now"]}
 ];
 
 const $=id=>document.getElementById(id);
+
+// Settings dialog and custom two-dimensional HSV color picker.
+(function setupColorPicker(){
+ const overlay=$("settings-overlay");
+ const openButton=$("settings-open");
+ const closeButtons=[$("settings-close"),$("settings-close-bottom")].filter(Boolean);
+ const field=$("color-sv-field");
+ const handle=$("sv-handle");
+ const hueInput=$("hue-slider");
+ const swatch=$("color-preview-swatch");
+ const hexLabel=$("color-preview-hex");
+ const description=$("color-preview-description");
+ if(!overlay||!openButton||!field||!handle||!hueInput)return;
+
+ const root=document.documentElement;
+ const storageKey="uee_custom_theme_v1";
+ const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+ const state={h:352,s:0.68,v:0.86};
+ let dragging=false;
+
+ function hsvToRgb(h,s,v){
+  const c=v*s, hp=((h%360)+360)%360/60;
+  const x=c*(1-Math.abs((hp%2)-1));
+  let rgb;
+  if(hp<1)rgb=[c,x,0];
+  else if(hp<2)rgb=[x,c,0];
+  else if(hp<3)rgb=[0,c,x];
+  else if(hp<4)rgb=[0,x,c];
+  else if(hp<5)rgb=[x,0,c];
+  else rgb=[c,0,x];
+  const m=v-c;
+  return rgb.map(n=>Math.round((n+m)*255));
+ }
+ function hex(rgb){return "#"+rgb.map(n=>n.toString(16).padStart(2,"0")).join("").toUpperCase();}
+ function blend(rgb,amount){
+  return rgb.map(n=>Math.round(n+(255-n)*amount));
+ }
+ function applyColor(save=true){
+  const rgb=hsvToRgb(state.h,state.s,state.v);
+  const accent=hex(rgb);
+  const strong=hex(hsvToRgb(state.h,Math.min(1,state.s*0.92+0.08),Math.max(0.42,state.v*0.62)));
+  const pale=hex(blend(rgb,0.72));
+  root.dataset.theme="custom";
+  root.style.setProperty("--accent",accent);
+  root.style.setProperty("--accent-rgb",rgb.join(", "));
+  root.style.setProperty("--accent-strong",strong);
+  root.style.setProperty("--accent-text",pale);
+  field.style.setProperty("--picker-base",`hsl(${state.h} 100% 50%)`);
+  field.style.setProperty("--selector-x",`${state.s*100}%`);
+  field.style.setProperty("--selector-y",`${(1-state.v)*100}%`);
+  field.setAttribute("aria-valuenow",String(Math.round(state.s*100)));
+  field.setAttribute("aria-valuetext",`Saturation ${Math.round(state.s*100)} percent, brightness ${Math.round(state.v*100)} percent`);
+  hueInput.value=String(Math.round(state.h));
+  if(swatch)swatch.style.backgroundColor=accent;
+  if(hexLabel)hexLabel.textContent=accent;
+  if(description)description.textContent=`HUE ${Math.round(state.h)}° · SATURATION ${Math.round(state.s*100)}% · VALUE ${Math.round(state.v*100)}%`;
+  if(save){
+   try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}
+  }
+ }
+ function updateFromPointer(event){
+  const rect=field.getBoundingClientRect();
+  if(!rect.width||!rect.height)return;
+  state.s=clamp((event.clientX-rect.left)/rect.width,0,1);
+  state.v=1-clamp((event.clientY-rect.top)/rect.height,0,1);
+  applyColor();
+ }
+ function openSettings(){
+  if(!overlay.open)overlay.showModal();
+  openButton.setAttribute("aria-expanded","true");
+  closeButtons[0]?.focus();
+ }
+ function closeSettings(){
+  if(overlay.open)overlay.close();
+  openButton.setAttribute("aria-expanded","false");
+  openButton.focus();
+ }
+ overlay.addEventListener("close",()=>openButton.setAttribute("aria-expanded","false"));
+ openButton.addEventListener("click",openSettings);
+ closeButtons.forEach(button=>button.addEventListener("click",closeSettings));
+ overlay.addEventListener("click",event=>{if(event.target===overlay)closeSettings();});
+ document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&overlay.open)closeSettings();
+ });
+ field.addEventListener("pointerdown",event=>{
+  dragging=true;
+  field.setPointerCapture?.(event.pointerId);
+  updateFromPointer(event);
+ });
+ field.addEventListener("pointermove",event=>{
+  if(dragging&&(event.buttons===1||event.pointerType==="touch"))updateFromPointer(event);
+ });
+ const stopDragging=()=>{dragging=false;};
+ field.addEventListener("pointerup",stopDragging);
+ field.addEventListener("pointercancel",stopDragging);
+ field.addEventListener("lostpointercapture",stopDragging);
+ field.addEventListener("keydown",event=>{
+  const step=event.shiftKey?0.1:0.02;
+  let handled=true;
+  if(event.key==="ArrowLeft")state.s=clamp(state.s-step,0,1);
+  else if(event.key==="ArrowRight")state.s=clamp(state.s+step,0,1);
+  else if(event.key==="ArrowUp")state.v=clamp(state.v+step,0,1);
+  else if(event.key==="ArrowDown")state.v=clamp(state.v-step,0,1);
+  else handled=false;
+  if(handled){event.preventDefault();applyColor();}
+ });
+ hueInput.addEventListener("input",()=>{state.h=Number(hueInput.value);applyColor();});
+ $("settings-reset")?.addEventListener("click",()=>{
+  state.h=352;state.s=0.68;state.v=0.86;applyColor();
+ });
+ try{
+  const saved=JSON.parse(localStorage.getItem(storageKey)||"null");
+  if(saved&&Number.isFinite(saved.h)&&Number.isFinite(saved.s)&&Number.isFinite(saved.v)){
+   state.h=clamp(saved.h,0,359);
+   state.s=clamp(saved.s,0,1);
+   state.v=clamp(saved.v,0,1);
+  }
+ }catch{}
+ applyColor(false);
+})();
+
+// Accessible Settings tabs and persistent visual-effect toggles.
+(function setupSettingsTabsAndEffects(){
+ const tabs=[...document.querySelectorAll("[data-settings-tab]")];
+ const panels=[...document.querySelectorAll("[data-settings-panel]")];
+ const tablist=document.querySelector(".settings-tabs");
+ function activateTab(name,focus=false){
+  tabs.forEach(tab=>{
+   const active=tab.dataset.settingsTab===name;
+   tab.classList.toggle("active",active);
+   tab.setAttribute("aria-selected",String(active));
+   tab.tabIndex=active?0:-1;
+   if(active&&focus)tab.focus();
+  });
+  panels.forEach(panel=>{panel.hidden=panel.dataset.settingsPanel!==name;});
+ }
+ tabs.forEach(tab=>tab.addEventListener("click",()=>activateTab(tab.dataset.settingsTab)));
+ tablist?.addEventListener("keydown",event=>{
+  const current=tabs.indexOf(document.activeElement);
+  let next=current;
+  if(event.key==="ArrowRight")next=(current+1)%tabs.length;
+  else if(event.key==="ArrowLeft")next=(current-1+tabs.length)%tabs.length;
+  else if(event.key==="Home")next=0;
+  else if(event.key==="End")next=tabs.length-1;
+  else return;
+  event.preventDefault();
+  activateTab(tabs[next].dataset.settingsTab,true);
+ });
+ const switches=[...document.querySelectorAll("[data-effect-toggle]")];
+ const storageKey="uee_visual_effects_v1";
+ let saved={};
+ try{
+  const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved=parsed;
+ }catch{}
+ function applyEffect(key,enabled,persist=false){
+  document.documentElement.classList.toggle("effect-"+key,enabled);
+  const control=switches.find(item=>item.dataset.effectToggle===key);
+  if(control)control.checked=enabled;
+  if(persist){
+   saved[key]=enabled;
+   try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}
+  }
+ }
+ switches.forEach(control=>{
+  const key=control.dataset.effectToggle;
+  applyEffect(key,saved[key]===true);
+  control.addEventListener("change",()=>applyEffect(key,control.checked,true));
+ });
+})();
 
 // Show the community disclaimer once per browser tab session.
 (function setupWelcomeNotice(){
