@@ -1444,3 +1444,84 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 .oc-history-actions,.effects-bulk-actions{display:flex;gap:8px;flex-wrap:wrap}.oc-history-actions button,.effects-bulk-actions button{font-size:10px;padding:9px 12px}
 .effects-bulk-actions{margin:14px 0 20px}
 @media(max-width:560px){.oc-history-card{align-items:flex-start;flex-direction:column}.oc-history-actions{width:100%}.oc-history-actions button{flex:1}}
+
+/* MIRROR ARENA — menu exits to the side, using an exponential-out curve. */
+@keyframes arena-home-exit{to{transform:translateX(-112vw);opacity:0}}
+@keyframes arena-header-exit{to{transform:translateX(-110vw);opacity:0}}
+@keyframes arena-footer-exit{to{transform:translateX(110vw);opacity:0}}
+@keyframes arena-enter{from{transform:translateX(105vw);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes arena-exit{to{transform:translateX(110vw);opacity:0}}
+@keyframes arena-home-return{from{transform:translateX(-105vw);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes arena-header-return{from{transform:translateX(-110vw);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes arena-footer-return{from{transform:translateX(110vw);opacity:0}to{transform:translateX(0);opacity:1}}
+body.simulator-opening #home-screen{animation:arena-home-exit .68s cubic-bezier(.16,1,.3,1) both}
+body.simulator-opening .site-header{animation:arena-header-exit .68s cubic-bezier(.16,1,.3,1) both}
+body.simulator-opening footer{animation:arena-footer-exit .68s cubic-bezier(.16,1,.3,1) both}
+body.simulator-entered #simulator-screen{animation:arena-enter .72s cubic-bezier(.16,1,.3,1) both}
+body.simulator-closing #simulator-screen{animation:arena-exit .68s cubic-bezier(.16,1,.3,1) both}
+body.simulator-closing .site-header{animation:arena-header-return .68s cubic-bezier(.16,1,.3,1) both}
+body.simulator-closing footer{animation:arena-footer-return .68s cubic-bezier(.16,1,.3,1) both}
+body.home-returning #home-screen{animation:arena-home-return .72s cubic-bezier(.16,1,.3,1) both}
+body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px))}
+.simulator-screen{width:100%;max-width:100%;padding:12px 0 28px}
+.simulator-topbar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(188,164,124,.28);padding:5px 0 13px}
+.simulator-record-tag,.simulator-turn-count,.sim-team-tag,.sim-fighter-state,.simulator-section-heading,.sim-log-label,.sim-commentary-heading>span{font:9px 'DM Mono',monospace;letter-spacing:.13em;color:#a99d8b}
+.simulator-heading{text-align:center;padding:30px 0 25px}
+.simulator-heading h2{font-family:Georgia,serif;font-size:clamp(40px,6vw,68px);margin:8px 0 12px;color:#e9e1d4}
+.simulator-heading>p:last-child{max-width:670px;margin:0 auto;color:#a99d8b;font-size:17px;line-height:1.5}
+.simulator-setup,.simulator-match{padding:24px;border:1px solid rgba(188,164,124,.3);background:linear-gradient(145deg,rgba(34,30,26,.8),rgba(12,12,12,.94));box-shadow:0 20px 65px rgba(0,0,0,.25)}
+.simulator-section-heading{display:flex;justify-content:space-between;gap:12px;margin:6px 0 14px}
+.sim-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sim-mode-card{display:grid;gap:7px;text-align:left;padding:16px;border:1px solid rgba(188,164,124,.25);background:#171615;color:#e9e1d4;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.sim-mode-card strong{font:22px Georgia,serif;letter-spacing:.05em}
+.sim-mode-card small{font:9px 'DM Mono',monospace;letter-spacing:.1em;color:#a99d8b}
+.sim-mode-card.active,.sim-mode-card:hover{border-color:#c9b38e;background:#29231d;transform:translateY(-2px)}
+.simulator-hint{min-height:20px;color:#aa9e8c;font:11px 'DM Mono',monospace;line-height:1.6;margin:15px 0 24px}
+.sim-fighter-selectors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.sim-slot-label{display:grid;gap:8px;padding:13px;border:1px solid rgba(188,164,124,.2);background:rgba(255,255,255,.025);font:9px 'DM Mono',monospace;letter-spacing:.12em;color:#b9a88f}
+.sim-slot-label select{width:100%;background:#111;color:#eeeae3;border:1px solid #51483d;padding:12px;font:14px Georgia,serif}
+.sim-slot-label select:focus{outline:2px solid #c9b38e;outline-offset:2px}
+.sim-setup-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:20px}
+.simulator-match-heading{display:flex;justify-content:space-between;align-items:center;padding-bottom:15px;border-bottom:1px solid rgba(188,164,124,.23)}
+.simulator-match-heading h3{margin:5px 0 0;font:26px Georgia,serif;color:#e9e1d4}
+.simulator-turn-count{padding:9px 12px;border:1px solid rgba(188,164,124,.22)}
+.simulator-battle-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:17px;padding-top:17px;align-items:start}
+.simulator-arena-panel{min-width:0}
+.sim-arena-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sim-fighter-card{min-width:0;padding:16px;border:1px solid rgba(188,164,124,.28);background:linear-gradient(150deg,#25211d,#111);transition:border-color .2s,opacity .2s}
+.sim-fighter-card:nth-child(odd){border-left:3px solid #ab8d66}.sim-fighter-card:nth-child(even){border-left:3px solid #75878b}
+.sim-fighter-card.sim-fighter-out{opacity:.42;filter:grayscale(.8)}
+.sim-fighter-top{display:flex;justify-content:space-between;gap:8px}
+.sim-fighter-state{color:#c5b38f}
+.sim-fighter-card h4{font:23px Georgia,serif;margin:13px 0 5px;overflow-wrap:anywhere;color:#f0e8dc}
+.sim-fighter-traits{min-height:27px;margin:0 0 12px;color:#9e9487;font:10px 'DM Mono',monospace;line-height:1.5}
+.sim-hp-track{height:7px;background:#302b25;border:1px solid #51483d;overflow:hidden}
+.sim-hp-track span{display:block;height:100%;background:linear-gradient(90deg,#9a7655,#d7bd91);transition:width .3s ease}
+.sim-hp-text{margin-top:7px;color:#c8b89f;font:9px 'DM Mono',monospace;letter-spacing:.08em}
+.sim-fighter-status{margin:10px 0 0;color:#9f998d;font:9px 'DM Mono',monospace;letter-spacing:.1em}
+.sim-match-status{margin:16px 0;padding:11px;border-top:1px solid rgba(188,164,124,.2);border-bottom:1px solid rgba(188,164,124,.2);color:#c4b49d;font:10px 'DM Mono',monospace;letter-spacing:.08em}
+.simulator-match-actions{display:flex;flex-wrap:wrap;gap:9px}
+.simulator-commentary{position:sticky;top:14px;min-width:0;border:1px solid rgba(188,164,124,.3);background:#100f0e}
+.sim-commentary-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:15px;border-bottom:1px solid rgba(188,164,124,.22)}
+.sim-commentary-heading h3{margin:5px 0 0;color:#e9e1d4;font:18px Georgia,serif}
+.sim-commentary-heading>span{font-size:8px}
+.sim-log{height:440px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:9px;overscroll-behavior:contain}
+.sim-log-entry{padding:10px;border-left:2px solid #64513b;background:rgba(255,255,255,.025)}
+.sim-log-chat{border-left-color:#788d91}.sim-log-action{border-left-color:#b59a72}.sim-log-system{border-left-color:#665e51;background:rgba(255,255,255,.04)}
+.sim-log-label{font-size:8px}
+.sim-log-entry p{margin:6px 0 0;color:#d5cabb;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.simulator-disclaimer{margin:14px 0 0;color:#8f877a;text-align:center;font:9px 'DM Mono',monospace;line-height:1.6}
+.flash-warning-dialog{width:min(560px,calc(100% - 28px));padding:0;border:1px solid #9c896c;background:#151311;color:#eeeae3;box-shadow:0 25px 90px rgba(0,0,0,.8)}
+.flash-warning-dialog::backdrop{background:rgba(0,0,0,.84);backdrop-filter:blur(5px)}
+.flash-warning-panel{padding:clamp(22px,5vw,38px)}
+.flash-warning-panel h2{font:31px Georgia,serif;line-height:1.05;color:#f0e6d8;margin:10px 0 18px}
+.flash-warning-panel p{color:#c4b9aa;font-size:16px;line-height:1.55}
+.flash-warning-never{display:flex;align-items:center;gap:10px;margin:20px 0 6px;color:#ded2c0;font:10px 'DM Mono',monospace;letter-spacing:.07em}
+.flash-warning-never input{width:17px;height:17px;accent-color:#b79a72}
+.flash-warning-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px}
+.flash-warning-settings{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0 0;padding:14px;border:1px solid rgba(188,164,124,.22)}
+.flash-warning-settings p{margin:0;color:#a99d8b;font-size:12px;line-height:1.5}
+.flash-warning-settings button{font-size:9px}
+@media(max-width:950px){.simulator-battle-layout{grid-template-columns:1fr}.simulator-commentary{position:relative;top:auto}.sim-log{height:300px}}
+@media(max-width:620px){body:has(#simulator-screen:not(.hidden)) main{width:calc(100% - 26px)}.simulator-setup,.simulator-match{padding:15px}.sim-mode-grid{grid-template-columns:1fr}.sim-fighter-selectors,.sim-arena-cards{grid-template-columns:1fr}.sim-setup-actions,.flash-warning-actions{align-items:stretch;flex-direction:column}.simulator-record-tag{font-size:7px}.simulator-match-actions button{flex:1}.sim-log{height:260px}}
+@media(prefers-reduced-motion:reduce){body.simulator-opening #home-screen,body.simulator-opening .site-header,body.simulator-opening footer,body.simulator-entered #simulator-screen,body.simulator-closing #simulator-screen,body.simulator-closing .site-header,body.simulator-closing footer,body.home-returning #home-screen{animation:none!important;transition:none!important}.sim-fighter-card,.sim-hp-track span,.sim-mode-card{transition:none!important}}
