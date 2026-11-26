@@ -2074,3 +2074,82 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @media (max-width: 560px) {
   .app-install-button { margin-right: 0; }
 }
+
+
+/* Creator information panel */
+.info-open {
+  border-color: rgba(190,170,145,.5);
+  color: var(--text);
+}
+.info-open:hover {
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb),.14);
+}
+.info-overlay {
+  width: min(560px, calc(100% - 28px));
+  max-width: none;
+  max-height: min(86vh, 720px);
+  padding: 0;
+  overflow: auto;
+  color: var(--text, #eee);
+  border: 1px solid rgba(190,160,145,.42);
+  background: linear-gradient(145deg, #21191b, #0b0a0d 72%);
+  box-shadow: 0 28px 90px rgba(0,0,0,.72), inset 0 1px rgba(255,255,255,.045);
+}
+.info-overlay::backdrop {
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(5px);
+}
+.info-panel { padding: clamp(20px, 5vw, 32px); }
+.info-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 19px;
+  border-bottom: 1px solid rgba(190,160,145,.22);
+}
+.info-kicker {
+  margin: 0 0 7px;
+  color: #c49a91;
+  font: 9px 'DM Mono',monospace;
+  letter-spacing: .2em;
+}
+.info-panel-header h2 {
+  margin: 0;
+  color: #f0e5df;
+  font: clamp(23px,5vw,31px) Georgia,serif;
+  letter-spacing: .09em;
+}
+.info-copy {
+  padding: 14px 0 4px;
+  color: #c5b9b7;
+  font: 13px/1.8 'DM Mono',monospace;
+}
+.info-copy p { margin: 0 0 14px; }
+.info-copy strong { color: #f0e5df; }
+.info-discord {
+  display: grid;
+  gap: 7px;
+  margin: 17px 0 20px;
+  padding: 15px 17px;
+  border: 1px solid rgba(190,160,145,.35);
+  background: rgba(255,255,255,.035);
+}
+.info-discord span {
+  color: #b58c86;
+  font: 9px 'DM Mono',monospace;
+  letter-spacing: .18em;
+}
+.info-discord strong {
+  color: #f5e7df;
+  font: 600 19px 'DM Mono',monospace;
+  letter-spacing: .04em;
+  overflow-wrap: anywhere;
+}
+.info-done { width: 100%; justify-content: center; }
+@media (max-width: 560px) {
+  .header-tools { gap: 7px; flex-wrap: wrap; }
+  .info-open,.app-install-button { margin-right: 0; }
+  .info-panel { padding: 20px; }
+}
