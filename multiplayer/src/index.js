@@ -301,7 +301,7 @@ export class RoomHub extends DurableObject {
     const survivorTeams = new Set(survivors.map(item => item.team));
     if (survivors.length <= 1 || (this.room.mode === "2v2" && survivorTeams.size <= 1)) {
       this.room.status = "finished";
-      this.room.winner = survivors.length ? (this.room.mode === "ffa" ? survivors[0].name : "Team " + survivors[0].team) : "Draw";
+      this.room.winner = survivors.length ? (this.room.mode === "2v2" ? "Team " + survivors[0].team : survivors[0].name) : "Draw";
       this.room.log.push({ at: Date.now(), text: "Match finished. Winner: " + this.room.winner + "." });
     } else {
       const nextLiving = survivors;
@@ -344,7 +344,7 @@ export class RoomHub extends DurableObject {
       if (survivors.length <= 1 || (this.room.mode === "2v2" && survivorTeams.size <= 1)) {
         this.room.status = "finished";
         this.room.winner = survivors.length
-          ? (this.room.mode === "ffa" ? survivors[0].name : "Team " + survivors[0].team)
+          ? (this.room.mode === "2v2" ? "Team " + survivors[0].team : survivors[0].name)
           : "Draw";
         this.room.log.push({ at: Date.now(), text: "Match finished. Winner: " + this.room.winner + "." });
       } else {
