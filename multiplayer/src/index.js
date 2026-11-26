@@ -223,6 +223,7 @@ export class RoomHub extends DurableObject {
         targetId: this.room.pendingChallenge.targetId,
         step: this.room.pendingChallenge.step || 0,
         totalSteps: this.room.pendingChallenge.totalSteps || 1,
+        mistakes: this.room.pendingChallenge.mistakes || 0,
         prompt: viewerId === (this.room.pendingChallenge.type === "parry" ? this.room.pendingChallenge.defenderId : this.room.pendingChallenge.qtePlayerId) ? this.room.pendingChallenge.prompt : null,
         expiresAt: this.room.pendingChallenge.expiresAt,
         windowMs: this.room.pendingChallenge.windowMs
