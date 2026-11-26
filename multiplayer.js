@@ -345,7 +345,7 @@
   const heroActions = document.querySelector(".hero-actions");
   if (heroActions) {
     const button = make("button", { id: "open-multiplayer-button", className: "secondary-button mp-home-button", type: "button" }, "MULTIPLAYER ARENA  ↗");
-    button.addEventListener("click", () => { fillCharacters(); showScreen(); });
+    button.addEventListener("click", () => { fillCharacters(); showScreen(); if (current) resume().catch(err => setStatus(err.message)); });
     heroActions.append(button);
   }
   $("mp-back").addEventListener("click", returnHome);
