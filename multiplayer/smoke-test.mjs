@@ -277,7 +277,10 @@ await run("2v2 format, full lobby requirement, team assignment, and friendly-fir
   const validAttack = await action(code, host, "attack", p2.id);
   check(validAttack.ok && validAttack.data.room.pendingChallenge?.type === "parry", "Attack against an opposing team did not open its parry QTE.");
   const parryChallenge = validAttack.data.room.pendingChallenge;
-  const parryResult = await action(code, p2, "parry", undefined, { challengeId: parryChallenge.id, input: parryChallenge.prompt });
+  check(parryChallenge.prompt === null, "Attacking teammate view revealed the opponent's parry prompt.");
+  const p2View = await getState(code, p2);
+  check(!!p2View.data.room.pendingChallenge?.prompt, "Target player did not receive the parry prompt.");
+  const parryResult = await action(code, p2, "parry", undefined, { challengeId: parryChallenge.id, input: p2View.data.room.pendingChallenge.prompt });
   check(parryResult.ok && parryResult.data.parried, "Opposing player could not parry during a 2v2 match.");
   check(parryResult.data.room.turnPlayerId === p2.id, "2v2 turn did not advance after the parry.");
 
@@ -305,7 +308,10 @@ await run("Free-for-all format and four-player turn progression", async () => {
   const attackResult = await action(code, host, "attack", p4.id);
   check(attackResult.ok && attackResult.data.room.pendingChallenge?.type === "parry", "FFA attack did not open a parry event.");
   const ffaChallenge = attackResult.data.room.pendingChallenge;
-  const ffaParry = await action(code, p4, "parry", undefined, { challengeId: ffaChallenge.id, input: ffaChallenge.prompt });
+  check(ffaChallenge.prompt === null, "Attacking player view revealed the FFA defender's parry prompt.");
+  const p4View = await getState(code, p4);
+  check(!!p4View.data.room.pendingChallenge?.prompt, "FFA defender did not receive the private parry prompt.");
+  const ffaParry = await action(code, p4, "parry", undefined, { challengeId: ffaChallenge.id, input: p4View.data.room.pendingChallenge.prompt });
   check(ffaParry.ok && ffaParry.data.parried && ffaParry.data.room.turnPlayerId === p2.id, "FFA parry or turn progression failed.");
 
   await leaveRoom(code, p2);
