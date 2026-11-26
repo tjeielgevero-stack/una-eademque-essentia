@@ -1200,17 +1200,52 @@ function simProfileField(record,label){
  return match?.[1]?.trim()||"";
 }
 function simAbilityOptions(record){
- const values=[1,2,3,4].map(n=>simProfileField(record,"Ability "+n)).filter(value=>value&&value!=="Not specified.");
- if(values.length)return values;
  const answers=record.answers||{};
+ const values=[1,2,3,4].map(n=>answers["ability_"+n]?.value||answers["complex_ability_"+n]?.value||simProfileField(record,"Ability "+n)).filter(value=>value&&value!=="Not specified.");
+ if(values.length)return values;
  const source=answers.advanced_abilities?.value||answers.complex_47?.value||"";
- if(typeof source==="string"&&source.trim())return source.split(/\\n+|;(?=\\s*[A-Z])/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+ if(typeof source==="string"&&source.trim())return source.split(/\n+|;(?=\s*[A-Z])/).map(x=>x.trim()).filter(Boolean).slice(0,4);
  return SIM_MOVES.slice();
 }
 function simUltimateOptions(record){
- const values=[1,2].map(n=>simProfileField(record,"Ultimate Ability "+n)).filter(value=>value&&value!=="Not specified.");
- if(values.length)return values;
- return ["Limit Break","Final Resonance"];
+ const answers=record.answers||{};
+ const values=[1,2].map(n=>answers["ultimate_ability_"+n]?.value||answers["complex_ultimate_"+n]?.value||simProfileField(record,"Ultimate Ability "+n)).filter(value=>value&&value!=="Not specified.");
+ return values.length?values:["Limit Break","Final Resonance"];
+}
+function simStatusInfliction(record){
+ const a=record.answers||{},entry=a.status_infliction||a.complex_status_infliction,raw=entry?.value??entry?.custom??[];
+ const values=Array.isArray(raw)?raw:[raw];
+ return [...new Set(values.map(value=>String(value).trim()).filter(value=>value&&value!=="No status effect"))].slice(0,3);
+}
+function simPassiveProfile(record){
+ const a=record.answers||{};
+ return {text:a.passive_ability?.value||a.complex_passive?.value||"",activation:a.passive_activation?.value||a.complex_passive_activation?.value||"Always active"};
+}
+function simApplyStatusInfliction(actor,target,basePotency){
+ const statuses=actor.statusInfliction||[];if(!statuses.length)return;
+ const potency=Math.max(.1,Math.round(basePotency/statuses.length*10)/10);
+ target.statusEffects=target.statusEffects||[];
+ statuses.forEach(name=>{const existing=target.statusEffects.find(effect=>effect.name===name);if(existing)existing.potency=Math.min(30,Math.round((existing.potency+potency)*10)/10);else target.statusEffects.push({name,potency});});
+ simAddLog("action",actor.name,"inflicts "+statuses.map(name=>name+" "+potency).join(" · ")+" on "+target.name+".");
+}
+function simTriggerPassive(fighter,event){
+ if(!fighter||!fighter.passiveAbility)return false;
+ const rule=fighter.passiveActivation||"Always active",always=rule==="Always active";
+ const matches=always||(rule==="At the start of battle"&&event==="battleStart")||(rule==="At the start of this character's turn"&&event==="turn")||(rule==="After taking damage"&&event==="damage")||(rule==="When below 50% HP"&&event==="lowHp")||(rule==="When an ally is knocked out"&&event==="allyOut")||(rule==="When E.G.O. manifests"&&event==="ego");
+ if(!matches)return false;
+ if(always&&fighter.passiveAnnounced)return true;
+ fighter.passiveActive=true;if(always)fighter.passiveAnnounced=true;
+ fighter.status=always?"PASSIVE ACTIVE":"PASSIVE TRIGGERED";
+ simAddLog("system",fighter.name,"passive activates: "+fighter.passiveAbility+" ("+rule+").");
+ return true;
+}
+function simMirrorAssist(actor){
+ if(!actor||!/(sephrus|zephyrus|aztiluth)/i.test(actor.name||""))return 0;
+ actor.mirrorSummons=(actor.mirrorSummons||0)+1;
+ const summonName="Sephrus Variant "+actor.mirrorSummons;
+ simAddLog("system",actor.name,summonName+" materializes from another Mirror World and joins the exchange.");
+ simAddLog("chat",summonName,'"The same essence. A different circumstance. We will assist."');
+ return 8;
 }
 
 function simRecordScore(record){
@@ -1303,6 +1338,9 @@ function simRenderArena(){
   const hpText=document.createElement("div");hpText.className="sim-hp-text";hpText.textContent="HEALTH "+f.hp+" / 100";
   const status=document.createElement("p");status.className="sim-fighter-status";status.textContent=f.status||"READY";
   card.append(top,name,mode,traits,hp,hpText,status);
+  if(f.passiveAbility){const passive=document.createElement("p");passive.className="sim-ego-detail";passive.textContent="PASSIVE · "+f.passiveAbility+" — "+f.passiveActivation+(f.passiveActive?" · ACTIVE":"");card.append(passive);}
+  if(f.statusEffects?.length){const effects=document.createElement("p");effects.className="sim-fighter-status";effects.textContent="STATUS · "+f.statusEffects.map(effect=>effect.name+" "+effect.potency).join(" · ");card.append(effects);}
+  if(f.mirrorSummons){const mirrors=document.createElement("p");mirrors.className="sim-ego-detail";mirrors.textContent="MIRROR ALLIES · "+f.mirrorSummons+" MATERIALIZED";card.append(mirrors);}
   if(f.egoEligible){const ego=document.createElement("p");ego.className="sim-ego-label";ego.textContent=f.egoActive?"✦ "+f.egoName+" · MANIFESTED":f.egoType+" AVAILABLE";card.append(ego);if(f.egoAppearance){const visual=document.createElement("p");visual.className="sim-ego-detail";visual.textContent="FORM · "+f.egoAppearance;card.append(visual);}if(f.egoFunction){const ability=document.createElement("p");ability.className="sim-ego-detail";ability.textContent="FUNCTION · "+f.egoFunction;card.append(ability);}}
   arena.append(card);if(f.justHit){const newWidth=Math.max(0,f.hp)+"%";window.requestAnimationFrame(()=>{fill.style.width=newWidth;});}f.justHit=false;
  });
@@ -1328,40 +1366,67 @@ function simTriggerHitEffect(kind,target){
   match.classList.remove("sim-hit-heavy","sim-hit-fatal");
  },kind==="fatal"?1100:780);
 }
-function simFinish(winner){simMatch.finished=true;$("sim-next-turn-button").disabled=true;$("sim-run-all-button").disabled=true;$("sim-match-status").textContent=winner?(simMatch.mode==="ffa"?winner.name+" WINS THE FREE-FOR-ALL.":"TEAM "+winner+" WINS THE MATCH."):"MATCH ENDED.";$("sim-feed-status").textContent="MATCH COMPLETE";simAddLog("system","",winner?(simMatch.mode==="ffa"?winner.name+" is the last OC standing.":"Team "+winner+" takes the match."):"The match ends in a draw.");$("sim-rematch-button").classList.remove("hidden");simRenderArena();}
+function simFinish(winner){simMatch.finished=true;$("sim-next-turn-button").disabled=true;$("sim-run-all-button").disabled=true;$("sim-match-status").textContent=winner?(simMatch.mode==="ffa"?winner.name+" WINS THE FREE-FOR-ALL.":"TEAM "+winner+" WINS THE MATCH."):"MATCH ENDED.";$("sim-feed-status").textContent="MATCH COMPLETE";simAddLog("system","",winner?(simMatch.mode==="ffa"?winner.name+" is the last OC standing.":"Team "+winner+" takes the match."):"The match ends in a draw.");$("sim-rematch-button").classList.remove("hidden");simRenderArena();simRefreshAbilityControls();}
 function simRunTurn(){
  if(!simMatch||simMatch.finished)return;
  const active=simAlive();if(active.length<=1){simFinish(active[0]||null);return;}
- const actor=active[Math.floor(Math.random()*active.length)];
- const opponents=active.filter(f=>f.id!==actor.id&&(simMatch.mode==="ffa"||f.team!==actor.team));
+ const actor=active[Math.floor(Math.random()*active.length)],opponents=active.filter(f=>f.id!==actor.id&&(simMatch.mode==="ffa"||f.team!==actor.team));
  if(!opponents.length){simFinish(actor.team);return;}
- const target=opponents[Math.floor(Math.random()*opponents.length)];
- const usesUltimate=actor.ultimateAbilities.length>0&&Math.random()<.075;
- const movePool=usesUltimate?actor.ultimateAbilities:actor.abilities;
- const move=movePool[Math.floor(Math.random()*movePool.length)]||SIM_MOVES[Math.floor(Math.random()*SIM_MOVES.length)];
- simMatch.turn++;
+ const target=opponents[Math.floor(Math.random()*opponents.length)],usesUltimate=actor.ultimateAbilities.length>0&&Math.random()<.075,abilityIndex=Math.floor(Math.random()*4);
+ const movePool=usesUltimate?actor.ultimateAbilities:actor.abilities,move=movePool[usesUltimate?Math.floor(Math.random()*movePool.length):abilityIndex]||SIM_MOVES[abilityIndex];
+ simMatch.turn++;simTriggerPassive(actor,"turn");
  if(actor.egoEligible&&!actor.egoUsed&&simMatch.turn>=2&&Math.random()<.32){
-  actor.egoUsed=true;actor.egoActive=true;actor.status=actor.egoType+" AWAKENED";
+  actor.egoUsed=true;actor.egoActive=true;actor.status=actor.egoType+" AWAKENED";simTriggerPassive(actor,"ego");
   simAddLog("system","",actor.name+" undergoes a transformation: "+actor.egoName+".");
   simAddLog("chat",actor.name,'"'+(actor.egoTheme?"This is what "+actor.egoTheme.toLowerCase()+" means to me.":"I will show you my true form.")+'"');
  }
  let impact=usesUltimate?26+Math.floor(Math.random()*13):9+Math.floor(Math.random()*10)+(actor.egoActive?6:0);
+ impact+=simMirrorAssist(actor);
  if(Math.random()<.18){impact=Math.max(5,impact-5);target.status="BRACED";}else target.status="REPOSITIONING";
  target.previousHp=target.hp;target.hp=Math.max(0,target.hp-impact);target.justHit=true;
+ simApplyStatusInfliction(actor,target,usesUltimate?30:[5,15,15,20][abilityIndex]);simTriggerPassive(target,"damage");if(target.hp<=50)simTriggerPassive(target,"lowHp");
  actor.status=actor.egoActive?"E.G.O. MOMENTUM +":"MOMENTUM +";
- simAddLog("action",actor.name,(usesUltimate?"unleashes ultimate ability ":"uses ability ")+move+(actor.egoActive?" through their manifested form":"")+". "+target.name+" loses "+impact+" health.");
+ simAddLog("action",actor.name,(usesUltimate?"unleashes ultimate ability ":"uses ability "+(abilityIndex+1)+" ")+move+(actor.egoActive?" through their manifested form":"")+". "+target.name+" loses "+impact+" health.");
  simAddLog("chat",actor.name,'"'+simQuote(actor)+'"');
- if(target.hp===0){target.alive=false;target.status="MATCH COMPLETE";simTriggerHitEffect("fatal",target);simAddLog("system","",target.name+" is out of the match.");}else if(impact>=16){simTriggerHitEffect("heavy",target);}
- else simAddLog("chat",target.name,'"'+SIM_REACTIONS[Math.floor(Math.random()*SIM_REACTIONS.length)]+'."');
+ if(target.hp===0){target.alive=false;target.status="MATCH COMPLETE";simTriggerHitEffect("fatal",target);simAddLog("system","",target.name+" is out of the match.");simMatch.fighters.filter(f=>f.alive&&f.team===target.team&&f.id!==target.id).forEach(f=>simTriggerPassive(f,"allyOut"));}
+ else if(impact>=16)simTriggerHitEffect("heavy",target);else simAddLog("chat",target.name,'"'+SIM_REACTIONS[Math.floor(Math.random()*SIM_REACTIONS.length)]+'."');
  simMatch.fighters.filter(f=>simMatch.mode!=="ffa"&&f.team===actor.team&&f.id!==actor.id&&f.alive).forEach(teammate=>{if(Math.random()<.26){teammate.status="SUPPORTING";simAddLog("chat",teammate.name,'"'+simQuote(teammate)+'"');}});
- simRenderArena();const winner=simWinner();if(winner!==false)simFinish(winner);else $("sim-match-status").textContent="TURN "+simMatch.turn+" RESOLVED — NEXT EXCHANGE READY.";
+ simRenderArena();simRefreshAbilityControls();const winner=simWinner();if(winner!==false)simFinish(winner);else $("sim-match-status").textContent="TURN "+simMatch.turn+" RESOLVED — NEXT EXCHANGE READY.";
+}
+function simRefreshAbilityControls(){
+ const actorSelect=$("sim-action-actor"),targetSelect=$("sim-action-target");if(!actorSelect||!targetSelect)return;
+ const oldActor=actorSelect.value,oldTarget=targetSelect.value,alive=simMatch?simAlive():[];
+ actorSelect.innerHTML="";alive.forEach(f=>actorSelect.add(new Option(f.name,f.id)));
+ if(alive.some(f=>f.id===oldActor))actorSelect.value=oldActor;
+ const actor=alive.find(f=>f.id===actorSelect.value)||alive[0],opponents=actor?alive.filter(f=>f.id!==actor.id&&(simMatch.mode==="ffa"||f.team!==actor.team)):[];
+ targetSelect.innerHTML="";opponents.forEach(f=>targetSelect.add(new Option(f.name,f.id)));
+ if(opponents.some(f=>f.id===oldTarget))targetSelect.value=oldTarget;
+ document.querySelectorAll("[data-sim-ability]").forEach(button=>{
+  const n=Number(button.dataset.simAbility),tier=["LOW · 5","MEDIUM · 15","MEDIUM · 15","LARGE · 20"][n-1],ability=actor?.abilities?.[n-1]||SIM_MOVES[n-1];
+  button.textContent="ABILITY "+n+" · "+tier+" — "+String(ability).slice(0,34);button.title=String(ability);
+  button.disabled=!actor||!opponents.length||!simMatch||simMatch.finished;
+ });
+}
+function simUseAbility(index){
+ if(!simMatch||simMatch.finished)return;
+ const actor=simMatch.fighters.find(f=>f.id===$("sim-action-actor")?.value),target=simMatch.fighters.find(f=>f.id===$("sim-action-target")?.value);
+ if(!actor?.alive||!target?.alive||actor.id===target.id||(simMatch.mode!=="ffa"&&actor.team===target.team))return;
+ const move=actor.abilities[index-1]||SIM_MOVES[index-1],potency=[5,15,15,20][index-1];
+ simMatch.turn++;simTriggerPassive(actor,"turn");
+ const impact=10+Math.floor(Math.random()*9)+(actor.egoActive?6:0)+simMirrorAssist(actor);
+ target.previousHp=target.hp;target.hp=Math.max(0,target.hp-impact);target.justHit=true;
+ simApplyStatusInfliction(actor,target,potency);simTriggerPassive(target,"damage");if(target.hp<=50)simTriggerPassive(target,"lowHp");
+ actor.status="USED ABILITY "+index;target.status=target.hp===0?"MATCH COMPLETE":"REPOSITIONING";
+ simAddLog("action",actor.name,"uses Ability "+index+": "+move+". "+target.name+" loses "+impact+" health.");simAddLog("chat",actor.name,'"'+simQuote(actor)+'"');
+ if(target.hp===0){target.alive=false;simTriggerHitEffect("fatal",target);simAddLog("system","",target.name+" is out of the match.");simMatch.fighters.filter(f=>f.alive&&f.team===target.team&&f.id!==target.id).forEach(f=>simTriggerPassive(f,"allyOut"));}else if(impact>=16)simTriggerHitEffect("heavy",target);
+ simRenderArena();simRefreshAbilityControls();const winner=simWinner();if(winner!==false)simFinish(winner);else $("sim-match-status").textContent="TURN "+simMatch.turn+" RESOLVED — "+actor.name+" used Ability "+index+".";
 }
 function simBuildMatch(ids){
  simAutoRunning=false;
  const records=readOcArchive(),teamMap=simMode==="1v1"?["A","B"]:simMode==="2v2"?["A","A","B","B"]:["ffa","ffa","ffa","ffa"];
  const fighters=ids.map((id,index)=>{
-  const record=records.find(r=>r.id===id),ego=simEgoProfile(record);
-  return {id:record.id,name:record.name||"Unnamed Variant",modeLabel:record.mode==="complex"?"COMPLEX":record.mode==="advanced"?"ADVANCED":"SIMPLE",team:teamMap[index],hp:100,alive:true,status:"READY",personality:simPersonality(record),abilities:simAbilityOptions(record),ultimateAbilities:simUltimateOptions(record),egoEligible:ego.eligible,egoType:ego.type,egoName:ego.name,egoTheme:ego.theme,egoAppearance:ego.appearance,egoFunction:ego.functionText,egoUsed:false,egoActive:false,justHit:false};
+  const record=records.find(r=>r.id===id),ego=simEgoProfile(record),passive=simPassiveProfile(record);
+  return {id:record.id,name:record.name||"Unnamed Variant",modeLabel:record.mode==="complex"?"COMPLEX":record.mode==="advanced"?"ADVANCED":"SIMPLE",team:teamMap[index],hp:100,alive:true,status:"READY",personality:simPersonality(record),abilities:simAbilityOptions(record),ultimateAbilities:simUltimateOptions(record),statusInfliction:simStatusInfliction(record),statusEffects:[],passiveAbility:passive.text,passiveActivation:passive.activation,passiveActive:false,passiveAnnounced:false,mirrorSummons:0,egoEligible:ego.eligible,egoType:ego.type,egoName:ego.name,egoTheme:ego.theme,egoAppearance:ego.appearance,egoFunction:ego.functionText,egoUsed:false,egoActive:false,justHit:false};
  });
  simMatch={mode:simMode,fighters,turn:0,finished:false,ids:ids.slice()};
  $("simulator-setup").classList.add("hidden");$("simulator-match").classList.remove("hidden");
@@ -1369,9 +1434,9 @@ function simBuildMatch(ids){
  $("sim-log").innerHTML="";$("sim-feed-status").textContent="MATCH LIVE";
  $("sim-next-turn-button").disabled=false;$("sim-run-all-button").disabled=false;$("sim-rematch-button").classList.add("hidden");
  $("sim-match-status").textContent="MATCH INITIALIZED. AWAITING FIRST EXCHANGE.";
- simRenderArena();simUpdateDifficulty();
- simAddLog("system","","Match initialized — "+(simMode==="ffa"?"Free For All":simMode.toUpperCase())+".");
- fighters.forEach(f=>{simAddLog("chat",f.name,'"'+simQuote(f)+'"');if(f.egoEligible)simAddLog("system","",f.name+" has a transformation available: "+f.egoName+".");});
+ simRenderArena();simUpdateDifficulty();simAddLog("system","","Match initialized — "+(simMode==="ffa"?"Free For All":simMode.toUpperCase())+".");
+ fighters.forEach(f=>{simAddLog("chat",f.name,'"'+simQuote(f)+'"');if(f.egoEligible)simAddLog("system","",f.name+" has a transformation available: "+f.egoName+".");simTriggerPassive(f,"battleStart");});
+ simRefreshAbilityControls();
 }
 function simStart(){const ids=[...document.querySelectorAll("[data-sim-slot]")].map(x=>x.value).filter(Boolean),min=simMode==="ffa"?3:SIM_MODE_INFO[simMode].count;if(ids.length<min){$("sim-setup-message").textContent=simMode==="ffa"?"Choose at least three OCs.":"Choose every fighter slot.";return;}if(new Set(ids).size!==ids.length){$("sim-setup-message").textContent="Choose a different saved OC for each slot.";return;}if(simMode!=="ffa"&&ids.length!==SIM_MODE_INFO[simMode].count){$("sim-setup-message").textContent="Fill every fighter slot before starting.";return;}simBuildMatch(ids);$("sim-setup-message").textContent="";}
 function simRematch(){if(simMatch)simBuildMatch(simMatch.ids);}
@@ -1394,6 +1459,8 @@ $("simulator-back-button")?.addEventListener("click",closeSimulator);
 document.querySelectorAll("[data-sim-mode]").forEach(button=>button.addEventListener("click",()=>simSetMode(button.dataset.simMode)));
 $("sim-start-button")?.addEventListener("click",simStart);
 $("sim-next-turn-button")?.addEventListener("click",simRunTurn);
+$("sim-action-actor")?.addEventListener("change",simRefreshAbilityControls);
+document.querySelectorAll("[data-sim-ability]").forEach(button=>button.addEventListener("click",()=>simUseAbility(Number(button.dataset.simAbility))));
 $("sim-run-all-button")?.addEventListener("click",simRunAll);
 $("sim-rematch-button")?.addEventListener("click",simRematch);
 $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList.remove("simulator-entered");screen("home");$("begin-button").click();});
