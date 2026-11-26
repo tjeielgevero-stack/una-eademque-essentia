@@ -120,17 +120,10 @@ const QUESTIONS = [
 {id:"notes",category:"FINAL CHARACTER DETAILS",title:"Additional Lore Notes",description:"Add any important detail that the structured questions did not cover.",options:["Other / custom answer","Leave blank for now"]}
 ];
 
-QUESTIONS.push(
- {id:"ability_1",category:"COMBAT PROFILE / ABILITIES",title:"Ability 1",description:"Describe the first regular fictional ability. It inflicts Low status potency (5).",freeText:true,inputLabel:"ABILITY 1"},
- {id:"ability_2",category:"COMBAT PROFILE / ABILITIES",title:"Ability 2",description:"Describe the second regular fictional ability. It inflicts Medium status potency (15).",freeText:true,inputLabel:"ABILITY 2"},
- {id:"ability_3",category:"COMBAT PROFILE / ABILITIES",title:"Ability 3",description:"Describe the third regular fictional ability. It inflicts Medium status potency (15).",freeText:true,inputLabel:"ABILITY 3"},
- {id:"ability_4",category:"COMBAT PROFILE / ABILITIES",title:"Ability 4",description:"Describe the fourth regular fictional ability. It inflicts Large status potency (20).",freeText:true,inputLabel:"ABILITY 4"},
- {id:"ultimate_ability_1",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 1",description:"Describe the first ultimate. It inflicts Massive status potency (30).",freeText:true,inputLabel:"ULTIMATE ABILITY 1"},
- {id:"ultimate_ability_2",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 2",description:"Describe the second ultimate. It inflicts Massive status potency (30).",freeText:true,inputLabel:"ULTIMATE ABILITY 2"},
- {id:"status_infliction",category:"COMBAT PROFILE / STATUS INFLICTION",title:"Which Status Effects Does This OC Inflict?",description:"Choose up to three status effects. Potency is divided evenly between your selections.",multiple:true,maxSelections:3,noneOption:"No status effect",options:["No status effect","Burn","Bleed","Rupture","Sinking","Tremor","Fragile","Bind","Paralyze","Poise","Charge","Haste","Protection","Strength","Feeble","Smoke","Fairy","Erosion","Paralysis","Endurance","Disarm","Stagger Protection","Stagger Resistance Down","Persistence","Blood","Nullify Power","Immobilized","Enhance","Weaken","Singleton","Offense Level Up","Offense Level Down","Defense Level Up","Defense Level Down","Damage Up","Damage Down","Coin Power Up","Coin Power Down","Attack Power Up","Attack Power Down","Defense Power Up","Defense Power Down","Ammo","Aggro","Discard","Fanatic","Nails","Talisman","Tremor Burst","Tremor - Scorch","Dark Flame","Butterfly","Echoes of the Manor","Bloodfeast","Charge Barrier","Plus Coin Boost / Drop"]},
- {id:"passive_ability",category:"COMBAT PROFILE / PASSIVES",title:"Passive Ability",description:"Describe the character's passive ability.",freeText:true,inputLabel:"PASSIVE ABILITY"},
- {id:"passive_activation",category:"COMBAT PROFILE / PASSIVES",title:"When Does This Passive Activate?",description:"Choose whether the passive is permanently active or activates after a specific battle event.",options:["Always active","At the start of battle","At the start of this character's turn","After taking damage","When below 50% HP","When an ally is knocked out","When E.G.O. manifests","Other / custom answer"]}
-);
+const COMBAT_PROFILE_QUESTIONS = [
+ {id:"status_infliction",category:"COMBAT PROFILE / ABILITIES & STATUS",title:"Abilities & Status Effects",description:"Choose up to three status effects for this character’s automatically generated abilities. Status potency is divided evenly between your selections.",multiple:true,maxSelections:3,noneOption:"No status effect",options:["No status effect","Burn","Bleed","Rupture","Sinking","Tremor","Fragile","Bind","Paralyze","Poise","Charge","Haste","Protection","Strength","Feeble","Smoke","Fairy","Erosion","Paralysis","Endurance","Disarm","Stagger Protection","Stagger Resistance Down","Persistence","Blood","Nullify Power","Immobilized","Enhance","Weaken","Singleton","Offense Level Up","Offense Level Down","Defense Level Up","Defense Level Down","Damage Up","Damage Down","Coin Power Up","Coin Power Down","Attack Power Up","Attack Power Down","Defense Power Up","Defense Power Down","Ammo","Aggro","Discard","Fanatic","Nails","Talisman","Tremor Burst","Tremor - Scorch","Dark Flame","Butterfly","Echoes of the Manor","Bloodfeast","Charge Barrier","Plus Coin Boost / Drop"]},,
+ {id:"passive_activation",category:"COMBAT PROFILE / PASSIVES",title:"When Does This Passive Activate?",description:"Choose when the automatically generated passive takes effect.",options:["Always active","At the start of battle","At the start of this character's turn","After taking damage","When below 50% HP","When an ally is knocked out","When E.G.O. manifests","Other / custom answer"]}
+];
 
 
 const $=id=>document.getElementById(id);
@@ -321,7 +314,6 @@ const ADVANCED_QUESTIONS = [
  {id:"advanced_conflict",category:"ADVANCED PROFILE / INNER CONFLICT",title:"Internal Conflict",description:"What contradiction, fear, unresolved question, or personal struggle makes this character difficult to understand—even to themselves?",freeText:true,inputLabel:"INNER CONFLICT"},
  {id:"advanced_code",category:"ADVANCED PROFILE / PERSONAL PRINCIPLES",title:"Personal Code & Boundaries",description:"What rules does this character try to live by? Which principles are non-negotiable, and what might tempt them to break those rules?",freeText:true,inputLabel:"PERSONAL CODE"},
  {id:"advanced_relationships",category:"ADVANCED PROFILE / CONNECTIONS",title:"Important Relationships — Detailed",description:"Describe the most important people in this character's life. Include names, history, current dynamics, and how those relationships affect their choices.",freeText:true,inputLabel:"RELATIONSHIP DETAILS"},
- {id:"advanced_abilities",category:"ADVANCED PROFILE / CAPABILITIES",title:"Signature Capabilities & Techniques",description:"Describe their distinctive fictional capabilities, signature techniques, limitations, and the visual or thematic identity behind them. Keep the description at a story-design level.",freeText:true,inputLabel:"SIGNATURE CAPABILITIES"},
  {id:"advanced_arc",category:"ADVANCED PROFILE / STORY DIRECTION",title:"Character Arc & Narrative Direction",description:"Where does the character begin, what could challenge or change them, and what kind of future—or unresolved ending—do you envision for them?",freeText:true,inputLabel:"CHARACTER ARC"},
  {id:"advanced_extra_lore",category:"ADVANCED PROFILE / ARCHIVE NOTES",title:"Additional Advanced Lore",description:"Add any other details that deserve a place in the full archive: symbols, recurring motifs, secrets, personal rituals, or connections to other records.",freeText:true,inputLabel:"ADDITIONAL LORE"},
  {id:"advanced_ego_function",category:"ADVANCED PROFILE / E.G.O. FUNCTION",title:"What Does Your E.G.O. Do?",description:"Describe the fictional abilities and practical narrative role of this Personal or Volatile E.G.O. Explain what it can do, how its effects appear, what conditions govern it, and what limitations or trade-offs keep it balanced.",showIf:a=>["Personally manifested E.G.O. (Effloresced E.G.O.)","Volatile E.G.O. (unstable manifestation)"].includes(a.ego_status),freeText:true,maxLength:6000,inputLabel:"PERSONAL / VOLATILE E.G.O. ABILITIES"}
@@ -399,17 +391,15 @@ function completeGeneratedCharacter(name,source){
  const egoName=v.ego_name||generatedPick(["Axiom of Ash","The Last Refrain","Crown of Unspoken Names","A Theatre Without Applause","The Shape of What Remains"]);
  if(!egoAbsent)putGenerated(a,"generated_ego_name",egoName);
  const motifs=String(egoTheme).split(/\s+/).slice(0,3).join(" ");
- const abilityNames=["Measured Reprisal","Shifting Measure","Witness Mark","Final Cadence"];
- const abilityDescriptions=[
- "An economical opening technique that establishes the user's rhythm and tests the opponent's response. Its visual language draws on "+motifs+".",
- "A reactive technique that changes its expression after observing an opponent's previous action, complementing a "+combat.toLowerCase()+" approach.",
- "A signature feint or tactical setup that marks a target's movement and creates a brief opening for the user or an ally. Its effect is temporary and requires accurate timing.",
- "A high-commitment finishing sequence combining the character's training with the symbolism of "+motifs+". Its force is balanced by a recovery window that can be exploited."
- ];
- for(let i=0;i<4;i++)putGenerated(a,"generated_ability_"+(i+1),abilityNames[i]+" — "+abilityDescriptions[i]);
- putGenerated(a,"generated_ultimate_1","Nocturne of the Unbroken — A rare full manifestation of "+egoTheme+", transforming the immediate battlefield into an expression of a defining conviction. It demands accumulated momentum and leaves the user vulnerable during recovery.");
- putGenerated(a,"generated_ultimate_2","The Final Unmasking — An alternate culmination that converts accumulated resolve into a decisive multi-stage sequence. It is difficult to prepare, exceptionally uncommon, and cannot be repeated freely.");
- putGenerated(a,"generated_passive","Composure of the Unfinished — Repeated observation gradually sharpens the user's timing and awareness. The benefit is lost when they abandon patience or act recklessly.");
+const abilityNames=["Measured Reprisal","Shifting Measure","Witness Mark","Final Cadence"];
+ abilityNames.forEach((abilityName,index)=>{
+  a["generated_ability_"+(index+1)]={choice:"Generated character detail",value:abilityName,custom:""};
+ });
+ const ultimateNames=["Nocturne of the Unbroken","The Final Unmasking"];
+ ultimateNames.forEach((abilityName,index)=>{
+  a["generated_ultimate_"+(index+1)]={choice:"Generated character detail",value:abilityName,custom:""};
+ });
+ a.generated_passive={choice:"Generated character detail",value:"Composure of the Unfinished",custom:""};
  if(![v.advanced_concept,v.advanced_motivation,v.advanced_conflict,v.backstory,v.complex_15,v.complex_59].some(value=>String(value||"").trim()))putGenerated(a,"generated_backstory","Raised in "+origin+", this variant learned to survive by reading people and recognizing the consequences behind seemingly small choices. A defining moral decision reshaped their priorities and led them toward "+affiliation+". Their current standing ("+rank+") offers influence and obligations, but does not settle the contradictions they carry.");
  if(![v.likes,v.complex_32,v.complex_33].some(value=>String(value||"").trim()))putGenerated(a,"generated_likes",generatedPick(["Quiet libraries, carefully prepared tea, old orchestral recordings, and people who keep their promises","Rain against windows, intricate craftsmanship, formal attire, and thoughtful conversation","Antique books, orderly rooms, subtle humor, and well-made objects","Late-night city lights, refined cuisine, handwritten notes, and dependable companions"]));
  if(![v.dislikes,v.complex_37,v.complex_29].some(value=>String(value||"").trim()))putGenerated(a,"generated_dislikes",generatedPick(["Careless promises, needless cruelty, loud self-importance, and being treated as a possession","Wastefulness, public humiliation, broken agreements, and false authority","Intrusive questions, deliberate dishonesty, and avoidable collateral damage","Condescension, performative loyalty, and having choices made for them"]));
@@ -453,10 +443,9 @@ function formatCharacterDossier(name,mode,answersSource){
  else if(egoStatus)egoType=egoStatus;
  const egoDescription=egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded."
   :[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet;
- const abilitySource=first("advanced_abilities","complex_47","complex_50","complex_51");
- // Preserve a user's full capabilities write-up before falling back to generated filler.
- const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||(n===1?abilitySource:"")||get("generated_ability_"+n)||notSet;
- const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet;
+ const compactGenerated=(value)=>String(value||"").split(/\s+[—–-]\s+/)[0].trim();
+ const ability=(n)=>mode==="complex"?(labelled("Ability "+n)||get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(compactGenerated(get("generated_ability_"+n))||notSet);
+ const ultimate=(n)=>mode==="complex"?(labelled("Ultimate Ability "+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(compactGenerated(get("generated_ultimate_"+n))||notSet);
  const passive=labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
  const passiveActivation=first("passive_activation","complex_passive_activation");
  const selectedStatuses=first("status_infliction","complex_status_infliction");
@@ -484,14 +473,14 @@ function formatCharacterDossier(name,mode,answersSource){
   "Ultimate Ability 1: "+ultimate(1),
   "Ultimate Ability 2: "+ultimate(2),
   "Passive Ability: "+passive+(passiveActivation?" · "+passiveActivation:""),
-  "Status Infliction: "+statusInfliction,
+  "Abilities & Status Effects: "+statusInfliction,
    ...(first("generated_passive_2")?["Passive Ability 2: "+first("generated_passive_2")]:[]),
   "Personality: "+personality,
   "Backstory: "+backstory,
   "Likes: "+likes,
   "Dislikes: "+dislikes,
   "Overall: "+overall
- ].join("\n\n");
+ ].join("\n");
 }
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
@@ -617,7 +606,7 @@ COMPLEX_QUESTIONS.push(
  {id:"complex_ability_4",category:"COMBAT PROFILE / ABILITIES",title:"Ability 4",description:"Fourth regular ability. Large potency (20).",freeText:true,maxLength:6000,inputLabel:"ABILITY 4"},
  {id:"complex_ultimate_1",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 1",description:"First ultimate. Massive potency (30).",freeText:true,maxLength:6000,inputLabel:"ULTIMATE ABILITY 1"},
  {id:"complex_ultimate_2",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 2",description:"Second ultimate. Massive potency (30).",freeText:true,maxLength:6000,inputLabel:"ULTIMATE ABILITY 2"},
- {id:"complex_status_infliction",category:"COMBAT PROFILE / STATUS INFLICTION",title:"Which Status Effects Does This OC Inflict?",description:"Choose up to three status effects. Potency is divided evenly between them.",multiple:true,maxSelections:3,noneOption:"No status effect",options:["No status effect","Burn","Bleed","Rupture","Sinking","Tremor","Fragile","Bind","Paralyze","Poise","Charge","Haste","Protection","Strength","Feeble","Smoke","Fairy","Erosion","Paralysis","Endurance","Disarm","Stagger Protection","Stagger Resistance Down","Persistence","Blood","Nullify Power","Immobilized","Enhance","Weaken","Singleton","Offense Level Up","Offense Level Down","Defense Level Up","Defense Level Down","Damage Up","Damage Down","Coin Power Up","Coin Power Down","Attack Power Up","Attack Power Down","Defense Power Up","Defense Power Down","Ammo","Aggro","Discard","Fanatic","Nails","Talisman","Tremor Burst","Tremor - Scorch","Dark Flame","Butterfly","Echoes of the Manor","Bloodfeast","Charge Barrier","Plus Coin Boost / Drop"]},
+ {id:"complex_status_infliction",category:"COMBAT PROFILE / ABILITIES & STATUS",title:"Abilities & Status Effects",description:"Choose up to three status effects for this character’s abilities. Potency is divided evenly between your selections.",multiple:true,maxSelections:3,noneOption:"No status effect",options:["No status effect","Burn","Bleed","Rupture","Sinking","Tremor","Fragile","Bind","Paralyze","Poise","Charge","Haste","Protection","Strength","Feeble","Smoke","Fairy","Erosion","Paralysis","Endurance","Disarm","Stagger Protection","Stagger Resistance Down","Persistence","Blood","Nullify Power","Immobilized","Enhance","Weaken","Singleton","Offense Level Up","Offense Level Down","Defense Level Up","Defense Level Down","Damage Up","Damage Down","Coin Power Up","Coin Power Down","Attack Power Up","Attack Power Down","Defense Power Up","Defense Power Down","Ammo","Aggro","Discard","Fanatic","Nails","Talisman","Tremor Burst","Tremor - Scorch","Dark Flame","Butterfly","Echoes of the Manor","Bloodfeast","Charge Barrier","Plus Coin Boost / Drop"]},
  {id:"complex_passive",category:"COMBAT PROFILE / PASSIVES",title:"Passive Ability",description:"Describe the character's passive ability.",freeText:true,maxLength:6000,inputLabel:"PASSIVE ABILITY"},
  {id:"complex_passive_activation",category:"COMBAT PROFILE / PASSIVES",title:"When Does This Passive Activate?",description:"Choose whether the passive is permanently active or activates after a specific battle event.",options:["Always active","At the start of battle","At the start of this character's turn","After taking damage","When below 50% HP","When an ally is knocked out","When E.G.O. manifests","Other / custom answer"]}
 );
@@ -626,7 +615,7 @@ const DOSSIER_QUESTIONS = [
  {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPassive Ability 2: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
 ];
 const WEAPON_QUESTION={id:"weapon_loadout",category:"COMBAT IDENTITY",title:"Weapon & Fighting Style",description:"Choose the character's non-E.G.O. fighting equipment and preferred style. This is a fictional character-design loadout; ranged ammunition uses invented archive types, not real-world specifications.",customizer:true,weaponCustomizer:true};
-function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;return [...base,WEAPON_QUESTION,...DOSSIER_QUESTIONS];}
+function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;const combat=creationMode==="complex"?[]:COMBAT_PROFILE_QUESTIONS;return [...base,...combat,WEAPON_QUESTION,...DOSSIER_QUESTIONS];}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
 function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
@@ -662,7 +651,7 @@ const GENERATED_DOWNSTREAM={
  backstory:["generated_backstory"],complex_15:["generated_backstory"],complex_59:["generated_backstory"],
  likes:["generated_likes"],complex_32:["generated_likes"],complex_33:["generated_likes"],
  dislikes:["generated_dislikes"],complex_37:["generated_dislikes"],complex_29:["generated_dislikes"],
- advanced_abilities:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
+ 
  complex_47:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  complex_50:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  complex_51:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
@@ -1177,7 +1166,7 @@ function render(){
    $("custom-wrap").classList.toggle("hidden",!custom);$("custom-answer").value=saved.custom||"";
    $("custom-label").textContent="CUSTOM PERSONALITY";
    $("next-button").classList.remove("hidden");
-   $("next-button").textContent=index===qs.length-1?"CONFIRM & COMPLETE":"SAVE PERSONALITY & CONTINUE";
+    $("next-button").textContent=index===qs.length-1?"CONFIRM & COMPLETE":q.id==="personality"?"SAVE PERSONALITY & CONTINUE":q.id.includes("status_infliction")?"SAVE ABILITIES & STATUS":"SAVE SELECTIONS & CONTINUE";
    return;
   }
   const options=customLastUnique(typeof q.options==="function"?q.options(values()):q.options);
@@ -1222,7 +1211,7 @@ function submit(){
   if(!Object.values(loadout).some(Boolean)){$("validation-message").textContent="ADD AT LEAST ONE SYNERGY, SUIT, E.G.O WEAPON VALUE, OR GIFT.";return;}
   setAnswer(q,"Custom E.G.O. loadout",loadout,"");advance();return;
  }
- if(q.multiple){const selected=Array.isArray(answers[q.id]?.value)?answers[q.id].value:[];if(!selected.length){$("validation-message").textContent="SELECT AT LEAST ONE PERSONALITY TRAIT OR CUSTOM.";return;}if(selected.includes("Other / custom answer")){const custom=$("custom-answer").value.trim();if(!custom){$("validation-message").textContent="PLEASE ENTER A CUSTOM PERSONALITY.";return;}setAnswer(q,"Other / custom answer",["Other / custom answer"],custom);}else setAnswer(q,"Selected traits",selected,"");advance();return;}
+ if(q.multiple){const selected=Array.isArray(answers[q.id]?.value)?answers[q.id].value:[];if(!selected.length){$("validation-message").textContent=q.id==="personality"?"SELECT AT LEAST ONE PERSONALITY TRAIT.":"SELECT AT LEAST ONE STATUS EFFECT.";return;}if(selected.includes("Other / custom answer")){const custom=$("custom-answer").value.trim();if(!custom){$("validation-message").textContent="PLEASE ENTER YOUR CUSTOM ANSWER.";return;}setAnswer(q,"Other / custom answer",["Other / custom answer"],custom);}else setAnswer(q,"Selected options",selected,"");advance();return;}
  const choice=[...$("choice-list").children].find(b=>b.dataset.selected==="true")?.lastElementChild.textContent;
  if(!choice){$("validation-message").textContent="PLEASE SELECT AN ANSWER BEFORE CONTINUING.";return;}
  let value=choice,custom="";
@@ -1245,7 +1234,7 @@ function randomizeAll(mode=creationMode){
  for(const q of activeQuestions()){
   if(q.showIf&&!q.showIf(values()))continue;
   if(q.freeText){if(q.optional){answers[q.id]={choice:"Optional profile details",value:"",custom:""};continue;}const text=randomizedWriting(q);answers[q.id]={choice:"Detailed response",value:text,custom:text};continue;}
-  if(q.multiple){const pool=q.options.filter(x=>x!=="Other / custom answer"),shuffled=pool.slice().sort(()=>Math.random()-.5),chosen=shuffled.slice(0,2+Math.floor(Math.random()*2));answers[q.id]={choice:"Selected traits",value:chosen,custom:""};continue;}
+   if(q.multiple){const pool=q.options.filter(x=>x!=="Other / custom answer"&&x!==q.noneOption),shuffled=pool.slice().sort(()=>Math.random()-.5),chosen=q.noneOption&&Math.random()<.12?[q.noneOption]:shuffled.slice(0,Math.max(1,Math.min(q.maxSelections||3,2+Math.floor(Math.random()*2))));answers[q.id]={choice:"Selected options",value:chosen,custom:""};continue;}
   if(q.id==="ego_name"){const name=randomEgoName(values().ego_theme);answers[q.id]={choice:"Other / custom answer",value:name,custom:name};continue;}
   if(q.customizer){
    const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
@@ -1309,7 +1298,7 @@ function simProfileField(record,label){
 }
 function simAbilityOptions(record){
  const answers=record.answers||{};
- const values=[1,2,3,4].map(n=>answers["ability_"+n]?.value||answers["complex_ability_"+n]?.value||simProfileField(record,"Ability "+n)).filter(value=>value&&value!=="Not specified.");
+ const values=[1,2,3,4].map(n=>record.mode==="complex"?(answers["complex_ability_"+n]?.value||simProfileField(record,"Ability "+n)):(String(answers["generated_ability_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
  if(values.length)return values;
  const source=answers.advanced_abilities?.value||answers.complex_47?.value||"";
  if(typeof source==="string"&&source.trim())return source.split(/\n+|;(?=\s*[A-Z])/).map(x=>x.trim()).filter(Boolean).slice(0,4);
@@ -1317,7 +1306,7 @@ function simAbilityOptions(record){
 }
 function simUltimateOptions(record){
  const answers=record.answers||{};
- const values=[1,2].map(n=>answers["ultimate_ability_"+n]?.value||answers["complex_ultimate_"+n]?.value||simProfileField(record,"Ultimate Ability "+n)).filter(value=>value&&value!=="Not specified.");
+ const values=[1,2].map(n=>record.mode==="complex"?(answers["complex_ultimate_"+n]?.value||simProfileField(record,"Ultimate Ability "+n)):(String(answers["generated_ultimate_"+n]?.value||"").split(/\s+[—–-]\s+/)[0].trim())).filter(value=>value&&value!=="Not specified.");
  return values.length?values:["Limit Break","Final Resonance"];
 }
 function simStatusInfliction(record){
