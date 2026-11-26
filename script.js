@@ -475,23 +475,33 @@ function formatWeaponLoadout(value){
 }
 function limitDossierOutput(sections,maxCharacters=4200){
  const weights=[.25,1,.65,1.15,1,1.35,1.2,1.55,.85,1.05,1.05,1.05,1.05,1.2,1.2,1.05,1.35,1.5,1.5,.95,.95,1.25];
- const separators=(sections.length-1)*2;
- const labels=sections.reduce((sum,line)=>sum+line.slice(0,line.indexOf(":")+2).length,0);
- const available=Math.max(0,maxCharacters-separators-labels);
- const weightTotal=weights.reduce((sum,value)=>sum+value,0);
- return sections.map((line,index)=>{
-  const colon=line.indexOf(":");
-  if(colon<0)return line;
-  const heading=line.slice(0,colon+2),body=line.slice(colon+2).trim();
-  const budget=Math.max(24,Math.floor(available*(weights[index]||1)/weightTotal));
-  if(body.length<=budget)return heading+body;
-  let cut=budget-2;
-  const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut),body.lastIndexOf("; ",cut));
-  if(sentenceCut>budget*.52)cut=sentenceCut+1;
-  else{const wordCut=body.lastIndexOf(" ",cut);if(wordCut>budget*.7)cut=wordCut;}
-  return heading+body.slice(0,cut).trimEnd()+"…";
- }).join("\n\n");
+ const build=limit=>{
+  const separators=(sections.length-1)*2;
+  const labels=sections.reduce((sum,line)=>sum+line.slice(0,line.indexOf(":")+2).length,0);
+  const available=Math.max(0,limit-separators-labels);
+  const weightTotal=weights.reduce((sum,value)=>sum+value,0);
+  return sections.map((line,index)=>{
+   const colon=line.indexOf(":");
+   if(colon<0)return line;
+   const heading=line.slice(0,colon+2),body=line.slice(colon+2).trim();
+   const budget=Math.max(24,Math.floor(available*(weights[index]||1)/weightTotal));
+   if(body.length<=budget)return heading+body;
+   let cut=budget-2;
+   const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut),body.lastIndexOf("; ",cut));
+   if(sentenceCut>budget*.52)cut=sentenceCut+1;
+   else{const wordCut=body.lastIndexOf(" ",cut);if(wordCut>budget*.7)cut=wordCut;}
+   return heading+body.slice(0,cut).trimEnd()+"…";
+  }).join("\n\n");
+ };
+ let output=build(maxCharacters);
+ const estimate=value=>Math.ceil(Math.max(value.length/3,value.trim().split(/\s+/).length*1.3));
+ while(estimate(output)>1400&&maxCharacters>1900){
+  maxCharacters-=150;
+  output=build(maxCharacters);
+ }
+ return output;
 }
+
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
  const notSet="Not specified.",isLazy=mode==="laziness";
