@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-oc-archive2">
+  <link rel="stylesheet" href="style.css?v=20261126-fight-safety2">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -203,6 +203,7 @@
           </label>
         </div>
         <p class="effects-footnote">Every switch is saved on this device. Animated effects respect your device's reduced-motion setting.</p>
+      <div class="flash-warning-settings"><p id="flash-warning-settings-status">Flashing-effects warning: shown when enabling Rainbow Apocalypse or Impact Frame.</p><button id="flash-warning-reset-button" class="secondary-button" type="button">RE-ENABLE FLASH WARNING</button></div>
       </section>
       <div class="settings-panel-footer">
         <span>CHANGES APPLY IMMEDIATELY</span>
@@ -211,6 +212,9 @@
     </section>
   </dialog>
 
+  <dialog id="flash-warning-dialog" class="flash-warning-dialog" aria-labelledby="flash-warning-title">
+    <div class="flash-warning-panel"><p class="eyebrow">VISUAL EFFECTS / SAFETY NOTICE</p><h2 id="flash-warning-title">FLASHING CONTENT WARNING</h2><p>Rainbow Apocalypse can rapidly cycle colors. Impact Frame can create repeated high-contrast flashes. These effects may cause discomfort and may trigger seizures in people with photosensitive epilepsy.</p><p>Neither effect will turn on until you explicitly agree. You can leave them disabled and continue using the rest of the site.</p><label class="flash-warning-never"><input id="flash-warning-never" type="checkbox"> DON'T SHOW THIS POP-UP EVER AGAIN</label><div class="flash-warning-actions"><button id="flash-warning-cancel" class="text-button" type="button">DON'T ENABLE</button><button id="flash-warning-accept" class="primary-button" type="button">I AGREE — ENABLE <span>✓</span></button></div></div>
+  </dialog>
   <main>
     <section id="home-screen" class="hero screen">
       <div class="archive-system-bar"><span class="system-light"></span><span>MIRROR ENGINE ONLINE</span><i>///</i><span>COMMUNITY CLEARANCE</span><i>///</i><span>FILE STATUS: OPEN</span></div>
@@ -237,6 +241,7 @@
       <section class="oc-archive" aria-labelledby="oc-archive-title"><div class="oc-archive-heading"><div><p class="eyebrow">LOCAL CHARACTER ARCHIVE</p><h2 id="oc-archive-title">YOUR OCs</h2></div><span id="oc-count" class="effects-count">0 SAVED</span></div><p class="oc-archive-note">Completed characters are saved on this device. Reopen a record to customize it, or remove it from your archive.</p><div id="oc-history-list" class="oc-history-list"><p class="oc-empty">NO CHARACTER RECORDS YET.</p></div></section><div class="hero-actions">
         <button id="begin-button" class="primary-button">BEGIN CREATION <span>↗</span></button>
         <button id="randomize-button" class="secondary-button">RANDOMIZE ALL <span>✦</span></button>
+        <button id="open-simulator-button" class="secondary-button">FIGHTING SIMULATOR <span>⚔</span></button>
       </div>
       <p class="small-note">A COMMUNITY CHARACTER BUILDER · YOUR STORY, YOUR MIRROR WORLD</p>
       <p class="sponsor-joke">Sponsored by The Head. Your data is probably being monitored.</p>
@@ -337,6 +342,32 @@
       <p id="copy-status" class="small-note" aria-live="polite"></p>
       <button id="restart-button" class="text-button restart">START A NEW VARIANT</button>
     </section>
+
+    <section id="simulator-screen" class="screen hidden simulator-screen" aria-labelledby="simulator-title">
+      <div class="simulator-topbar"><button id="simulator-back-button" class="text-button" type="button">← MAIN MENU</button><span class="simulator-record-tag">MIRROR MATCH ENGINE / SIMULATION ONLY</span></div>
+      <header class="simulator-heading"><p class="eyebrow">UNOFFICIAL COMBAT SANDBOX</p><h2 id="simulator-title">THE MIRROR ARENA</h2><p>Let your saved OCs meet in a fictional match. Turns use abstract stamina and momentum values, with character-driven dialogue and reactions.</p></header>
+      <section id="simulator-setup" class="simulator-setup">
+        <div class="simulator-section-heading"><span>01 / MATCH FORMAT</span><span>SELECT A MODE</span></div>
+        <div class="sim-mode-grid" role="group" aria-label="Match format">
+          <button class="sim-mode-card active" type="button" data-sim-mode="1v1"><strong>1V1</strong><small>ONE AGAINST ONE</small></button>
+          <button class="sim-mode-card" type="button" data-sim-mode="2v2"><strong>2V2</strong><small>TEAM AGAINST TEAM</small></button>
+          <button class="sim-mode-card" type="button" data-sim-mode="ffa"><strong>FREE FOR ALL</strong><small>UP TO FOUR OCS</small></button>
+        </div>
+        <p id="sim-mode-description" class="simulator-hint">Two saved OCs enter a one-on-one match.</p>
+        <div class="simulator-section-heading"><span>02 / PARTICIPANTS</span><span id="sim-participant-count">2 FIGHTERS</span></div>
+        <div id="sim-fighter-selectors" class="sim-fighter-selectors"></div>
+        <p id="sim-setup-message" class="simulator-hint" role="status"></p>
+        <div class="sim-setup-actions"><button id="sim-create-oc-button" class="text-button" type="button">CREATE AN OC FIRST</button><button id="sim-start-button" class="primary-button" type="button">INITIALIZE MATCH <span>↗</span></button></div>
+      </section>
+      <section id="simulator-match" class="simulator-match hidden" aria-label="Live match">
+        <div class="simulator-match-heading"><div><p class="eyebrow">LIVE MIRROR MATCH</p><h3 id="sim-match-title">1V1</h3></div><span id="sim-turn-count" class="simulator-turn-count">TURN 00</span></div>
+        <div class="simulator-battle-layout">
+          <section class="simulator-arena-panel" aria-label="Arena"><div id="sim-arena-cards" class="sim-arena-cards"></div><div id="sim-match-status" class="sim-match-status" role="status">MATCH READY.</div><div class="simulator-match-actions"><button id="sim-next-turn-button" class="primary-button" type="button">RUN NEXT TURN <span>→</span></button><button id="sim-run-all-button" class="secondary-button" type="button">SIMULATE MATCH</button><button id="sim-rematch-button" class="text-button hidden" type="button">REMATCH</button></div></section>
+          <aside class="simulator-commentary" aria-label="Character chats and interactions"><div class="sim-commentary-heading"><div><p class="eyebrow">LIVE TRANSCRIPT</p><h3>CHAT & INTERACTIONS</h3></div><span id="sim-feed-status">STANDBY</span></div><div id="sim-log" class="sim-log" aria-live="polite" aria-relevant="additions"></div></aside>
+        </div>
+      </section>
+      <p class="simulator-disclaimer">This is a lighthearted, fictional OC simulator. Outcomes are randomized for entertainment and do not represent canon power rankings.</p>
+    </section>
   </main>
 
   <footer>
@@ -345,6 +376,6 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-oc-archive2"></script>
+  <script src="script.js?v=20261126-fight-safety2"></script>
 </body>
 </html>
