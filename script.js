@@ -264,7 +264,7 @@ const $=id=>document.getElementById(id);
   if(event.key==="Tab"){event.preventDefault();button.focus();}
  });
 })();
-let index=0,answers={};
+let index=0,answers={},characterName="";
 function values(){const v={};for(const q of QUESTIONS)if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
 function visible(){return QUESTIONS.filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
@@ -293,7 +293,7 @@ function setAnswer(q,choice,value,custom=""){
  answers[q.id]={choice,value,custom};
  pruneHiddenAnswers();
 }
-function screen(n){["home-screen","picker-screen","result-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
+function screen(n){["home-screen","name-screen","picker-screen","result-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
 function renderSinnerEgo(saved){
   const savedValue=(saved.value&&saved.value.sinner_ego)||"";
   const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal";panel.dataset.egoPath="sinner";
@@ -468,7 +468,9 @@ function render(){
 }
 function finish(){
  pruneHiddenAnswers();
+ $("result-character-name").textContent=characterName||"UNNAMED VARIANT";
  const qs=visible();$("summary-list").innerHTML="";
+ const nameRow=document.createElement("div");nameRow.className="summary-row";const nameKey=document.createElement("strong"),nameValue=document.createElement("span");nameKey.textContent="Name";nameValue.textContent=characterName||"Unnamed Variant";nameRow.append(nameKey,nameValue);$("summary-list").append(nameRow);
  qs.forEach(q=>{const row=document.createElement("div");row.className="summary-row";const k=document.createElement("strong"),v=document.createElement("span");k.textContent=q.title;const answer=answers[q.id]?.value;v.textContent=answer&&typeof answer==="object"?(answer.sinner_ego!==undefined?`Abnormality E.G.O.: ${answer.sinner_ego||"—"}`:[`Synergy: ${answer.synergy||"—"}`,`Suit: ${answer.suit||"—"}`,`E.G.O Weapon: ${answer.category4||"—"}`,`Gift: ${answer.gift||"—"}`].join(" · ")):answer||"Not specified";row.append(k,v);$("summary-list").append(row);});
  screen("result");
 }
@@ -512,12 +514,19 @@ function randomizeAll(){
  pruneHiddenAnswers();
  finish();
 }
-function summary(){return ["PROJECT MOON VARIANT BUILDER — CHARACTER RECORD","Shared setting note: use this builder for original Project Moon-inspired characters and Mirror World variants.","",...visible().map(q=>{const v=answers[q.id]?.value;if(v&&typeof v==="object"&&v.sinner_ego!==undefined)return `${q.title}: Abnormality E.G.O.: ${v.sinner_ego||"Not specified"}`;if(v&&typeof v==="object")return `${q.title}: E.G.O. Synergy: ${v.synergy||"Not specified"}; Suit: ${v.suit||"Not specified"}; E.G.O Weapon: ${v.category4||"Not specified"}; Gift: ${v.gift||"Not specified"}`;return `${q.title}: ${v||"Not specified"}`;})].join("\n");}
-$("begin-button").onclick=()=>{index=0;render();screen("picker");};
+function summary(){return ["PROJECT MOON VARIANT BUILDER — CHARACTER RECORD",`Name: ${characterName||"Unnamed Variant"}`,"Shared setting note: use this builder for original Project Moon-inspired characters and Mirror World variants.","",...visible().map(q=>{const v=answers[q.id]?.value;if(v&&typeof v==="object"&&v.sinner_ego!==undefined)return `${q.title}: Abnormality E.G.O.: ${v.sinner_ego||"Not specified"}`;if(v&&typeof v==="object")return `${q.title}: E.G.O. Synergy: ${v.synergy||"Not specified"}; Suit: ${v.suit||"Not specified"}; E.G.O Weapon: ${v.category4||"Not specified"}; Gift: ${v.gift||"Not specified"}`;return `${q.title}: ${v||"Not specified"}`;})].join("\n");}
+$("begin-button").onclick=()=>{ $("character-name").value=characterName; $("name-validation").textContent=""; screen("name"); $("character-name").focus(); };
+$("name-back").onclick=()=>screen("home");
+$("name-continue").onclick=()=>{
+ const entered=$("character-name").value.trim();
+ if(!entered){$("name-validation").textContent="PLEASE ENTER A NAME TO BEGIN YOUR RECORD."; $("character-name").focus(); return;}
+ characterName=entered;index=0;render();screen("picker");
+};
+$("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("randomize-button").onclick=randomizeAll;
 $("home-button").onclick=()=>screen("home");
-$("back-button").onclick=()=>{if(index>0){index--;render();}};
+$("back-button").onclick=()=>{if(index>0){index--;render();}else{ $("character-name").value=characterName;screen("name"); }};
 $("next-button").onclick=submit;
 $("edit-button").onclick=()=>{index=0;render();screen("picker");};
-$("restart-button").onclick=()=>{answers={};index=0;screen("home");};
+$("restart-button").onclick=()=>{answers={};characterName="";index=0;$("character-name").value="";screen("home");};
 $("copy-button").onclick=async()=>{try{await navigator.clipboard.writeText(summary());$("copy-status").textContent="SUMMARY COPIED TO CLIPBOARD.";}catch{$("copy-status").textContent="CLIPBOARD UNAVAILABLE. PLEASE COPY MANUALLY.";}}
