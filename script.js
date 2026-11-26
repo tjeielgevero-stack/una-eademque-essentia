@@ -630,7 +630,7 @@ $("restart-button").onclick=()=>{answers={};characterName="";creationMode="simpl
 $("copy-button").onclick=async()=>{try{await navigator.clipboard.writeText(summary());$("copy-status").textContent="SUMMARY COPIED TO CLIPBOARD.";}catch{$("copy-status").textContent="CLIPBOARD UNAVAILABLE. PLEASE COPY MANUALLY.";}}
 
 // MIRROR ARENA: a lightweight fictional OC matchup simulator.
-let simMode="1v1",simMatch=null;
+let simMode="1v1",simMatch=null,simAutoRunning=false;
 const SIM_MODE_INFO={"1v1":{count:2,description:"Two saved OCs enter a one-on-one match.",labels:["TEAM A · FIGHTER 1","TEAM B · FIGHTER 1"]},"2v2":{count:4,description:"Two pairs compete as teams, with teammates able to support each other.",labels:["TEAM A · FIGHTER 1","TEAM A · FIGHTER 2","TEAM B · FIGHTER 1","TEAM B · FIGHTER 2"]},"ffa":{count:4,description:"Three or four OCs compete individually. The last active character wins.",labels:["FREE AGENT 1","FREE AGENT 2","FREE AGENT 3","FREE AGENT 4"]}};
 const SIM_DIALOGUE={aloof:["That was your opening?","Wake me when this becomes interesting.","...Predictable."],reserved:["I would rather settle this quickly.","There is no need for a spectacle.","Understood. My turn."],stoic:["I will remain composed.","Noted.","I can continue."],cheerful:["This is getting exciting!","Come on, show me what you can do!","That was a good one!"],sarcastic:["Was that supposed to impress me?","I have seen paperwork more threatening than that.","Lovely. Truly inspired."],analytical:["Your timing is becoming predictable.","I have adjusted my approach.","Interesting pattern."],pragmatic:["Let's keep this efficient.","No wasted movement.","Enough talking. Next exchange."],proud:["Remember who you are facing.","I will not be outdone.","You will have to do better."],cynical:["Of course it came to this.","Nothing ever goes smoothly, does it?","I expected as much."],gentle:["Are you alright? We can take a moment.","I do not want this to go too far.","Let's finish this fairly."],mischievous:["Oh, you fell for that?","I have another surprise.","Try to keep up!"],protective:["Stay behind me. I have this.","I will not let my team down.","I've got your back."],loyal:["We stand together.","I will support you.","Not abandoning this match."],default:["Let's see how this goes.","Your move.","I am not finished yet."]};
 const SIM_MOVES=["measured feint","momentum shift","careful pressure","a clean counter","a clever change of pace","a focused flourish"];
@@ -755,6 +755,7 @@ function simRunTurn(){
  simRenderArena();const winner=simWinner();if(winner!==false)simFinish(winner);else $("sim-match-status").textContent="TURN "+simMatch.turn+" RESOLVED — NEXT EXCHANGE READY.";
 }
 function simBuildMatch(ids){
+ simAutoRunning=false;
  const records=readOcArchive(),teamMap=simMode==="1v1"?["A","B"]:simMode==="2v2"?["A","A","B","B"]:["ffa","ffa","ffa","ffa"];
  const fighters=ids.map((id,index)=>{
   const record=records.find(r=>r.id===id),ego=simEgoProfile(record);
@@ -772,7 +773,17 @@ function simBuildMatch(ids){
 }
 function simStart(){const ids=[...document.querySelectorAll("[data-sim-slot]")].map(x=>x.value).filter(Boolean),min=simMode==="ffa"?3:SIM_MODE_INFO[simMode].count;if(ids.length<min){$("sim-setup-message").textContent=simMode==="ffa"?"Choose at least three OCs.":"Choose every fighter slot.";return;}if(new Set(ids).size!==ids.length){$("sim-setup-message").textContent="Choose a different saved OC for each slot.";return;}if(simMode!=="ffa"&&ids.length!==SIM_MODE_INFO[simMode].count){$("sim-setup-message").textContent="Fill every fighter slot before starting.";return;}simBuildMatch(ids);$("sim-setup-message").textContent="";}
 function simRematch(){if(simMatch)simBuildMatch(simMatch.ids);}
-function simRunAll(){let guard=0;while(simMatch&&!simMatch.finished&&guard<80){simRunTurn();guard++;}if(simMatch&&!simMatch.finished)simFinish(simWinner());}
+function simRunAll(){
+ if(!simMatch||simMatch.finished||simAutoRunning)return;
+ simAutoRunning=true;$("sim-run-all-button").disabled=true;$("sim-next-turn-button").disabled=true;
+ const tick=()=>{
+  if(!simMatch||simMatch.finished){simAutoRunning=false;return;}
+  simRunTurn();
+  if(simMatch.finished){simAutoRunning=false;return;}
+  window.setTimeout(tick,520);
+ };
+ tick();
+}
 function transitionDelay(){return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches?1:720;}
 function openSimulator(){document.body.classList.add("simulator-opening");window.setTimeout(()=>{screen("simulator");document.body.classList.remove("simulator-opening");document.body.classList.add("simulator-entered");simSetMode("1v1");},transitionDelay());}
 function closeSimulator(){document.body.classList.remove("simulator-entered");document.body.classList.add("simulator-closing");window.setTimeout(()=>{screen("home");document.body.classList.remove("simulator-closing");document.body.classList.add("home-returning");window.setTimeout(()=>document.body.classList.remove("home-returning"),transitionDelay());},transitionDelay());}
