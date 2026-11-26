@@ -569,7 +569,7 @@ function finish(){
  const qs=visible();$("summary-list").innerHTML="";
  const modeRow=document.createElement("div");modeRow.className="summary-row";const modeKey=document.createElement("strong"),modeValue=document.createElement("span");modeKey.textContent="Creation Mode";modeValue.textContent=creationMode==="advanced"?"Advanced Creation":"Simple Creation";modeRow.append(modeKey,modeValue);$("summary-list").append(modeRow);
  const nameRow=document.createElement("div");nameRow.className="summary-row";const nameKey=document.createElement("strong"),nameValue=document.createElement("span");nameKey.textContent="Name";nameValue.textContent=characterName||"Unnamed Variant";nameRow.append(nameKey,nameValue);$("summary-list").append(nameRow);
- qs.forEach(q=>{const row=document.createElement("div");row.className="summary-row";const k=document.createElement("strong"),v=document.createElement("span");k.textContent=q.title;const answer=answers[q.id]?.value;v.textContent=answer&&typeof answer==="object"?(answer.sinner_ego!==undefined?`Abnormality E.G.O.: ${answer.sinner_ego||"—"}`:[`Synergy: ${answer.synergy||"—"}`,`Suit: ${answer.suit||"—"}`,`E.G.O Weapon: ${answer.category4||"—"}`,`Gift: ${answer.gift||"—"}`].join(" · ")):answer||"Not specified";row.append(k,v);$("summary-list").append(row);});
+ qs.forEach(q=>{const row=document.createElement("div");row.className="summary-row";const k=document.createElement("strong"),v=document.createElement("span");k.textContent=q.title;const answer=answers[q.id]?.value;v.textContent=Array.isArray(answer)?(answers[q.id]?.choice==="Other / custom answer"?(answers[q.id]?.custom||"Custom"):answer.join(", ")):answer&&typeof answer==="object"?(answer.sinner_ego!==undefined?`Abnormality E.G.O.: ${answer.sinner_ego||"—"}`:[`Synergy: ${answer.synergy||"—"}`,`Suit: ${answer.suit||"—"}`,`E.G.O Weapon: ${answer.category4||"—"}`,`Gift: ${answer.gift||"—"}`].join(" · ")):answer||"Not specified";row.append(k,v);$("summary-list").append(row);});
  screen("result");
 }
 function advance(){pruneHiddenAnswers();index++;if(index>=visible().length)finish();else render();}
@@ -618,7 +618,7 @@ function randomizeAll(){
  finish();
 }
 function summary(){return ["PROJECT MOON VARIANT BUILDER — CHARACTER RECORD",`Name: ${characterName||"Unnamed Variant"}`,`Creation Mode: ${creationMode==="advanced"?"Advanced Creation":"Simple Creation"}`,"Shared setting note: use this builder for original Project Moon-inspired characters and Mirror World variants.","",...visible().map(q=>{const v=answers[q.id]?.value;if(v&&typeof v==="object"&&v.sinner_ego!==undefined)return `${q.title}: Abnormality E.G.O.: ${v.sinner_ego||"Not specified"}`;if(v&&typeof v==="object")return `${q.title}: E.G.O. Synergy: ${v.synergy||"Not specified"}; Suit: ${v.suit||"Not specified"}; E.G.O Weapon: ${v.category4||"Not specified"}; Gift: ${v.gift||"Not specified"}`;return `${q.title}: ${v||"Not specified"}`;})].join("\n");}
-$("begin-button").onclick=()=>{ $("character-name").value=characterName; $("name-validation").textContent=""; screen("name"); $("character-name").focus(); };
+$("begin-button").onclick=()=>{ editingOcId=null;answers={}; $("character-name").value=""; $("name-validation").textContent=""; screen("name"); $("character-name").focus(); };
 $("name-back").onclick=()=>screen("home");
 $("name-continue").onclick=()=>{
  const entered=$("character-name").value.trim();
@@ -628,14 +628,15 @@ $("name-continue").onclick=()=>{
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>{ $("character-name").value=characterName;screen("name"); };
 function beginSelectedMode(mode){
- creationMode=mode;answers={};index=0;render();screen("picker");
+ creationMode=mode;answers={};editingOcId=null;index=0;render();screen("picker");
 }
 $("mode-simple").onclick=()=>beginSelectedMode("simple");
 $("mode-advanced").onclick=()=>beginSelectedMode("advanced");
-$("randomize-button").onclick=randomizeAll;
+$("randomize-button").onclick=()=>{editingOcId=null;randomizeAll();};
+renderOcHistory();
 $("home-button").onclick=()=>screen("home");
 $("back-button").onclick=()=>{if(index>0){index--;render();}else{screen("mode");}};
 $("next-button").onclick=submit;
 $("edit-button").onclick=()=>{index=0;render();screen("picker");};
-$("restart-button").onclick=()=>{answers={};characterName="";creationMode="simple";index=0;$("character-name").value="";screen("home");};
+$("restart-button").onclick=()=>{answers={};characterName="";creationMode="simple";editingOcId=null;index=0;$("character-name").value="";renderOcHistory();screen("home");};
 $("copy-button").onclick=async()=>{try{await navigator.clipboard.writeText(summary());$("copy-status").textContent="SUMMARY COPIED TO CLIPBOARD.";}catch{$("copy-status").textContent="CLIPBOARD UNAVAILABLE. PLEASE COPY MANUALLY.";}}
