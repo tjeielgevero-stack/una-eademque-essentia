@@ -2305,3 +2305,32 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 /* VIBE CODED UPDATE 1.0.5 — give detailed dossiers comfortable reading room. */
 .profile-summary{font-size:clamp(12px,1.22vw,14px);line-height:1.68;letter-spacing:.008em;}
 @media(max-width:620px){.profile-summary{font-size:11px;line-height:1.58;padding:15px;}}
+
+
+/* LORE BOOK — searchable Project Moon encyclopedia */
+.lore-book-overlay{width:min(980px,calc(100% - 24px));max-width:980px;max-height:min(92vh,920px);padding:0;border:1px solid rgba(var(--accent-rgb),.34);border-radius:8px;background:#101014;color:#e9e2d7;box-shadow:0 28px 100px rgba(0,0,0,.72)}
+.lore-book-overlay::backdrop{background:rgba(3,3,5,.82);backdrop-filter:blur(7px)}
+.lore-book-panel{padding:clamp(18px,3vw,32px);max-height:92vh;overflow:auto}
+.lore-book-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;border-bottom:1px solid rgba(var(--accent-rgb),.24);padding-bottom:18px}
+.lore-book-kicker{margin:0 0 8px;color:var(--accent);font:9px 'DM Mono',monospace;letter-spacing:.2em}
+.lore-book-header h2{margin:0;color:#f0e9df;font:500 clamp(30px,5vw,48px)/1 'Cormorant Garamond',serif;letter-spacing:.1em}
+.lore-book-intro{max-width:680px;margin:12px 0 0;color:#bdb6ad;font:12px/1.75 'DM Mono',monospace}
+.lore-book-spoiler{margin:18px 0;padding:11px 13px;border-left:2px solid var(--accent);background:rgba(var(--accent-rgb),.07);color:#c9c0b5;font:10px/1.65 'DM Mono',monospace}
+.lore-book-spoiler strong{color:#e6cda6}
+.lore-book-controls{display:grid;gap:7px;margin:18px 0 13px}
+.lore-book-search-label{color:#a99d8c;font:9px 'DM Mono',monospace;letter-spacing:.14em}
+#lore-book-search{width:100%;min-height:42px;padding:10px 12px;border:1px solid rgba(var(--accent-rgb),.3);border-radius:4px;background:#17171c;color:#f1ece4;font:12px 'DM Mono',monospace}
+.lore-book-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 18px}
+.lore-book-tab{padding:9px 11px;border:1px solid rgba(var(--accent-rgb),.23);border-radius:3px;background:#17171c;color:#bcb3a7;font:9px 'DM Mono',monospace;letter-spacing:.06em;cursor:pointer}
+.lore-book-tab:hover,.lore-book-tab.is-active{border-color:var(--accent);background:rgba(var(--accent-rgb),.13);color:#f1e7d8}
+.lore-book-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.lore-entry{min-width:0;padding:15px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(0,0,0,.13))}
+.lore-entry-kicker{display:block;margin-bottom:7px;color:var(--accent);font:8px 'DM Mono',monospace;letter-spacing:.13em}
+.lore-entry h3{margin:0 0 8px;color:#e8dfd2;font:500 22px/1.15 'Cormorant Garamond',serif}
+.lore-entry p{margin:0;color:#bdb6ad;font:11px/1.8 'DM Mono',monospace}
+.lore-empty{grid-column:1/-1;padding:25px;text-align:center;color:#aaa093;font:10px 'DM Mono',monospace}
+.lore-book-sources{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:22px;padding-top:16px;border-top:1px solid rgba(var(--accent-rgb),.2);font:9px 'DM Mono',monospace}
+.lore-book-sources>span{flex-basis:100%;color:var(--accent);letter-spacing:.15em}
+.lore-book-sources a{color:#c9b99f;text-decoration:underline;text-underline-offset:3px}
+.lore-book-sources small{flex-basis:100%;color:#817a72;line-height:1.7}
+@media(max-width:650px){.lore-book-content{grid-template-columns:1fr}.lore-book-tabs{display:grid;grid-template-columns:1fr 1fr}.lore-book-tab{min-height:40px}.lore-book-header h2{font-size:32px}}
