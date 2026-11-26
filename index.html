@@ -7,10 +7,15 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-modes1">
+  <link rel="stylesheet" href="style.css?v=20261126-syndicate-fx1">
 </head>
 <body>
-  <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true"></div>
+  <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
+    <span class="fx-layer fx-embers"></span>
+    <span class="fx-layer fx-rain"></span>
+    <span class="fx-layer fx-vignette"></span>
+    <span class="fx-layer fx-shimmer"></span>
+  </div>
   <div id="welcome-notice" class="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-description">
     <div class="notice-panel">
       <div class="notice-kicker"><span class="notice-light"></span> COMMUNITY NOTICE / PLEASE READ</div>
@@ -50,7 +55,7 @@
       </div>
       <div class="settings-tabs" role="tablist" aria-label="Settings categories">
         <button id="settings-tab-appearance" class="settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="settings-appearance" tabindex="0" data-settings-tab="appearance">APPEARANCE</button>
-        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">04</span></button>
+        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">14</span></button>
       </div>
       <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
       <div class="color-picker-section">
@@ -84,9 +89,10 @@
             <span class="effects-overline">PERSONALIZE THE ARCHIVE</span>
             <h3>VISUAL EFFECTS</h3>
           </div>
-          <span class="effects-count">04 EFFECTS</span>
+          <span class="effects-count">14 SWITCHES</span>
         </div>
         <p class="effects-description">Combine any of these effects, or leave them all off for a quieter page. Each switch is saved on this device.</p>
+                <div class="effects-subheading"><strong>ATMOSPHERE / VISUAL EFFECTS</strong><span>10 OPTIONAL LAYERS</span></div>
         <div class="effects-grid">
           <label class="effect-card" for="effect-particles">
             <span class="effect-symbol" aria-hidden="true">✧</span>
@@ -108,8 +114,61 @@
             <span class="effect-copy"><strong>GLITCH FLICKER</strong><small>Occasional, restrained signal distortion on archive details.</small></span>
             <input id="effect-glitch" class="effect-switch" type="checkbox" data-effect-toggle="glitch">
           </label>
+          <label class="effect-card" for="effect-embers">
+            <span class="effect-symbol" aria-hidden="true">✺</span>
+            <span class="effect-copy"><strong>FLOATING EMBERS</strong><small>Tiny warm specks drift through the archive.</small></span>
+            <input id="effect-embers" class="effect-switch" type="checkbox" data-effect-toggle="embers">
+          </label>
+          <label class="effect-card" for="effect-rain">
+            <span class="effect-symbol" aria-hidden="true">⋰</span>
+            <span class="effect-copy"><strong>ARCHIVE RAIN</strong><small>A faint curtain of diagonal rain across the screen.</small></span>
+            <input id="effect-rain" class="effect-switch" type="checkbox" data-effect-toggle="rain">
+          </label>
+          <label class="effect-card" for="effect-vignette">
+            <span class="effect-symbol" aria-hidden="true">◉</span>
+            <span class="effect-copy"><strong>THEATRICAL VIGNETTE</strong><small>Deepens the corners for a more cinematic frame.</small></span>
+            <input id="effect-vignette" class="effect-switch" type="checkbox" data-effect-toggle="vignette">
+          </label>
+          <label class="effect-card" for="effect-shimmer">
+            <span class="effect-symbol" aria-hidden="true">✧</span>
+            <span class="effect-copy"><strong>SILVER SHIMMER</strong><small>A slow, subtle light sweep across the page.</small></span>
+            <input id="effect-shimmer" class="effect-switch" type="checkbox" data-effect-toggle="shimmer">
+          </label>
+          <label class="effect-card" for="effect-orbit">
+            <span class="effect-symbol" aria-hidden="true">◎</span>
+            <span class="effect-copy"><strong>ORBITING SEAL</strong><small>Adds a more pronounced orbit to the archive seal.</small></span>
+            <input id="effect-orbit" class="effect-switch" type="checkbox" data-effect-toggle="orbit">
+          </label>
+          <label class="effect-card" for="effect-borderflow">
+            <span class="effect-symbol" aria-hidden="true">◇</span>
+            <span class="effect-copy"><strong>LIVING BORDERS</strong><small>A gentle accent pulse travels through cards on hover.</small></span>
+            <input id="effect-borderflow" class="effect-switch" type="checkbox" data-effect-toggle="borderflow">
+          </label>
         </div>
-        <p class="effects-footnote">Animated effects respect your device's reduced-motion setting.</p>
+        <div class="effects-subheading"><strong>UNNECESSARY ANIMATIONS</strong><span>4 COMPLETELY OPTIONAL EXTRAS</span></div>
+        <div class="effects-grid">
+          <label class="effect-card" for="effect-idlefloat">
+            <span class="effect-symbol" aria-hidden="true">〰</span>
+            <span class="effect-copy"><strong>IDLE FLOAT</strong><small>The header tag gently bobs for absolutely no reason.</small></span>
+            <input id="effect-idlefloat" class="effect-switch" type="checkbox" data-effect-toggle="idlefloat">
+          </label>
+          <label class="effect-card" for="effect-buttonbounce">
+            <span class="effect-symbol" aria-hidden="true">↟</span>
+            <span class="effect-copy"><strong>BUTTON BOUNCE</strong><small>Buttons perform a tiny spring when hovered.</small></span>
+            <input id="effect-buttonbounce" class="effect-switch" type="checkbox" data-effect-toggle="buttonbounce">
+          </label>
+          <label class="effect-card" for="effect-hoverwiggle">
+            <span class="effect-symbol" aria-hidden="true">⌁</span>
+            <span class="effect-copy"><strong>UNNECESSARY WIGGLE</strong><small>Cards give a tiny wiggle when hovered.</small></span>
+            <input id="effect-hoverwiggle" class="effect-switch" type="checkbox" data-effect-toggle="hoverwiggle">
+          </label>
+          <label class="effect-card" for="effect-sparkle">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>DECORATIVE SPARKLE</strong><small>The Settings gear gets a pointless little twinkle.</small></span>
+            <input id="effect-sparkle" class="effect-switch" type="checkbox" data-effect-toggle="sparkle">
+          </label>
+        </div>
+        <p class="effects-footnote">Every switch is saved on this device. Animated effects respect your device's reduced-motion setting.</p>Animated effects respect your device's reduced-motion setting.</p>
       </section>
       <div class="settings-panel-footer">
         <span>CHANGES APPLY IMMEDIATELY</span>
@@ -252,6 +311,6 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-modes2"></script>
+  <script src="script.js?v=20261126-syndicate-fx1"></script>
 </body>
 </html>
