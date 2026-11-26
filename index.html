@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-overdrive1">
+  <link rel="stylesheet" href="style.css?v=20261126-impact-pacing1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -15,6 +15,7 @@
     <span class="fx-layer fx-rain"></span>
     <span class="fx-layer fx-vignette"></span>
     <span class="fx-layer fx-shimmer"></span>
+    <span class="fx-layer fx-impact"></span>
   </div>
   <div id="welcome-notice" class="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-describedby="notice-description">
     <div class="notice-panel">
@@ -55,7 +56,7 @@
       </div>
       <div class="settings-tabs" role="tablist" aria-label="Settings categories">
         <button id="settings-tab-appearance" class="settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="settings-appearance" tabindex="0" data-settings-tab="appearance">APPEARANCE</button>
-        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">18</span></button>
+        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">20</span></button>
       </div>
       <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
       <div class="color-picker-section">
@@ -89,7 +90,7 @@
             <span class="effects-overline">PERSONALIZE THE ARCHIVE</span>
             <h3>VISUAL EFFECTS</h3>
           </div>
-          <span class="effects-count">18 SWITCHES</span>
+          <span class="effects-count">20 SWITCHES</span>
         </div>
         <p class="effects-description">Combine any of these effects, or leave them all off for a quieter page. Each switch is saved on this device.</p>
                 <div class="effects-subheading"><strong>ATMOSPHERE / VISUAL EFFECTS</strong><span>10 OPTIONAL LAYERS</span></div>
@@ -189,6 +190,16 @@
             <span class="effect-symbol" aria-hidden="true">✦</span>
             <span class="effect-copy"><strong>MAIN CHARACTER ENTRANCE</strong><small>Every screen and question arrives like a dramatic boss introduction.</small></span>
             <input id="effect-bossintro" class="effect-switch" type="checkbox" data-effect-toggle="bossintro">
+          </label>
+          <label class="effect-card" for="effect-impactframe">
+            <span class="effect-symbol" aria-hidden="true">▣</span>
+            <span class="effect-copy"><strong>IMPACT FRAME</strong><small>Every click gets a dramatic monochrome comic-book impact flash.</small></span>
+            <input id="effect-impactframe" class="effect-switch" type="checkbox" data-effect-toggle="impactframe">
+          </label>
+          <label class="effect-card" for="effect-onepiecepacing">
+            <span class="effect-symbol" aria-hidden="true">⌛</span>
+            <span class="effect-copy"><strong>ONE PIECE PACING</strong><small>Everything moves in gloriously unnecessary slow motion.</small></span>
+            <input id="effect-onepiecepacing" class="effect-switch" type="checkbox" data-effect-toggle="onepiecepacing">
           </label>
         </div>
         <p class="effects-footnote">Every switch is saved on this device. Animated effects respect your device's reduced-motion setting.</p>
@@ -334,6 +345,6 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-syndicate-fx1"></script>
+  <script src="script.js?v=20261126-impact-pacing1"></script>
 </body>
 </html>
