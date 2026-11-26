@@ -673,8 +673,26 @@ function render(){
    $("custom-wrap").classList.add("hidden");
    return;
  }
- if(q.multiple){const selected=Array.isArray(saved.value)?saved.value:[];const options=typeof q.options==="function"?q.options(values()):q.options;options.forEach((opt,i)=>{const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",Math.min(i,12)*12+"ms");b.className="choice"+(selected.includes(opt)?" selected":"");const m=document.createElement("span");m.className="choice-mark";const t=document.createElement("span");t.textContent=opt;b.append(m,t);if(selected.includes(opt))b.dataset.selected="true";b.onclick=()=>{let next=selected.slice();if(opt==="Other / custom answer")next=next.includes(opt)?[]:[opt];else{next=next.filter(x=>x!=="Other / custom answer");next=next.includes(opt)?next.filter(x=>x!==opt):next.concat(opt);}setAnswer(q,next.includes("Other / custom answer")?"Other / custom answer":"Selected traits",next,saved.custom||"");render();if(next.includes("Other / custom answer"))$("custom-answer").focus();};$("choice-list").append(b);});const custom=selected.includes("Other / custom answer");$("custom-wrap").classList.toggle("hidden",!custom);$("custom-answer").value=saved.custom||"";$("custom-label").textContent="CUSTOM PERSONALITY";$("next-button").classList.remove("hidden");$("next-button").textContent=index===qs.length-1?"CONFIRM & COMPLETE":"SAVE PERSONALITY & CONTINUE";return;}
- const options=typeof q.options==="function"?q.options(values()):q.options;
+ if(q.multiple){
+   const originalOptions=typeof q.options==="function"?q.options(values()):q.options;
+   const isSephrusPersonality=q.id==="personality"&&String(characterName||"").trim().toLowerCase()==="sephrus aztiluth";
+   const canonical="Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He values originality and the act of creating things. His fundamental mindset, identity, and personality remain consistent across every variant.";
+   let selected=Array.isArray(saved.value)?saved.value:[];
+   if(isSephrusPersonality&&!selected.includes(canonical)){selected=[canonical];setAnswer(q,"Selected traits",selected,"");}
+   const options=isSephrusPersonality?["BROKEN",canonical,...originalOptions.slice(1).map(()=> "BROKEN")]:originalOptions;
+   options.forEach((opt,i)=>{
+    const isBroken=isSephrusPersonality&&opt==="BROKEN";
+    const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",Math.min(i,12)*12+"ms");
+    b.className="choice"+(selected.includes(opt)?" selected":"")+(isBroken?" personality-broken":"");
+    const m=document.createElement("span");m.className="choice-mark";const t=document.createElement("span");t.textContent=opt;b.append(m,t);
+    if(isBroken){b.disabled=true;b.setAttribute("aria-label","BROKEN personality option");b.style.color="#e23b3b";b.style.borderColor="rgba(226,59,59,.45)";b.style.cursor="not-allowed";}
+    if(selected.includes(opt))b.dataset.selected="true";
+    if(!isBroken)b.onclick=()=>{let next=selected.slice();if(opt==="Other / custom answer")next=next.includes(opt)?[]:[opt];else{next=next.filter(x=>x!=="Other / custom answer");next=next.includes(opt)?next.filter(x=>x!==opt):next.concat(opt);}setAnswer(q,next.includes("Other / custom answer")?"Other / custom answer":"Selected traits",next,saved.custom||"");render();if(next.includes("Other / custom answer"))$("custom-answer").focus();};
+    $("choice-list").append(b);
+   });
+   const custom=selected.includes("Other / custom answer");$("custom-wrap").classList.toggle("hidden",!custom);$("custom-answer").value=saved.custom||"";$("custom-label").textContent="CUSTOM PERSONALITY";$("next-button").classList.remove("hidden");$("next-button").textContent=index===qs.length-1?"CONFIRM & COMPLETE":"SAVE PERSONALITY & CONTINUE";return;
+  }
+  const options=typeof q.options==="function"?q.options(values()):q.options;
  options.forEach((opt,optIndex)=>{const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",`${Math.min(optIndex,12)*22}ms`);b.className="choice"+(saved.choice===opt?" selected":"");const mark=document.createElement("span");mark.className="choice-mark";const label=document.createElement("span");label.textContent=opt;b.append(mark,label);if(saved.choice===opt)b.dataset.selected="true";b.onclick=()=>{
    if(opt==="Other / custom answer"){
     [...$("choice-list").children].forEach(x=>{x.classList.remove("selected");delete x.dataset.selected;});
