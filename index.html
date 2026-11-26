@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-desktop1">
+  <link rel="stylesheet" href="style.css?v=20261127-download1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -552,6 +552,15 @@
     </section>
   </main>
 
+  <section class="desktop-download-section" id="desktop-download" aria-labelledby="desktop-download-title">
+    <div class="desktop-download-copy">
+      <p class="eyebrow">NATIVE WINDOWS APPLICATION</p>
+      <h2 id="desktop-download-title">TAKE THE ARCHIVE <span>WITH YOU.</span></h2>
+      <p>Prefer a dedicated desktop experience? Una Eademque Essentia is getting a native Windows edition with its own dashboard.</p>
+      <p class="desktop-download-status" role="status">THE WINDOWS INSTALLER IS CURRENTLY BEING PREPARED.</p>
+    </div>
+    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases" target="_blank" rel="noopener noreferrer">VIEW DESKTOP RELEASES <span>↗</span></a>
+  </section>
   <footer>
     <span>PROJECT MOON CHARACTER ARCHIVE</span>
     <span>UNOFFICIAL FAN-MADE CREATION TOOL</span>
@@ -625,7 +634,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261127-desktop1", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261127-download1", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
