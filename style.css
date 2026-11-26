@@ -1580,11 +1580,11 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
   background:linear-gradient(145deg,rgba(34,30,26,.88),rgba(10,10,10,.96));
   color:#ded3c2;
   white-space:pre-wrap;overflow-wrap:anywhere;
-  font:clamp(11px,1.2vw,13px)/1.75 'DM Mono',monospace;
+  font:clamp(11px,1.2vw,13px)/1.45 'DM Mono',monospace;
   letter-spacing:.015em;
   box-shadow:0 16px 44px rgba(0,0,0,.24);
 }
-@media(max-width:620px){.profile-summary{padding:14px;font-size:10px;line-height:1.65}}
+@media(max-width:620px){.profile-summary{padding:14px;font-size:10px;line-height:1.4}}
 
 
 /* E.G.O. manifestation impact frame for the multiplayer Mirror Arena. */
