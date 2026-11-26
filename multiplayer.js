@@ -425,14 +425,14 @@
       : (isOwner ? "Complete all four directions in sequence. The final prompt is deliberately unforgiving." : (attacker?.name || "A player") + " is attempting an ultimate against " + (target?.name || "their target") + ".");
     $("mp-qte-prompt").textContent = qteArrow(challenge.prompt);
     $("mp-qte-step").textContent = challenge.type === "parry" ? "ONE RESPONSE · " + (challenge.windowMs / 1000).toFixed(2) + "s" : "ACTIVATION " + (challenge.step + 1) + " / " + challenge.totalSteps + " · " + (challenge.windowMs / 1000).toFixed(2) + "s";
-    const buttons = document.querySelectorAll("[data-qte-input]");
-    buttons.forEach(button => button.disabled = !isOwner || qteSubmitting);
     const challengeStateId = challenge.id + ":" + challenge.step;
     if (activeChallengeId !== challengeStateId) {
       activeChallengeId = challengeStateId;
       qteSubmitting = false;
       stopQteTimer();
     }
+    const buttons = document.querySelectorAll("[data-qte-input]");
+    buttons.forEach(button => button.disabled = !isOwner || qteSubmitting);
     if (isOwner && !qteSubmitting) {
       const bar = $("mp-qte-timebar");
       const remaining = Math.max(0, challenge.expiresAt - Date.now());
