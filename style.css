@@ -2058,3 +2058,19 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 .sim-ability-note{margin:12px 0 0}
 #choice-list .choice[data-custom-answer="true"]{grid-column:1;justify-self:end;width:calc(50% - 4px)}
 @media(max-width:620px){.sim-ability-selectors,.sim-ability-buttons{grid-template-columns:1fr}#choice-list .choice[data-custom-answer="true"]{grid-column:1;width:100%}}
+
+
+/* Progressive Web App installation control */
+.app-install-button {
+  margin-right: 8px;
+  border-color: rgba(205,195,180,.55);
+  color: var(--text);
+}
+.app-install-button:hover {
+  color: #fff;
+  border-color: var(--accent);
+  background: rgba(220,210,195,.08);
+}
+@media (max-width: 560px) {
+  .app-install-button { margin-right: 0; }
+}
