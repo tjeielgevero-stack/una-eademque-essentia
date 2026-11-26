@@ -2259,3 +2259,31 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @media(max-width:620px) {
   .weapon-fields { grid-template-columns:1fr; }
 }
+
+
+/* VIBE CODED UPDATE 1.0.0 — home update log and personal background upload. */
+.update-log{width:min(100%,900px);margin:34px auto 0;padding:23px 25px;text-align:left;border:1px solid rgba(188,164,124,.34);background:linear-gradient(135deg,rgba(26,25,25,.91),rgba(8,8,9,.88));box-shadow:0 16px 42px rgba(0,0,0,.22);position:relative;overflow:hidden}
+.update-log:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(180deg,var(--accent),transparent)}
+.update-log-heading,.background-upload-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:14px}
+.update-log-heading h2{margin:5px 0 0;color:var(--pm-ivory);font:500 clamp(23px,4vw,31px) 'Cormorant Garamond',Georgia,serif;letter-spacing:.035em}
+.update-log-version,.background-upload-status{padding:6px 8px;border:1px solid rgba(var(--accent-rgb),.36);color:var(--accent-text);font:8px 'DM Mono',monospace;letter-spacing:.1em;white-space:nowrap}
+.update-log-intro,.background-upload-description{margin:11px 0 15px;color:#a99d8b;font:10px/1.65 'DM Mono',monospace}
+.update-log-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.update-log-list li{display:grid;grid-template-columns:minmax(155px,.7fr) minmax(0,1.5fr);gap:14px;padding:10px 0;border-top:1px solid rgba(188,164,124,.13)}
+.update-log-list strong{color:#e9e1d4;font:9px 'DM Mono',monospace;letter-spacing:.06em}
+.update-log-list span{color:#a99d8b;font:10px/1.55 'DM Mono',monospace}
+.background-upload-setting{padding:22px 0 18px;border-bottom:1px solid rgba(var(--accent-rgb),.18)}
+.background-upload-heading h3{margin:6px 0 0;color:#eee8e1;font:500 27px 'Cormorant Garamond',Georgia,serif;letter-spacing:.04em}
+.background-dropzone{min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;border:1px dashed rgba(var(--accent-rgb),.55);background:linear-gradient(135deg,rgba(var(--accent-rgb),.07),rgba(0,0,0,.2));color:#eee8e1;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
+.background-dropzone:hover,.background-dropzone.dragover{border-color:var(--accent);background:rgba(var(--accent-rgb),.13);transform:translateY(-1px)}
+.background-dropzone:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.background-drop-icon{color:var(--accent);font:30px/1 Georgia,serif}
+.background-dropzone strong{font:9px 'DM Mono',monospace;letter-spacing:.13em}
+.background-dropzone small,.background-upload-footnote{color:#8e8790;font:8px/1.6 'DM Mono',monospace;letter-spacing:.05em}
+.background-upload-footnote{margin:12px 0 0}
+.background-image-preview-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:14px}
+.background-image-preview-wrap[hidden]{display:none}
+.background-image-preview-wrap img{display:block;width:100%;max-height:130px;object-fit:cover;border:1px solid rgba(var(--accent-rgb),.3)}
+.background-image-preview-wrap button{font-size:9px}
+body{background-image:linear-gradient(rgba(5,5,7,.68),rgba(5,5,7,.76)),var(--user-background-image,none),radial-gradient(ellipse at 50% 8%,rgba(var(--accent-rgb),.15),transparent 43%),repeating-linear-gradient(0deg,transparent 0 39px,rgba(255,255,255,.012) 40px),linear-gradient(145deg,#111218,#090a0e 70%);background-size:cover,cover,auto,auto,auto;background-position:center,center,center,center,center;background-attachment:fixed,fixed,scroll,scroll,scroll}
+@media(max-width:560px){.update-log{padding:18px;margin-top:25px}.update-log-heading,.background-upload-heading{align-items:flex-start;flex-direction:column}.update-log-list li{grid-template-columns:1fr;gap:5px}.background-image-preview-wrap{grid-template-columns:1fr}}
