@@ -156,7 +156,10 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     check(ego.ok && ego.data.room.pendingChallenge?.type === "parry", "Eligible player could not activate E.G.O. with a parry window.");
     check(ego.data.room.players.find(player => player.id === guest.id).egoUsed, "E.G.O. usage was not recorded.");
     const egoChallenge = ego.data.room.pendingChallenge;
-    const egoParry = await action(code, host, "parry", undefined, { challengeId: egoChallenge.id, input: egoChallenge.prompt });
+    check(egoChallenge.prompt === null, "E.G.O. attacker was incorrectly shown the defender's parry direction.");
+    const hostEgoView = await getState(code, host);
+    check(!!hostEgoView.data.room.pendingChallenge?.prompt, "E.G.O. defender did not receive the private parry prompt.");
+    const egoParry = await action(code, host, "parry", undefined, { challengeId: egoChallenge.id, input: hostEgoView.data.room.pendingChallenge.prompt });
     check(egoParry.ok && egoParry.data.room.players.find(player => player.id === host.id).hp === 100, "E.G.O. strike did not respect a successful parry.");
 
     check(egoParry.data.room.turnPlayerId === host.id, "Turn did not return to the host after the E.G.O. parry.");
