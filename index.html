@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-settings2">
+  <link rel="stylesheet" href="style.css?v=20261126-name1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true"></div>
@@ -149,6 +149,23 @@
       <p class="sponsor-joke">Sponsored by The Head. Your data is probably being monitored.</p>
     </section>
 
+    <section id="name-screen" class="name-screen screen hidden" aria-labelledby="name-title">
+      <div class="name-panel">
+        <div class="name-ornament" aria-hidden="true">✦ ───────── ✦</div>
+        <p class="eyebrow">IDENTITY REGISTRATION / 00</p>
+        <h2 id="name-title">Create Your Name.</h2>
+        <p class="name-description">Every record begins with an identity. What shall this character be called?</p>
+        <label class="name-field-label" for="character-name">CHARACTER NAME</label>
+        <input id="character-name" class="name-input" type="text" maxlength="80" autocomplete="off" placeholder="Enter a name..." aria-describedby="name-validation">
+        <p id="name-validation" class="validation" role="alert"></p>
+        <div class="name-actions">
+          <button id="name-back" class="secondary-button" type="button">← BACK</button>
+          <button id="name-continue" class="primary-button" type="button">CONTINUE <span>→</span></button>
+        </div>
+        <p class="name-footnote">YOU CAN CHANGE THIS NAME BEFORE COMPLETING YOUR RECORD.</p>
+      </div>
+    </section>
+
     <section id="picker-screen" class="picker screen hidden" aria-live="polite">
       <div class="section-frame" aria-hidden="true"><span>ARCHIVE RECORD</span><span>U.E.E. / 001</span></div>
       <div class="picker-layout">
@@ -190,6 +207,7 @@
     <section id="result-screen" class="result screen hidden">
       <div class="section-frame" aria-hidden="true"><span>ARCHIVE RECORD</span><span>SEALED</span></div>
       <p class="eyebrow">CREATION COMPLETE</p>
+      <p id="result-character-name" class="result-character-name"></p>
       <h2>YOUR VARIANT<br><span>TAKES FORM.</span></h2>
       <p class="intro">Review the choices you made. You can return to any page and revise your answers.</p>
       <div class="record-stamp result-stamp"><span>RECORD SEALED FOR REVIEW</span><span>UNA EADEMQUE ESSENTIA / ARCHIVE</span></div>
@@ -209,6 +227,6 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-settings2"></script>
+  <script src="script.js?v=20261126-name1"></script>
 </body>
 </html>
