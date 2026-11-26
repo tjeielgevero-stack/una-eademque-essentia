@@ -1811,113 +1811,142 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
   text-align:center;
   text-shadow:0 2px 16px rgba(0,0,0,.75),0 0 12px rgba(176,112,105,.14);
 }
+
+/* Irregular transparent glass facets with fine fractured edges. */
 .sephrus-glass-shard {
   position:absolute;
   inset:0;
-  z-index:3;
+  z-index:5;
   opacity:0;
   pointer-events:none;
-  border:1px solid rgba(231,220,218,.34);
-  background:linear-gradient(135deg,rgba(238,230,232,.28),rgba(117,105,120,.08) 48%,rgba(202,177,178,.22));
-  box-shadow:inset 0 0 14px rgba(255,255,255,.09);
+  background:
+    linear-gradient(138deg,rgba(245,251,255,.42),rgba(180,207,224,.08) 34%,rgba(255,255,255,.22) 53%,rgba(104,134,155,.13)),
+    linear-gradient(35deg,rgba(255,255,255,.08),rgba(150,184,205,.03));
+  -webkit-backdrop-filter:blur(1.2px) brightness(1.18);
+  backdrop-filter:blur(1.2px) brightness(1.18);
+  filter:drop-shadow(0 0 1px rgba(238,248,255,.9)) drop-shadow(0 0 3px rgba(185,220,240,.38));
+  transform:translate3d(0,0,0);
+  will-change:transform,opacity,filter;
 }
-.sephrus-glass-shard[data-shard="1"] {
-  clip-path:polygon(0 0,55% 0,39% 43%,0 61%);
-  --shard-x:-42px;--shard-y:-53px;--shard-r:-19deg;
+.sephrus-fracture-web {
+  position:absolute;
+  inset:-1px;
+  z-index:4;
+  width:calc(100% + 2px);
+  height:calc(100% + 2px);
+  overflow:visible;
+  opacity:0;
+  pointer-events:none;
+  filter:drop-shadow(0 0 2px rgba(221,241,255,.88));
 }
-.sephrus-glass-shard[data-shard="2"] {
-  clip-path:polygon(55% 0,100% 0,100% 55%,66% 43%);
-  --shard-x:49px;--shard-y:-44px;--shard-r:17deg;
-}
-.sephrus-glass-shard[data-shard="3"] {
-  clip-path:polygon(0 61%,39% 43%,51% 100%,0 100%);
-  --shard-x:-51px;--shard-y:48px;--shard-r:14deg;
-}
-.sephrus-glass-shard[data-shard="4"] {
-  clip-path:polygon(66% 43%,100% 55%,100% 100%,51% 100%);
-  --shard-x:55px;--shard-y:48px;--shard-r:-16deg;
-}
-.sephrus-glass-shard[data-shard="5"] {
-  clip-path:polygon(55% 0,66% 43%,39% 43%);
-  --shard-x:5px;--shard-y:-66px;--shard-r:27deg;
-}
-.sephrus-glass-shard[data-shard="6"] {
-  clip-path:polygon(39% 43%,66% 43%,51% 100%);
-  --shard-x:8px;--shard-y:66px;--shard-r:-24deg;
+.sephrus-fracture-web path {
+  fill:none;
+  stroke:rgba(238,248,255,.9);
+  stroke-width:.42;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;
 }
 
-/* Chains enter from every edge, tighten, then recoil as the glass gives way. */
+/* Long chains built from individual interlocking steel links. */
 .sephrus-pull-chain {
   position:absolute;
-  z-index:5;
-  display:block;
-  color:#d8d2d0;
-  font:700 19px/1 'DM Mono',monospace;
-  letter-spacing:-.34em;
-  white-space:nowrap;
+  z-index:8;
+  display:flex;
   opacity:0;
   pointer-events:none;
-  filter:grayscale(1) drop-shadow(0 0 5px rgba(236,226,224,.55));
-  text-shadow:0 1px 2px rgba(0,0,0,.85);
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.9)) drop-shadow(0 0 5px rgba(218,232,242,.48));
+  will-change:transform,opacity;
 }
+.sephrus-chain-link {
+  display:block;
+  flex:0 0 auto;
+  width:14px;
+  height:23px;
+  margin-top:-7px;
+  border:2px solid #aebbc5;
+  border-radius:55% 48% 55% 48%;
+  background:linear-gradient(135deg,rgba(246,250,255,.42),rgba(51,61,70,.72) 48%,rgba(201,214,224,.2));
+  box-shadow:
+    inset 1px 1px 2px rgba(255,255,255,.75),
+    inset -2px -2px 3px rgba(0,0,0,.7),
+    0 0 2px rgba(239,247,255,.48);
+}
+.sephrus-chain-link:nth-child(odd) { transform:rotate(38deg); }
+.sephrus-chain-link:nth-child(even) { transform:rotate(-38deg); }
+
 .sephrus-pull-chain[data-chain="top-left"] {
-  top:-16px;left:7%;
-  --chain-from:translate(-90px,-78px);
-  --chain-taut:translate(0,0);
-  --chain-pull:translate(-34px,-30px);
-  --chain-end:translate(-135px,-112px);
+  top:-228px;left:10%;flex-direction:column;
+  --chain-start:translateY(-125px);
+  --chain-held:translateY(0);
+  --chain-recoil:translateY(-125px);
+  --chain-end:translateY(-205px);
 }
 .sephrus-pull-chain[data-chain="top-right"] {
-  top:-16px;right:7%;
-  --chain-from:translate(90px,-78px);
-  --chain-taut:translate(0,0);
-  --chain-pull:translate(34px,-30px);
-  --chain-end:translate(135px,-112px);
+  top:-228px;right:10%;flex-direction:column;
+  --chain-start:translateY(-125px);
+  --chain-held:translateY(0);
+  --chain-recoil:translateY(-125px);
+  --chain-end:translateY(-205px);
 }
 .sephrus-pull-chain[data-chain="bottom-left"] {
-  bottom:-16px;left:7%;
-  --chain-from:translate(-90px,78px);
-  --chain-taut:translate(0,0);
-  --chain-pull:translate(-34px,30px);
-  --chain-end:translate(-135px,112px);
+  bottom:-228px;left:10%;flex-direction:column;
+  --chain-start:translateY(125px);
+  --chain-held:translateY(0);
+  --chain-recoil:translateY(125px);
+  --chain-end:translateY(205px);
 }
 .sephrus-pull-chain[data-chain="bottom-right"] {
-  right:7%;bottom:-16px;
-  --chain-from:translate(90px,78px);
-  --chain-taut:translate(0,0);
-  --chain-pull:translate(34px,30px);
-  --chain-end:translate(135px,112px);
+  right:10%;bottom:-228px;flex-direction:column;
+  --chain-start:translateY(125px);
+  --chain-held:translateY(0);
+  --chain-recoil:translateY(125px);
+  --chain-end:translateY(205px);
 }
+.sephrus-pull-chain[data-chain^="left"] {
+  left:-228px;flex-direction:row;
+}
+.sephrus-pull-chain[data-chain^="left"] .sephrus-chain-link,
+.sephrus-pull-chain[data-chain^="right"] .sephrus-chain-link {
+  width:23px;height:14px;margin-top:0;margin-left:-7px;
+}
+.sephrus-pull-chain[data-chain^="left"] .sephrus-chain-link:nth-child(odd),
+.sephrus-pull-chain[data-chain^="right"] .sephrus-chain-link:nth-child(odd) { transform:rotate(38deg); }
+.sephrus-pull-chain[data-chain^="left"] .sephrus-chain-link:nth-child(even),
+.sephrus-pull-chain[data-chain^="right"] .sephrus-chain-link:nth-child(even) { transform:rotate(-38deg); }
 .sephrus-pull-chain[data-chain="left-upper"] {
-  top:19%;left:-66px;
-  --chain-from:translate(-96px,-50%) rotate(90deg);
-  --chain-taut:translate(0,-50%) rotate(90deg);
-  --chain-pull:translate(-32px,-50%) rotate(90deg);
-  --chain-end:translate(-145px,-50%) rotate(90deg);
+  top:25%;
+  --chain-start:translateX(-125px);
+  --chain-held:translateX(0);
+  --chain-recoil:translateX(-125px);
+  --chain-end:translateX(-205px);
 }
 .sephrus-pull-chain[data-chain="left-lower"] {
-  top:67%;left:-66px;
-  --chain-from:translate(-96px,-50%) rotate(90deg);
-  --chain-taut:translate(0,-50%) rotate(90deg);
-  --chain-pull:translate(-32px,-50%) rotate(90deg);
-  --chain-end:translate(-145px,-50%) rotate(90deg);
+  top:73%;
+  --chain-start:translateX(-125px);
+  --chain-held:translateX(0);
+  --chain-recoil:translateX(-125px);
+  --chain-end:translateX(-205px);
+}
+.sephrus-pull-chain[data-chain^="right"] {
+  right:-228px;flex-direction:row;
 }
 .sephrus-pull-chain[data-chain="right-upper"] {
-  top:19%;right:-66px;
-  --chain-from:translate(96px,-50%) rotate(90deg);
-  --chain-taut:translate(0,-50%) rotate(90deg);
-  --chain-pull:translate(32px,-50%) rotate(90deg);
-  --chain-end:translate(145px,-50%) rotate(90deg);
+  top:25%;
+  --chain-start:translateX(125px);
+  --chain-held:translateX(0);
+  --chain-recoil:translateX(125px);
+  --chain-end:translateX(205px);
 }
 .sephrus-pull-chain[data-chain="right-lower"] {
-  top:67%;right:-66px;
-  --chain-from:translate(96px,-50%) rotate(90deg);
-  --chain-taut:translate(0,-50%) rotate(90deg);
-  --chain-pull:translate(32px,-50%) rotate(90deg);
-  --chain-end:translate(145px,-50%) rotate(90deg);
+  top:73%;
+  --chain-start:translateX(125px);
+  --chain-held:translateX(0);
+  --chain-recoil:translateX(125px);
+  --chain-end:translateX(205px);
 }
 .sephrus-afterimage.shattering .sephrus-pull-chain {
-  animation:sephrus-chain-pull 1.1s cubic-bezier(.2,.78,.18,1) both;
+  animation:sephrus-chain-pull 1.55s cubic-bezier(.18,.76,.18,1) both;
 }
 
 .sephrus-afterimage.shattering .sephrus-afterimage-frame {
