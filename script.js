@@ -492,8 +492,8 @@ function formatCharacterDossier(name,mode,answersSource){
  const passiveLine=passive+(passiveActivation&&!passive.includes(passiveActivation)?" · Activation: "+passiveActivation:"");
  const passive2=lazyField("Passive Ability 2")||labelled("Passive Ability 2")||first("passive_ability_2","complex_passive_2","generated_passive_2")||notSet;
  const personality=lazyField("Personality")||labelled("Personality")||first("advanced_personality","complex_03","generated_personality")||(isSephrus?"Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he appreciates originality and the act of creating things. He is morally gray rather than inherently good or evil, and his fundamental identity remains unchanged across every Mirror World.":combine("personality","advanced_personality","complex_03","complex_21","complex_24"))||"Reserved and observant, the character tends to understand a situation before deciding how much of themself to reveal. Their behavior is shaped by experience rather than a simple division between kindness and cruelty.";
- const storyParts=["advanced_concept","advanced_motivation","advanced_conflict","advanced_code","advanced_relationships","advanced_arc","advanced_extra_lore","backstory","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59"].map(get).filter(Boolean);
- const backstory=lazyField("Backstory")||labelled("Backstory")||(storyParts.length?storyParts.join("\n\n"):first("generated_backstory"))||"Not specified.";
+ const storyParts=["advanced_concept","advanced_motivation","advanced_conflict","advanced_code","advanced_relationships","advanced_arc","advanced_extra_lore","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59"].map(get).filter(Boolean);
+ const backstory=lazyField("Backstory")||labelled("Backstory")||(storyParts.length?storyParts.join("\n\n"):first("generated_backstory","backstory","upbringing","complex_14"))||"Not specified.";
  const preference=(value,type)=>{
   if(!value||value===notSet)return notSet;
   if(value.length>180&&/[.!?]/.test(value))return value;
@@ -1365,7 +1365,9 @@ function simStatusInfliction(record){
 }
 function simPassiveProfile(record){
  const a=record.answers||{};
- return {text:a.passive_ability?.value||a.complex_passive?.value||"",activation:a.passive_activation?.value||a.complex_passive_activation?.value||"Always active"};
+ const raw=a.passive_ability?.value||a.complex_passive?.value||a.generated_passive?.value||"";
+ const text=a.generated_passive?.value?String(raw).split(/\\s+[—–-]\\s+/)[0].trim():raw;
+ return {text,activation:a.passive_activation?.value||a.complex_passive_activation?.value||"Always active"};
 }
 function simApplyStatusInfliction(actor,target,basePotency){
  const statuses=actor.statusInfliction||[];if(!statuses.length)return;
