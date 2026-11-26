@@ -2300,3 +2300,8 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 .background-accent-indicator{display:block;width:25px;height:25px;margin:3px 0 2px;border:1px solid rgba(255,255,255,.38);border-radius:3px;background:linear-gradient(145deg,#777b80,#3d4147);box-shadow:inset 0 0 0 1px rgba(0,0,0,.42),0 0 0 1px rgba(var(--accent-rgb),.22),0 0 13px rgba(var(--accent-rgb),.52),inset 0 0 9px rgba(var(--accent-rgb),.75);position:relative;transition:box-shadow .2s ease,border-color .2s ease,background .2s ease}
 .background-accent-indicator:after{content:"";position:absolute;inset:4px;border-radius:2px;background:rgba(var(--accent-rgb),.72);box-shadow:0 0 10px rgba(var(--accent-rgb),.9)}
 .background-dropzone:hover .background-accent-indicator,.background-dropzone.dragover .background-accent-indicator{border-color:var(--accent);box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 0 0 1px rgba(var(--accent-rgb),.42),0 0 20px rgba(var(--accent-rgb),.78),inset 0 0 12px rgba(var(--accent-rgb),.9)}
+
+
+/* VIBE CODED UPDATE 1.0.5 — give detailed dossiers comfortable reading room. */
+.profile-summary{font-size:clamp(12px,1.22vw,14px);line-height:1.68;letter-spacing:.008em;}
+@media(max-width:620px){.profile-summary{font-size:11px;line-height:1.58;padding:15px;}}
