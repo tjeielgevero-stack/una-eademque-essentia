@@ -62,6 +62,7 @@ function syndicateOptions(a){
 }
 
 const QUESTIONS = [
+{id:"personality",category:"PERSONALITY & TEMPERAMENT",title:"Personality",description:"Select every trait that fits this character. Choose Custom to enter your own personality description instead; Custom cannot be combined with preset traits.",multiple:true,options:["Aloof","Reserved","Stoic","Calm and composed","Analytical","Pragmatic","Cynical","Sarcastic","Witty","Cheerful","Outgoing","Charismatic","Gentle","Compassionate","Patient","Idealistic","Ambitious","Proud","Arrogant","Eccentric","Mischievous","Impulsive","Hot-headed","Anxious","Paranoid","Melancholic","Detached","Secretive","Protective","Loyal","Manipulative","Ruthless","Soft-spoken","Other / custom answer"]},
 {id:"era",category:"SETTING & TIMELINE",title:"Story Era",description:"At what point in the Project Moon timeline does this variant's story take place?",options:["Before the events of Lobotomy Corporation","During the Lobotomy Corporation era","After the White Nights and Dark Days","During the Library of Ruina era","During the Limbus Company era","An alternate Mirror World / original timeline","Other / custom answer"]},
 {id:"origin_type",category:"GEOGRAPHY & ORIGIN",title:"Place of Origin",description:"Which part of the world was this variant born or first raised in?",options:["A Nest in the City","The Backstreets of a District","The Outskirts","The Ruins beneath the City","Outside the known setting / custom Mirror World","Unknown / undisclosed"]},
 {id:"district",category:"GEOGRAPHY & ORIGIN",title:"District / Corp.",description:"Choose the combined District and corresponding Corp. entry. The archive extends the alphabetical pattern through District 26 - Z Corp.; that final entry is an extrapolation, not a confirmed in-game reveal.",showIf:a=>["A Nest in the City","The Backstreets of a District"].includes(a.origin_type),options:Object.values(DISTRICT_CORP).concat(["Unknown / undisclosed","Other / custom answer"])},
@@ -309,6 +310,9 @@ const $=id=>document.getElementById(id);
   applyEffect(key,saved[key]===true);
   control.addEventListener("change",()=>applyEffect(key,control.checked,true));
  });
+ $("effects-apply-all")?.addEventListener("click",()=>{switches.forEach(x=>applyEffect(x.dataset.effectToggle,true));try{localStorage.setItem(storageKey,JSON.stringify(Object.fromEntries(switches.map(x=>[x.dataset.effectToggle,true]))));}catch{}});
+ $("effects-disable-all")?.addEventListener("click",()=>{switches.forEach(x=>applyEffect(x.dataset.effectToggle,false));try{localStorage.setItem(storageKey,"{}");}catch{}});
+ document.addEventListener("pointerdown",event=>{effectsRoot.style.setProperty("--impact-x",Math.round(event.clientX/window.innerWidth*100)+"%");effectsRoot.style.setProperty("--impact-y",Math.round(event.clientY/window.innerHeight*100)+"%");},{passive:true});
 })();
 
 // Show the community disclaimer once per browser tab session.
@@ -344,7 +348,13 @@ const ADVANCED_QUESTIONS = [
  {id:"advanced_extra_lore",category:"ADVANCED PROFILE / ARCHIVE NOTES",title:"Additional Advanced Lore",description:"Add any other details that deserve a place in the full archive: symbols, recurring motifs, secrets, personal rituals, or connections to other records.",freeText:true,inputLabel:"ADDITIONAL LORE"}
 ];
 
-let index=0,answers={},characterName="",creationMode="simple";
+let index=0,answers={},characterName="",creationMode="simple",editingOcId=null;
+const OC_STORAGE_KEY="uee_oc_archive_v1";
+function readOcArchive(){try{const x=JSON.parse(localStorage.getItem(OC_STORAGE_KEY)||"[]");return Array.isArray(x)?x:[];}catch{return [];}}
+function writeOcArchive(x){try{localStorage.setItem(OC_STORAGE_KEY,JSON.stringify(x));}catch{}}
+function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
+function saveCurrentOc(){const rows=readOcArchive();const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:JSON.parse(JSON.stringify(answers)),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
+function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
 function activeQuestions(){return creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
 function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
@@ -551,6 +561,7 @@ function render(){
    $("custom-wrap").classList.add("hidden");
    return;
  }
+ if(q.multiple){const selected=Array.isArray(saved.value)?saved.value:[];const options=typeof q.options==="function"?q.options(values()):q.options;options.forEach((opt,i)=>{const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",Math.min(i,12)*12+"ms");b.className="choice"+(selected.includes(opt)?" selected":"");const m=document.createElement("span");m.className="choice-mark";const t=document.createElement("span");t.textContent=opt;b.append(m,t);if(selected.includes(opt))b.dataset.selected="true";b.onclick=()=>{let next=selected.slice();if(opt==="Other / custom answer")next=next.includes(opt)?[]:[opt];else{next=next.filter(x=>x!=="Other / custom answer");next=next.includes(opt)?next.filter(x=>x!==opt):next.concat(opt);}setAnswer(q,next.includes("Other / custom answer")?"Other / custom answer":"Selected traits",next,saved.custom||"");render();if(next.includes("Other / custom answer"))$("custom-answer").focus();};$("choice-list").append(b);});const custom=selected.includes("Other / custom answer");$("custom-wrap").classList.toggle("hidden",!custom);$("custom-answer").value=saved.custom||"";$("custom-label").textContent="CUSTOM PERSONALITY";$("next-button").classList.remove("hidden");$("next-button").textContent=index===qs.length-1?"CONFIRM & COMPLETE":"SAVE PERSONALITY & CONTINUE";return;}
  const options=typeof q.options==="function"?q.options(values()):q.options;
  options.forEach((opt,optIndex)=>{const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",`${Math.min(optIndex,12)*22}ms`);b.className="choice"+(saved.choice===opt?" selected":"");const mark=document.createElement("span");mark.className="choice-mark";const label=document.createElement("span");label.textContent=opt;b.append(mark,label);if(saved.choice===opt)b.dataset.selected="true";b.onclick=()=>{
    if(opt==="Other / custom answer"){
@@ -565,6 +576,7 @@ function render(){
 }
 function finish(){
  pruneHiddenAnswers();
+ saveCurrentOc();
  $("result-character-name").textContent=characterName||"UNNAMED VARIANT";
  const qs=visible();$("summary-list").innerHTML="";
  const modeRow=document.createElement("div");modeRow.className="summary-row";const modeKey=document.createElement("strong"),modeValue=document.createElement("span");modeKey.textContent="Creation Mode";modeValue.textContent=creationMode==="advanced"?"Advanced Creation":"Simple Creation";modeRow.append(modeKey,modeValue);$("summary-list").append(modeRow);
@@ -590,6 +602,7 @@ function submit(){
   if(!Object.values(loadout).some(Boolean)){$("validation-message").textContent="ADD AT LEAST ONE SYNERGY, SUIT, E.G.O WEAPON VALUE, OR GIFT.";return;}
   setAnswer(q,"Custom E.G.O. loadout",loadout,"");advance();return;
  }
+ if(q.multiple){const selected=Array.isArray(answers[q.id]?.value)?answers[q.id].value:[];if(!selected.length){$("validation-message").textContent="SELECT AT LEAST ONE PERSONALITY TRAIT OR CUSTOM.";return;}if(selected.includes("Other / custom answer")){const custom=$("custom-answer").value.trim();if(!custom){$("validation-message").textContent="PLEASE ENTER A CUSTOM PERSONALITY.";return;}setAnswer(q,"Other / custom answer",["Other / custom answer"],custom);}else setAnswer(q,"Selected traits",selected,"");advance();return;}
  const choice=[...$("choice-list").children].find(b=>b.dataset.selected==="true")?.lastElementChild.textContent;
  if(!choice){$("validation-message").textContent="PLEASE SELECT AN ANSWER BEFORE CONTINUING.";return;}
  let value=choice,custom="";
