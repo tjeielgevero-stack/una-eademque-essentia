@@ -118,11 +118,10 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     const push = await hostPush;
     check(push.state.players.length === 2, "WebSocket did not broadcast the joined player.");
 
-    const wrongTurn = await action(code, guest, "attack", host.id);
-    check(wrongTurn.status === 409, "Out-of-turn action was not rejected.");
-
     const started = await startRoom(code, host);
     check(started.ok && started.data.room.status === "active", "Host could not start a 1v1 match.");
+    const wrongTurn = await action(code, guest, "attack", host.id);
+    check(wrongTurn.status === 409, "Out-of-turn action was not rejected.");
     const reconnectedState = await getState(code, guest);
     check(reconnectedState.ok && reconnectedState.data.room.status === "active", "Player could not recover the current room state.");
 
@@ -160,6 +159,8 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     check(egoParry.data.room.turnPlayerId === host.id, "Turn did not return to the host after the E.G.O. parry.");
     const hostCharge1 = await action(code, host, "defend");
     check(hostCharge1.ok, "Host could not take a charge-building action.");
+    const ultimateTooEarly = await action(code, guest, "ultimate", host.id);
+    check(ultimateTooEarly.status === 409, "A player with insufficient charge could start an ultimate.");
     const guestCharge1 = await action(code, guest, "defend");
     check(guestCharge1.ok, "Guest could not take a charge-building action.");
     const hostCharge2 = await action(code, host, "defend");
@@ -167,12 +168,10 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     const guestCharge2 = await action(code, guest, "defend");
     check(guestCharge2.ok, "Guest's second charge-building action failed.");
     const hostCharge3 = await action(code, host, "defend");
-    check(hostCharge3.data.room.players.find(player => player.id === host.id).ultimateCharge === 3, "Three completed actions did not unlock ultimate charge.");
-
-    const ultimateStart = await action(code, guest, "ultimate", host.id);
-    check(ultimateStart.status === 409, "A player with insufficient charge could start an ultimate.");
+    check(hostCharge3.data.room.players.find(player => player.id === host.id).ultimateCharge === 3, "Three completed actions did not unlock host ultimate charge.");
     const guestCharge3 = await action(code, guest, "defend");
-    check(guestCharge3.data.room.players.find(player => player.id === guest.id).ultimateCharge === 3, "Guest did not reach three ultimate charges.");
+    check(guestCharge3.data.room.players.find(player => player.id === guest.id).ultimateCharge === 3, "Three completed actions did not unlock guest ultimate charge.");
+
     const ultimate = await action(code, host, "ultimate", guest.id);
     check(ultimate.ok && ultimate.data.room.pendingChallenge?.type === "ultimate", "Charged player could not begin the ultimate QTE.");
     let challenge = ultimate.data.room.pendingChallenge;
