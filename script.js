@@ -1270,7 +1270,7 @@ $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$(
 $("mode-back").onclick=()=>screen("home");
 function launchSelectedMode(){resetSephrusSecretState();answers={};editingOcId=null;index=0;characterName="";$("character-name").value="";$("name-validation").textContent="";screen("name");$("character-name").focus();}
 function beginSelectedMode(mode){
- creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":"simple";
+ creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
  answers={};editingOcId=null;index=0;
  if(creationMode==="laziness"){launchSelectedMode();return;}
  const dlg=$("randomize-confirm-dialog");
