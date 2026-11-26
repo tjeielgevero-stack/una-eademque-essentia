@@ -32,7 +32,7 @@ function safeCharacter(input) {
     egoEligible: source.egoEligible === true
   };
 }
-function teamFor(mode, index) {
+async function forwardRequest(request, url) {\n  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.text();\n  return new Request(url, { method: request.method, headers: request.headers, body });\n}\nfunction teamFor(mode, index) {
   if (mode === "2v2") return index % 2 === 0 ? "A" : "B";
   return mode === "ffa" ? String(index + 1) : (index === 0 ? "A" : "B");
 }
@@ -82,7 +82,7 @@ export default {
       const wsUrl = new URL(request.url);
       const internal = new URL("https://room.internal/ws");
       internal.search = wsUrl.search;
-      return stub.fetch(new Request(internal, request));
+      return stub.fetch(new Request(internal, { method: "GET", headers: request.headers }));
     }
     if (action === "join" && request.method === "POST") {
       let body;
@@ -92,9 +92,9 @@ export default {
         body: JSON.stringify({ playerName: cleanText(body.playerName, 24) || "Guest", character: safeCharacter(body.character) })
       });
     }
-    if (action === "start" && request.method === "POST") return stub.fetch(new Request("https://room.internal/start", request));
-    if (action === "action" && request.method === "POST") return stub.fetch(new Request("https://room.internal/action", request));
-    if (action === "leave" && request.method === "POST") return stub.fetch(new Request("https://room.internal/leave", request));
+    if (action === "start" && request.method === "POST") return stub.fetch(await forwardRequest(request, "https://room.internal/start"));
+    if (action === "action" && request.method === "POST") return stub.fetch(await forwardRequest(request, "https://room.internal/action"));
+    if (action === "leave" && request.method === "POST") return stub.fetch(await forwardRequest(request, "https://room.internal/leave"));
     if (!action && request.method === "GET") return stub.fetch(new Request("https://room.internal/state" + url.search, request));
     return json({ error: "Method not allowed." }, 405);
   }
