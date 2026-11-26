@@ -850,7 +850,7 @@ $("name-back").onclick=()=>screen("mode");
 $("name-continue").onclick=()=>{
  const entered=$("character-name").value.trim();
  if(!entered){$("name-validation").textContent="PLEASE ENTER A NAME TO BEGIN YOUR RECORD."; $("character-name").focus(); return;}
- characterName=entered;index=0;render();screen("picker");
+ resetSephrusSecretState();characterName=entered;index=0;render();screen("picker");
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>screen("home");
