@@ -561,20 +561,71 @@ function showSephrusAfterimage(messageText){
  message.className="sephrus-afterimage-text";
  message.textContent=String(messageText||sephrusSecretMessage(characterName));
  frame.append(label,message);
- for(let i=0;i<6;i++){
-  const shard=document.createElement("span");
-  shard.className="sephrus-glass-shard";
-  shard.setAttribute("aria-hidden","true");
-  shard.dataset.shard=String(i+1);
-  frame.append(shard);
+
+ // Build an irregular 4-by-4 glass tessellation, split into 32 individual facets.
+ const gridX=[
+  [0,23,49,75,100],
+  [0,25,52,73,100],
+  [0,20,50,78,100],
+  [0,24,47,75,100],
+  [0,22,51,74,100]
+ ];
+ const gridY=[0,22,49,75,100];
+ const grid=gridY.map((y,row)=>gridX[row].map(x=>({x,y})));
+ const svgNS="http://www.w3.org/2000/svg";
+ const fractureWeb=document.createElementNS(svgNS,"svg");
+ fractureWeb.classList.add("sephrus-fracture-web");
+ fractureWeb.setAttribute("viewBox","0 0 100 100");
+ fractureWeb.setAttribute("preserveAspectRatio","none");
+ fractureWeb.setAttribute("aria-hidden","true");
+ const fracturePath=document.createElementNS(svgNS,"path");
+ const fractureSegments=[];
+ let shardIndex=0;
+ for(let row=0;row<4;row++){
+  for(let col=0;col<4;col++){
+   const tl=grid[row][col],tr=grid[row][col+1],br=grid[row+1][col+1],bl=grid[row+1][col];
+   const triangles=(row+col)%2===0?[[tl,tr,br],[tl,br,bl]]:[[tl,tr,bl],[tr,br,bl]];
+   triangles.forEach(points=>{
+    const polygon=points.map(point=>`${point.x}% ${point.y}%`).join(",");
+    const shard=document.createElement("span");
+    shard.className="sephrus-glass-shard";
+    shard.dataset.shard=String(++shardIndex);
+    shard.setAttribute("aria-hidden","true");
+    shard.style.clipPath=`polygon(${polygon})`;
+    const cx=points.reduce((sum,p)=>sum+p.x,0)/3;
+    const cy=points.reduce((sum,p)=>sum+p.y,0)/3;
+    const distance=30+Math.hypot(cx-50,cy-50)*2.15;
+    const dx=(cx-50)/(Math.hypot(cx-50,cy-50)||1)*distance;
+    const dy=(cy-50)/(Math.hypot(cx-50,cy-50)||1)*distance;
+    const rotation=(shardIndex%2===0?-1:1)*(10+(shardIndex%5)*5);
+    shard.style.setProperty("--shard-x",`${dx.toFixed(1)}px`);
+    shard.style.setProperty("--shard-y",`${dy.toFixed(1)}px`);
+    shard.style.setProperty("--shard-r",`${rotation}deg`);
+    frame.append(shard);
+    points.forEach((point,index)=>{
+     const next=points[(index+1)%points.length];
+     fractureSegments.push(`M${point.x} ${point.y} L${next.x} ${next.y}`);
+    });
+   });
+  }
  }
+ fracturePath.setAttribute("d",fractureSegments.join(" "));
+ fractureWeb.append(fracturePath);
+ frame.insertBefore(fractureWeb,frame.children[2]||null);
+
+ // Each chain is made from interlocking metal links, not a text symbol.
  const chainPositions=["top-left","top-right","bottom-left","bottom-right","left-upper","left-lower","right-upper","right-lower"];
  chainPositions.forEach(position=>{
   const chain=document.createElement("span");
   chain.className="sephrus-pull-chain";
   chain.dataset.chain=position;
-  chain.textContent="⛓ ⛓ ⛓";
   chain.setAttribute("aria-hidden","true");
+  for(let linkIndex=0;linkIndex<16;linkIndex++){
+   const link=document.createElement("i");
+   link.className="sephrus-chain-link";
+   link.dataset.link=String(linkIndex+1);
+   chain.append(link);
+  }
   frame.append(chain);
  });
  notice.append(frame);
