@@ -245,7 +245,7 @@ const $=id=>document.getElementById(id);
  function updateWarningStatus(){const node=$("flash-warning-settings-status");if(node)node.textContent=warningSuppressed?"Flashing-effects warning: hidden. Use this control to show it again.":"Flashing-effects warning: shown whenever you try to enable Rainbow Apocalypse or Impact Frame.";}
  function requestEnable(keys){
   const gate=[];keys.forEach(key=>{if(sensitive.includes(key)&&!warningSuppressed)gate.push(key);else applyEffect(key,true,false);});
-  if(gate.length){pending.splice(0,pending.length,...gate);const hide=$("flash-warning-never");if(hide)hide.checked=false;if(warningDialog&&!warningDialog.open)warningDialog.showModal();}else persist();
+  if(gate.length){pending.splice(0,pending.length,...gate);gate.forEach(key=>{const control=switches.find(x=>x.dataset.effectToggle===key);if(control)control.checked=false;saved[key]=false;});persist();const hide=$("flash-warning-never");if(hide)hide.checked=false;if(warningDialog&&!warningDialog.open)warningDialog.showModal();}else persist();
  }
  switches.forEach(control=>{
   const key=control.dataset.effectToggle;let enabled=saved[key]===true;
@@ -255,8 +255,8 @@ const $=id=>document.getElementById(id);
  });
  if(sensitive.some(key=>saved[key]===true)&&!warningSuppressed)persist();
  $("flash-warning-accept")?.addEventListener("click",()=>{if($("flash-warning-never")?.checked){warningSuppressed=true;try{localStorage.setItem(warningKey,"1");}catch{}}pending.splice(0).forEach(key=>applyEffect(key,true,false));persist();updateWarningStatus();warningDialog?.close();});
- $("flash-warning-cancel")?.addEventListener("click",()=>{pending.splice(0);warningDialog?.close();});
- warningDialog?.addEventListener("cancel",()=>{pending.splice(0);});
+ $("flash-warning-cancel")?.addEventListener("click",()=>{pending.splice(0);persist();warningDialog?.close();});
+ warningDialog?.addEventListener("cancel",()=>{pending.splice(0);persist();});
  $("flash-warning-reset-button")?.addEventListener("click",()=>{warningSuppressed=false;try{localStorage.removeItem(warningKey);}catch{}updateWarningStatus();});
  $("effects-apply-all")?.addEventListener("click",()=>{const all=switches.map(x=>x.dataset.effectToggle);all.filter(key=>!sensitive.includes(key)).forEach(key=>applyEffect(key,true,false));requestEnable(all.filter(key=>sensitive.includes(key)));persist();});
  $("effects-disable-all")?.addEventListener("click",()=>{switches.forEach(x=>applyEffect(x.dataset.effectToggle,false,false));persist();});
@@ -635,7 +635,7 @@ function simRunTurn(){
  let impact=9+Math.floor(Math.random()*10);if(Math.random()<.18){impact=Math.max(5,impact-5);target.status="BRACED";}else target.status="REPOSITIONING";target.hp=Math.max(0,target.hp-impact);actor.status="MOMENTUM +";
  simAddLog("action",actor.name,"uses "+move+". "+target.name+" loses "+impact+" stamina.");simAddLog("chat",actor.name,'"'+simQuote(actor)+'"');
  if(target.hp===0){target.alive=false;target.status="MATCH COMPLETE";simAddLog("system","",target.name+" is out of the match.");}else simAddLog("chat",target.name,'"'+SIM_REACTIONS[Math.floor(Math.random()*SIM_REACTIONS.length)]+'."');
- simMatch.fighters.filter(f=>f.team===actor.team&&f.id!==actor.id&&f.alive).forEach(teammate=>{if(Math.random()<.26){teammate.status="SUPPORTING";simAddLog("chat",teammate.name,'"'+simQuote(teammate)+'"');}});
+ simMatch.fighters.filter(f=>simMatch.mode!=="ffa"&&f.team===actor.team&&f.id!==actor.id&&f.alive).forEach(teammate=>{if(Math.random()<.26){teammate.status="SUPPORTING";simAddLog("chat",teammate.name,'"'+simQuote(teammate)+'"');}});
  simRenderArena();const winner=simWinner();if(winner!==false)simFinish(winner);else $("sim-match-status").textContent="TURN "+simMatch.turn+" RESOLVED — NEXT EXCHANGE READY.";
 }
 function simBuildMatch(ids){const records=readOcArchive(),teamMap=simMode==="1v1"?["A","B"]:simMode==="2v2"?["A","A","B","B"]:["ffa","ffa","ffa","ffa"];const fighters=ids.map((id,index)=>{const record=records.find(r=>r.id===id);return{id:record.id,name:record.name||"Unnamed Variant",team:teamMap[index],hp:100,alive:true,status:"READY",personality:simPersonality(record)};});simMatch={mode:simMode,fighters,turn:0,finished:false,ids:ids.slice()};$("simulator-setup").classList.add("hidden");$("simulator-match").classList.remove("hidden");$("sim-match-title").textContent=simMode==="ffa"?"FREE FOR ALL":simMode.toUpperCase();$("sim-log").innerHTML="";$("sim-feed-status").textContent="MATCH LIVE";$("sim-next-turn-button").disabled=false;$("sim-run-all-button").disabled=false;$("sim-rematch-button").classList.add("hidden");$("sim-match-status").textContent="MATCH INITIALIZED. AWAITING FIRST EXCHANGE.";simRenderArena();simAddLog("system","","Match initialized — "+(simMode==="ffa"?"Free For All":simMode.toUpperCase())+".");fighters.forEach(f=>simAddLog("chat",f.name,'"'+simQuote(f)+'"'));}
