@@ -1525,3 +1525,32 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @media(max-width:950px){.simulator-battle-layout{grid-template-columns:1fr}.simulator-commentary{position:relative;top:auto}.sim-log{height:300px}}
 @media(max-width:620px){body:has(#simulator-screen:not(.hidden)) main{width:calc(100% - 26px)}.simulator-setup,.simulator-match{padding:15px}.sim-mode-grid{grid-template-columns:1fr}.sim-fighter-selectors,.sim-arena-cards{grid-template-columns:1fr}.sim-setup-actions,.flash-warning-actions{align-items:stretch;flex-direction:column}.simulator-record-tag{font-size:7px}.simulator-match-actions button{flex:1}.sim-log{height:260px}}
 @media(prefers-reduced-motion:reduce){body.simulator-opening #home-screen,body.simulator-opening .site-header,body.simulator-opening footer,body.simulator-entered #simulator-screen,body.simulator-closing #simulator-screen,body.simulator-closing .site-header,body.simulator-closing footer,body.home-returning #home-screen{animation:none!important;transition:none!important}.sim-fighter-card,.sim-hp-track span,.sim-mode-card{transition:none!important}}
+
+/* Complex mode expands the three creation cards without squeezing their copy. */
+.creation-mode-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.complex-mode-card{border-color:rgba(188,164,124,.52);background:linear-gradient(145deg,rgba(54,43,32,.82),rgba(17,17,17,.96))}
+.mode-randomize-area{display:flex;justify-content:center;margin:18px auto 4px}
+.mode-randomize-area button{min-width:220px}
+@media(max-width:760px){.creation-mode-grid{grid-template-columns:1fr}}
+/* Animated simulator health display. */
+.sim-hp-track{position:relative;height:10px;border-radius:10px;overflow:hidden;background:linear-gradient(90deg,#321f1c,#28251f);box-shadow:inset 0 1px 3px rgba(0,0,0,.8)}
+.sim-hp-fill{position:relative;display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#925d4d,#c8a06f,#e6d2a9);background-size:200% 100%;transition:width .75s cubic-bezier(.16,1,.3,1);animation:sim-health-flow 4s ease-in-out infinite}
+@keyframes sim-health-flow{0%,100%{background-position:0 50%;filter:brightness(.92)}50%{background-position:100% 50%;filter:brightness(1.12)}}
+.sim-fighter-card.sim-damage-pulse .sim-hp-track{animation:sim-health-hit .48s ease-out}
+@keyframes sim-health-hit{0%{box-shadow:0 0 0 rgba(223,176,133,0)}32%{box-shadow:0 0 15px rgba(223,176,133,.55)}100%{box-shadow:0 0 0 rgba(223,176,133,0)}}
+.sim-fighter-card.sim-ego-awakened{border-color:#c7aa7d;box-shadow:inset 0 0 28px rgba(194,160,111,.12),0 0 24px rgba(194,160,111,.12);background:linear-gradient(145deg,rgba(61,49,35,.9),#111)}
+.sim-fighter-card.sim-ego-awakened h4{text-shadow:0 0 15px rgba(225,197,153,.35)}
+.sim-ego-label{margin:11px 0 0;padding-top:9px;border-top:1px solid rgba(198,170,125,.25);color:#d6bd92;font:9px 'DM Mono',monospace;letter-spacing:.09em;line-height:1.5}
+.sim-difficulty-panel{margin:0 0 15px;padding:15px 18px;border:1px solid rgba(188,164,124,.3);background:rgba(18,16,14,.88)}
+.sim-difficulty-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sim-difficulty-label{font:9px 'DM Mono',monospace;letter-spacing:.13em;color:#9e927f}
+#sim-difficulty-rating{font:11px 'DM Mono',monospace;letter-spacing:.1em;color:#d8c8aa}
+.sim-one-sided-warning{margin:9px 0 0;color:#e1b8a0;font:11px 'DM Mono',monospace;line-height:1.55}
+.randomize-confirm-dialog{width:min(520px,calc(100% - 28px));padding:0;border:1px solid #9c896c;background:#151311;color:#eeeae3;box-shadow:0 25px 90px rgba(0,0,0,.8)}
+.randomize-confirm-dialog::backdrop{background:rgba(0,0,0,.82);backdrop-filter:blur(4px)}
+.randomize-confirm-panel{padding:clamp(22px,5vw,36px)}
+.randomize-confirm-panel h2{font:30px Georgia,serif;line-height:1.05;color:#f0e6d8;margin:10px 0 18px}
+.randomize-confirm-panel p{color:#c4b9aa;font-size:16px;line-height:1.55}
+.randomize-confirm-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px}
+@media(max-width:560px){.randomize-confirm-actions{align-items:stretch;flex-direction:column}.sim-difficulty-top{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){.sim-hp-fill{animation:none!important;transition:none!important}.sim-fighter-card.sim-damage-pulse .sim-hp-track{animation:none!important}}
