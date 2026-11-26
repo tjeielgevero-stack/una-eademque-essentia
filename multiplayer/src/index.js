@@ -566,7 +566,12 @@ export class RoomHub extends DurableObject {
       ? livingBefore[this.room.turnIndex % livingBefore.length]
       : null;
 
-    this.room.log.push({ at: Date.now(), text: player.name + " left the room." });
+    const pending = this.room.pendingChallenge;
+    if (pending && [pending.attackerId, pending.defenderId, pending.qtePlayerId, pending.targetId].includes(player.id)) {
+      this.room.pendingChallenge = null;
+      this.addLog("system", "The pending exchange is canceled because " + player.name + " left the room.");
+    }
+    this.room.log.push({ at: Date.now(), kind: "system", text: player.name + " left the room." });
     if (this.room.status === "lobby") {
       this.room.players = this.room.players.filter(item => item.id !== player.id);
       this.room.players.forEach((item, index) => {
@@ -602,6 +607,18 @@ export class RoomHub extends DurableObject {
 
     await this.saveAndBroadcast("player-left");
     return json({ ok: true, room: this.publicState() });
+  }
+
+  async alarm() {
+    await this.ready;
+    const challenge = this.room?.pendingChallenge;
+    if (!challenge) return;
+    if (Date.now() < challenge.expiresAt) {
+      await this.ctx.storage.setAlarm(challenge.expiresAt);
+      return;
+    }
+    if (challenge.type === "parry") await this.completeParry(false, true);
+    else if (challenge.type === "ultimate") await this.failUltimate(true);
   }
 
   webSocketMessage(ws, message) {
