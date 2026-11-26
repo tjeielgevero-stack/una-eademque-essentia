@@ -346,7 +346,7 @@ function profileFieldsFromAnswers(a){
  };
  const first=(...ids)=>ids.map(get).find(Boolean)||"";
  const combine=(...ids)=>[...new Set(ids.map(get).filter(value=>value&&value!=="Not affiliated with the Head"))].join(" · ");
- const detailText=first("dossier_details","profile_details","advanced_abilities","complex_abilities");
+ const detailText=first("laziness_profile","dossier_details","profile_details","advanced_abilities","complex_abilities");
  const labelled=(label,source=detailText)=>{
   if(!source)return "";
   const labels=["Name","Title","Race","Affiliation","Grade","Appearance","Origin","E.G.O Type","E.G.O","Ability 1","Ability 2","Ability 3","Ability 4","Ultimate Ability 1","Ultimate Ability 2","Passive Ability 2","Passive Ability","Personality","Backstory","Likes","Dislikes","Overall"];
