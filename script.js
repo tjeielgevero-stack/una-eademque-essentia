@@ -500,8 +500,34 @@ function setAnswer(q,choice,value,custom=""){
 }
 function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
 function resetSephrusSecretState(){sephrusBrokenClickCount=0;sephrusEscapeRunning=false;}
+function sephrusSecretKey(name){
+ const normalized=String(name||"").trim().toLowerCase().replace(/\\s+/g," ");
+ const messages={
+  "sephrus":"You have returned to the name. That does not mean you understand the one who bears it.",
+  "zephyrus":"The wind carries every name. It does not promise to return them.",
+  "aztiluth":"You remember the ending. The beginning has not forgiven you.",
+  "sephrus aztiluth":"We are one and the same. you choose yours. but choose mine, and i decide what happens.",
+  "sephrus zephyrus":"Two names, one reflection. Which one did you think was yours?",
+  "zephyrus aztiluth":"The wind has crossed the mirror. Something on the other side noticed.",
+  "sephrus zephyrus aztiluth":"Three names. One essence. No mirror remains between us. You did not find this record; it allowed you to."
+ };
+ return Object.prototype.hasOwnProperty.call(messages,normalized)?normalized:null;
+}
+function sephrusSecretMessage(name){
+ const key=sephrusSecretKey(name);
+ const messages={
+  "sephrus":"You have returned to the name. That does not mean you understand the one who bears it.",
+  "zephyrus":"The wind carries every name. It does not promise to return them.",
+  "aztiluth":"You remember the ending. The beginning has not forgiven you.",
+  "sephrus aztiluth":"We are one and the same. you choose yours. but choose mine, and i decide what happens.",
+  "sephrus zephyrus":"Two names, one reflection. Which one did you think was yours?",
+  "zephyrus aztiluth":"The wind has crossed the mirror. Something on the other side noticed.",
+  "sephrus zephyrus aztiluth":"Three names. One essence. No mirror remains between us. You did not find this record; it allowed you to."
+ };
+ return key?messages[key]:messages["sephrus aztiluth"];
+}
 
-function showSephrusAfterimage(){
+function showSephrusAfterimage(messageText){
  const previous=document.querySelector(".sephrus-afterimage");
  if(previous)previous.remove();
  const notice=document.createElement("aside");
@@ -516,7 +542,7 @@ function showSephrusAfterimage(){
  label.textContent="UNREGISTERED MIRROR RECORD";
  const message=document.createElement("p");
  message.className="sephrus-afterimage-text";
- message.textContent="We are one and the same. you choose yours. but choose mine, and i decide what happens.";
+ message.textContent=String(messageText||sephrusSecretMessage(characterName));
  frame.append(label,message);
  for(let i=0;i<6;i++){
   const shard=document.createElement("span");
@@ -549,7 +575,7 @@ function returnHomeFromSephrusSecret(){
   renderOcHistory();
   screen("home");
   requestAnimationFrame(()=>overlay.classList.remove("active"));
-  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage();},2250);
+  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage(afterimageMessage);},2250);
  },2100);
 }
 function renderSinnerEgo(saved){
@@ -729,7 +755,7 @@ function render(){
  }
  if(q.multiple){
    const originalOptions=typeof q.options==="function"?q.options(values()):q.options;
-   const isSephrusPersonality=q.id==="personality"&&String(characterName||"").trim().toLowerCase()==="sephrus aztiluth";
+   const isSephrusPersonality=q.id==="personality"&&sephrusSecretKey(characterName)!==null;
    const canonical="Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He values originality and the act of creating things. His fundamental mindset, identity, and personality remain consistent across every variant.";
    let selected=Array.isArray(saved.value)?saved.value:[];
    if(isSephrusPersonality&&!selected.includes(canonical)){selected=[canonical];setAnswer(q,"Selected traits",selected,"");}
