@@ -634,7 +634,7 @@ function showSephrusAfterimage(messageText){
  window.setTimeout(()=>{
   if(!notice.isConnected)return;
   notice.classList.add("shattering");
-  window.setTimeout(()=>notice.remove(),1850);
+  window.setTimeout(()=>notice.remove(),2300);
  },5000);
 }
 function returnHomeFromSephrusSecret(){
