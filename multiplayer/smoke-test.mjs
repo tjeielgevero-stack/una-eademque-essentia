@@ -50,8 +50,8 @@ async function getState(code, player) {
   const query = new URLSearchParams({ playerId: player.id, token: player.token });
   return request("/api/rooms/" + code + "?" + query.toString());
 }
-async function action(code, player, type, targetId) {
-  return request("/api/rooms/" + code + "/action", "POST", playerBody(player, { type, targetId }));
+async function action(code, player, type, targetId, extra = {}) {
+  return request("/api/rooms/" + code + "/action", "POST", playerBody(player, { type, targetId, ...extra }));
 }
 async function leaveRoom(code, player) {
   return request("/api/rooms/" + code + "/leave", "POST", playerBody(player));
@@ -128,24 +128,66 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
 
     const firstAttack = await action(code, host, "attack", guest.id);
     check(firstAttack.ok, "Host attack was rejected.");
-    const guestAfterAttack = firstAttack.data.room.players.find(player => player.id === guest.id);
-    check(guestAfterAttack.hp < 100 && firstAttack.data.room.turnPlayerId === guest.id, "Attack did not reduce HP or advance the turn.");
+    const firstParry = firstAttack.data.room.pendingChallenge;
+    check(firstParry?.type === "parry" && firstParry.defenderId === guest.id, "Attack did not open a parry QTE.");
+    check(firstAttack.data.room.players.find(player => player.id === guest.id).hp === 100, "HP changed before the parry QTE was resolved.");
+
+    const parry = await action(code, guest, "parry", undefined, { challengeId: firstParry.id, input: firstParry.prompt });
+    check(parry.ok && parry.data.parried === true, "Correct parry input was not accepted.");
+    check(parry.data.room.players.find(player => player.id === guest.id).hp === 100, "Successful parry did not prevent the incoming damage.");
+    check(parry.data.room.turnPlayerId === guest.id, "Parry resolution did not advance the turn.");
 
     const defend = await action(code, guest, "defend");
     check(defend.ok, "Defend action was rejected.");
     check(defend.data.room.players.find(player => player.id === guest.id).guarding, "Defend did not enable guarding.");
 
-    const hostBeforeGuardedAttack = defend.data.room.players.find(player => player.id === host.id).hp;
     const guardedAttack = await action(code, host, "attack", guest.id);
-    check(guardedAttack.ok, "Attack against a guarding player was rejected.");
-    const hostAfterGuardedAttack = guardedAttack.data.room.players.find(player => player.id === host.id).hp;
-    const guestAfterGuardedAttack = guardedAttack.data.room.players.find(player => player.id === guest.id);
-    check(hostAfterGuardedAttack === hostBeforeGuardedAttack, "Unexpected HP change to the attacker.");
-    check(!guestAfterGuardedAttack.guarding, "Guarding was not consumed by an incoming attack.");
+    check(guardedAttack.ok && guardedAttack.data.room.pendingChallenge?.type === "parry", "Attack against a guarding player did not open a parry QTE.");
+    const guardedChallenge = guardedAttack.data.room.pendingChallenge;
+    const wrongDirection = guardedChallenge.prompt === "UP" ? "DOWN" : "UP";
+    const failedParry = await action(code, guest, "parry", undefined, { challengeId: guardedChallenge.id, input: wrongDirection });
+    check(failedParry.ok && failedParry.data.parried === false, "Incorrect parry input was not resolved as a failed parry.");
+    const guestAfterGuardedAttack = failedParry.data.room.players.find(player => player.id === guest.id);
+    check(guestAfterGuardedAttack.hp < 100 && !guestAfterGuardedAttack.guarding, "Failed parry did not apply guarded damage and consume the guard.");
 
     const ego = await action(code, guest, "ego", host.id);
-    check(ego.ok, "Eligible player could not activate E.G.O.");
+    check(ego.ok && ego.data.room.pendingChallenge?.type === "parry", "Eligible player could not activate E.G.O. with a parry window.");
     check(ego.data.room.players.find(player => player.id === guest.id).egoUsed, "E.G.O. usage was not recorded.");
+    const egoChallenge = ego.data.room.pendingChallenge;
+    const egoParry = await action(code, host, "parry", undefined, { challengeId: egoChallenge.id, input: egoChallenge.prompt });
+    check(egoParry.ok && egoParry.data.room.players.find(player => player.id === host.id).hp === 100, "E.G.O. strike did not respect a successful parry.");
+
+    check(egoParry.data.room.turnPlayerId === host.id, "Turn did not return to the host after the E.G.O. parry.");
+    const hostCharge1 = await action(code, host, "defend");
+    check(hostCharge1.ok, "Host could not take a charge-building action.");
+    const guestCharge1 = await action(code, guest, "defend");
+    check(guestCharge1.ok, "Guest could not take a charge-building action.");
+    const hostCharge2 = await action(code, host, "defend");
+    check(hostCharge2.ok, "Host's second charge-building action failed.");
+    const guestCharge2 = await action(code, guest, "defend");
+    check(guestCharge2.ok, "Guest's second charge-building action failed.");
+    const hostCharge3 = await action(code, host, "defend");
+    check(hostCharge3.data.room.players.find(player => player.id === host.id).ultimateCharge === 3, "Three completed actions did not unlock ultimate charge.");
+
+    const ultimateStart = await action(code, guest, "ultimate", host.id);
+    check(ultimateStart.status === 409, "A player with insufficient charge could start an ultimate.");
+    const guestCharge3 = await action(code, guest, "defend");
+    check(guestCharge3.data.room.players.find(player => player.id === guest.id).ultimateCharge === 3, "Guest did not reach three ultimate charges.");
+    const ultimate = await action(code, host, "ultimate", guest.id);
+    check(ultimate.ok && ultimate.data.room.pendingChallenge?.type === "ultimate", "Charged player could not begin the ultimate QTE.");
+    let challenge = ultimate.data.room.pendingChallenge;
+    check(challenge.totalSteps === 4, "Ultimate did not require four activation prompts.");
+    for (let step = 0; step < 4; step += 1) {
+      const result = await action(code, host, "qte", undefined, { challengeId: challenge.id, input: challenge.prompt });
+      check(result.ok, "Ultimate QTE step " + (step + 1) + " failed.");
+      if (step < 3) {
+        challenge = result.data.room.pendingChallenge;
+        check(challenge && challenge.step === step + 1, "Ultimate QTE did not advance to the next activation.");
+      } else {
+        check(!result.data.room.pendingChallenge, "Ultimate challenge remained open after the final prompt.");
+        check(result.data.room.players.find(player => player.id === host.id).ultimateUsed, "Successful ultimate was not recorded as spent.");
+      }
+    }
 
     const left = await leaveRoom(code, host);
     check(left.ok && left.data.room.status === "finished", "Leaving during battle did not finish the 1v1 match.");
@@ -206,8 +248,11 @@ await run("2v2 format, full lobby requirement, team assignment, and friendly-fir
   check(friendlyFire.status === 400, "Friendly fire was not rejected in 2v2.");
 
   const validAttack = await action(code, host, "attack", p2.id);
-  check(validAttack.ok, "Attack against an opposing team was rejected.");
-  check(validAttack.data.room.turnPlayerId === p2.id, "2v2 turn did not advance correctly.");
+  check(validAttack.ok && validAttack.data.room.pendingChallenge?.type === "parry", "Attack against an opposing team did not open its parry QTE.");
+  const parryChallenge = validAttack.data.room.pendingChallenge;
+  const parryResult = await action(code, p2, "parry", undefined, { challengeId: parryChallenge.id, input: parryChallenge.prompt });
+  check(parryResult.ok && parryResult.data.parried, "Opposing player could not parry during a 2v2 match.");
+  check(parryResult.data.room.turnPlayerId === p2.id, "2v2 turn did not advance after the parry.");
 
   const opposingPlayerLeaves = await leaveRoom(code, p2);
   check(opposingPlayerLeaves.ok, "A player could not leave during a 2v2 match.");
@@ -231,7 +276,10 @@ await run("Free-for-all format and four-player turn progression", async () => {
   check(started.ok, "Four-player free-for-all could not start.");
   check(started.data.room.players.map(player => player.team).join(",") === "1,2,3,4", "FFA player identifiers were not unique.");
   const attackResult = await action(code, host, "attack", p4.id);
-  check(attackResult.ok && attackResult.data.room.turnPlayerId === p2.id, "FFA action or turn progression failed.");
+  check(attackResult.ok && attackResult.data.room.pendingChallenge?.type === "parry", "FFA attack did not open a parry event.");
+  const ffaChallenge = attackResult.data.room.pendingChallenge;
+  const ffaParry = await action(code, p4, "parry", undefined, { challengeId: ffaChallenge.id, input: ffaChallenge.prompt });
+  check(ffaParry.ok && ffaParry.data.parried && ffaParry.data.room.turnPlayerId === p2.id, "FFA parry or turn progression failed.");
 
   await leaveRoom(code, p2);
   await leaveRoom(code, p3);
