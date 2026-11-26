@@ -733,6 +733,26 @@ const SIM_MOVES=["measured feint","momentum shift","careful pressure","a clean c
 const SIM_REACTIONS=["steadies their footing","reconsiders their approach","answers with a guarded stance","takes a breath and regroups","looks for a new opening","shakes off the surprise"];
 function simPersonality(record){const p=record.answers?.personality;if(!p)return[];if(p.choice==="Other / custom answer")return[p.custom||"custom"];return Array.isArray(p.value)?p.value:[String(p.value||"")];}
 
+function simProfileField(record,label){
+ const text=record.profileSummary||record.answers?.profile_details?.value||"";
+ const escaped=label;
+ const match=String(text).match(new RegExp("(?:^|\\n)"+escaped+"\\s*:\\s*([^\\n]+)","i"));
+ return match?.[1]?.trim()||"";
+}
+function simAbilityOptions(record){
+ const values=[1,2,3,4].map(n=>simProfileField(record,"Ability "+n)).filter(value=>value&&value!=="Not specified.");
+ if(values.length)return values;
+ const answers=record.answers||{};
+ const source=answers.advanced_abilities?.value||answers.complex_47?.value||"";
+ if(typeof source==="string"&&source.trim())return source.split(/\\n+|;(?=\\s*[A-Z])/).map(x=>x.trim()).filter(Boolean).slice(0,4);
+ return SIM_MOVES.slice();
+}
+function simUltimateOptions(record){
+ const values=[1,2].map(n=>simProfileField(record,"Ultimate Ability "+n)).filter(value=>value&&value!=="Not specified.");
+ if(values.length)return values;
+ return ["Limit Break","Final Resonance"];
+}
+
 function simRecordScore(record){
  const a=record.answers||{};
  const tech={"Competent professional":1,"Highly skilled specialist":2,"Among the best in their Office":3,"Exceptional Grade 1-level specialist":4,"Comparable to a renowned veteran":5,"Color Fixer-level overall capability":6,"Beyond ordinary City classifications (deliberate AU)":8};
@@ -851,18 +871,21 @@ function simRunTurn(){
  const actor=active[Math.floor(Math.random()*active.length)];
  const opponents=active.filter(f=>f.id!==actor.id&&(simMatch.mode==="ffa"||f.team!==actor.team));
  if(!opponents.length){simFinish(actor.team);return;}
- const target=opponents[Math.floor(Math.random()*opponents.length)],move=SIM_MOVES[Math.floor(Math.random()*SIM_MOVES.length)];
+ const target=opponents[Math.floor(Math.random()*opponents.length)];
+ const usesUltimate=actor.ultimateAbilities.length>0&&Math.random()<.075;
+ const movePool=usesUltimate?actor.ultimateAbilities:actor.abilities;
+ const move=movePool[Math.floor(Math.random()*movePool.length)]||SIM_MOVES[Math.floor(Math.random()*SIM_MOVES.length)];
  simMatch.turn++;
  if(actor.egoEligible&&!actor.egoUsed&&simMatch.turn>=2&&Math.random()<.32){
   actor.egoUsed=true;actor.egoActive=true;actor.status=actor.egoType+" AWAKENED";
   simAddLog("system","",actor.name+" undergoes a transformation: "+actor.egoName+".");
   simAddLog("chat",actor.name,'"'+(actor.egoTheme?"This is what "+actor.egoTheme.toLowerCase()+" means to me.":"I will show you my true form.")+'"');
  }
- let impact=9+Math.floor(Math.random()*10)+(actor.egoActive?6:0);
+ let impact=usesUltimate?26+Math.floor(Math.random()*13):9+Math.floor(Math.random()*10)+(actor.egoActive?6:0);
  if(Math.random()<.18){impact=Math.max(5,impact-5);target.status="BRACED";}else target.status="REPOSITIONING";
  target.previousHp=target.hp;target.hp=Math.max(0,target.hp-impact);target.justHit=true;
  actor.status=actor.egoActive?"E.G.O. MOMENTUM +":"MOMENTUM +";
- simAddLog("action",actor.name,"uses "+move+(actor.egoActive?" through their manifested form":"")+". "+target.name+" loses "+impact+" health.");
+ simAddLog("action",actor.name,(usesUltimate?"unleashes ultimate ability ":"uses ability ")+move+(actor.egoActive?" through their manifested form":"")+". "+target.name+" loses "+impact+" health.");
  simAddLog("chat",actor.name,'"'+simQuote(actor)+'"');
  if(target.hp===0){target.alive=false;target.status="MATCH COMPLETE";simTriggerHitEffect("fatal",target);simAddLog("system","",target.name+" is out of the match.");}else if(impact>=16){simTriggerHitEffect("heavy",target);}
  else simAddLog("chat",target.name,'"'+SIM_REACTIONS[Math.floor(Math.random()*SIM_REACTIONS.length)]+'."');
@@ -874,7 +897,7 @@ function simBuildMatch(ids){
  const records=readOcArchive(),teamMap=simMode==="1v1"?["A","B"]:simMode==="2v2"?["A","A","B","B"]:["ffa","ffa","ffa","ffa"];
  const fighters=ids.map((id,index)=>{
   const record=records.find(r=>r.id===id),ego=simEgoProfile(record);
-  return {id:record.id,name:record.name||"Unnamed Variant",modeLabel:record.mode==="complex"?"COMPLEX":record.mode==="advanced"?"ADVANCED":"SIMPLE",team:teamMap[index],hp:100,alive:true,status:"READY",personality:simPersonality(record),egoEligible:ego.eligible,egoType:ego.type,egoName:ego.name,egoTheme:ego.theme,egoAppearance:ego.appearance,egoFunction:ego.functionText,egoUsed:false,egoActive:false,justHit:false};
+  return {id:record.id,name:record.name||"Unnamed Variant",modeLabel:record.mode==="complex"?"COMPLEX":record.mode==="advanced"?"ADVANCED":"SIMPLE",team:teamMap[index],hp:100,alive:true,status:"READY",personality:simPersonality(record),abilities:simAbilityOptions(record),ultimateAbilities:simUltimateOptions(record),egoEligible:ego.eligible,egoType:ego.type,egoName:ego.name,egoTheme:ego.theme,egoAppearance:ego.appearance,egoFunction:ego.functionText,egoUsed:false,egoActive:false,justHit:false};
  });
  simMatch={mode:simMode,fighters,turn:0,finished:false,ids:ids.slice()};
  $("simulator-setup").classList.add("hidden");$("simulator-match").classList.remove("hidden");
