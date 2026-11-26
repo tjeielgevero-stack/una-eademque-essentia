@@ -1249,22 +1249,23 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
   const ctx=audioContext();if(!ctx)return false;
   stopAmbient();
   const preset=tracks[currentTrack]||tracks.city;
-  const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime((distorted?.19:.24)*currentVolume,ctx.currentTime,distorted?1.1:.8);master.connect(ctx.destination);ambientMaster=master;
+  const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime((distorted ? .19 : .24)*currentVolume,ctx.currentTime,distorted?1.1:.8);master.connect(ctx.destination);ambientMaster=master;
   let output=master;
   if(distorted){const shaper=ctx.createWaveShaper();shaper.curve=makeDistortionCurve(24);shaper.oversample="4x";const band=ctx.createBiquadFilter();band.type="bandpass";band.frequency.value=340;band.Q.value=.72;shaper.connect(band);band.connect(master);output=shaper;ambientNodes.push(shaper,band);}
   const filter=ctx.createBiquadFilter();filter.type="lowpass";filter.frequency.value=distorted?520:preset.brightness;filter.Q.value=.7;filter.connect(output);ambientNodes.push(filter);
   preset.notes.forEach((frequency,index)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=index===1?preset.wave:"sine";osc.frequency.value=frequency;osc.detune.value=(index%2?4:-3)+(distorted?(index-1.5)*13:0);gain.gain.value=[.17,.075,.105,.045][index];osc.connect(gain);gain.connect(filter);osc.start();ambientNodes.push(osc,gain);});
-  const slow=ctx.createOscillator(),depth=ctx.createGain();slow.frequency.value=distorted?.14:.055;depth.gain.value=distorted?210:145;slow.connect(depth);depth.connect(filter.frequency);slow.start();ambientNodes.push(slow,depth);
+  const slow=ctx.createOscillator(),depth=ctx.createGain();slow.frequency.value=distorted ? .14 : .055;depth.gain.value=distorted?210:145;slow.connect(depth);depth.connect(filter.frequency);slow.start();ambientNodes.push(slow,depth);
   let step=0;
-  const playNote=()=>{if(!context||!ambientMaster)return;const note=ctx.createOscillator(),env=ctx.createGain();note.type=distorted?"triangle":preset.wave;note.frequency.value=preset.arp[step++%preset.arp.length];note.detune.value=distorted?((step%3)-1)*17:((step%4)-1.5)*4;env.gain.setValueAtTime(.0001,ctx.currentTime);env.gain.linearRampToValueAtTime(distorted?.018:.035,ctx.currentTime+.035);env.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.34);note.connect(env);env.connect(filter);note.start();note.stop(ctx.currentTime+.36);};
+  const playNote=()=>{if(!context||!ambientMaster)return;const note=ctx.createOscillator(),env=ctx.createGain();note.type=distorted?"triangle":preset.wave;note.frequency.value=preset.arp[step++%preset.arp.length];note.detune.value=distorted?((step%3)-1)*17:((step%4)-1.5)*4;env.gain.setValueAtTime(.0001,ctx.currentTime);env.gain.linearRampToValueAtTime(distorted ? .018 : .035,ctx.currentTime+.035);env.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.34);note.connect(env);env.connect(filter);note.start();note.stop(ctx.currentTime+.36);};
   playNote();arpTimer=window.setInterval(playNote,preset.speed);
   if(status)status.textContent=(distorted?"DISTORTED RETURN · ":"PLAYING · ")+preset.name.toUpperCase();
   return true;
  }
  function beginGrim(){
+  grimActive=true;
   if(!musicEnabled)return;
   const ctx=audioContext();if(!ctx)return;
-  grimActive=true;stopAmbient();
+  stopAmbient();
   if(grimMaster){try{grimMaster.gain.value=0;}catch{}}clearNodes(grimNodes);
   const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime(.18*currentVolume,ctx.currentTime,.12);master.connect(ctx.destination);grimMaster=master;
   const filter=ctx.createBiquadFilter();filter.type="lowpass";filter.frequency.value=290;filter.Q.value=3.5;filter.connect(master);grimNodes.push(filter);
@@ -1273,8 +1274,8 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
   if(status)status.textContent="GRIM · THE ARCHIVE HAS BEEN BREACHED";
  }
  function endGrim(){
-  if(!musicEnabled)return;
-  const ctx=audioContext();if(!ctx)return;
+  if(!musicEnabled){grimActive=false;return;}
+  const ctx=audioContext();if(!ctx){grimActive=false;return;}
   if(grimMaster){try{grimMaster.gain.cancelScheduledValues(ctx.currentTime);grimMaster.gain.value=0;}catch{}}
   clearNodes(grimNodes);grimMaster=null;grimActive=false;returnDistorted=true;startAmbient(true);
  }
@@ -1290,7 +1291,7 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
  }
  toggle.addEventListener("change",()=>{musicEnabled=toggle.checked;try{localStorage.setItem(musicKey,String(musicEnabled));}catch{}if(musicEnabled){if(grimActive)beginGrim();else if(!startAmbient(returnDistorted)){musicEnabled=false;toggle.checked=false;try{localStorage.setItem(musicKey,"false");}catch{}}}else{stopAmbient();if(grimMaster)grimMaster.gain.value=0;clearNodes(grimNodes);grimMaster=null;if(status)status.textContent="AMBIENT MUSIC PAUSED";}});
  if(trackSelect)trackSelect.addEventListener("change",()=>{currentTrack=tracks[trackSelect.value]?trackSelect.value:"city";try{localStorage.setItem(trackKey,currentTrack);}catch{}if(musicEnabled&&!grimActive)startAmbient(returnDistorted);playUiSound("select");});
- if(volumeSlider)volumeSlider.addEventListener("input",()=>{currentVolume=Number(volumeSlider.value)/100;if(volumeValue)volumeValue.textContent=volumeSlider.value+"%";try{localStorage.setItem(volumeKey,String(currentVolume));}catch{}if(ambientMaster&&context)ambientMaster.gain.setTargetAtTime((returnDistorted?.19:.24)*currentVolume,context.currentTime,.08);if(grimMaster&&context)grimMaster.gain.setTargetAtTime(.18*currentVolume,context.currentTime,.08);});
+ if(volumeSlider)volumeSlider.addEventListener("input",()=>{currentVolume=Number(volumeSlider.value)/100;if(volumeValue)volumeValue.textContent=volumeSlider.value+"%";try{localStorage.setItem(volumeKey,String(currentVolume));}catch{}if(ambientMaster&&context)ambientMaster.gain.setTargetAtTime((returnDistorted ? .19 : .24)*currentVolume,context.currentTime,.08);if(grimMaster&&context)grimMaster.gain.setTargetAtTime(.18*currentVolume,context.currentTime,.08);});
  if(sfxToggle)sfxToggle.addEventListener("change",()=>{sfxEnabled=sfxToggle.checked;try{localStorage.setItem(sfxKey,String(sfxEnabled));}catch{}if(sfxEnabled)playUiSound("success");});
  document.addEventListener("click",event=>{
   const target=event.target instanceof Element?event.target:null;if(!target)return;
