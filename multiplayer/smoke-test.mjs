@@ -164,10 +164,14 @@ await run("Lobby host handoff when the creator leaves", async () => {
   check(hostLeaves.ok && hostLeaves.data.room.status === "lobby", "Room did not remain open after the original host left.");
   check(hostLeaves.data.room.hostPlayerId === guest.id, "The next player was not promoted to host.");
 
+  const challenger = (await joinRoom(code, "Next Challenger")).player;
+  const lobbyState = (await getState(code, guest)).data.room;
+  check(lobbyState.players[0].team !== lobbyState.players[1].team, "Teams were not reassigned after the original host left.");
+
   const started = await startRoom(code, guest);
-  check(started.ok && started.data.room.status === "active", "Promoted host could not start the match.");
+  check(started.ok && started.data.room.status === "active", "Promoted host could not start the match after a challenger joined.");
   const guestLeaves = await leaveRoom(code, guest);
-  check(guestLeaves.ok, "Promoted host could not leave the match.");
+  check(guestLeaves.ok && guestLeaves.data.room.winner === "Next Challenger", "Match did not resolve correctly after the promoted host left.");
 });
 
 await run("Public room discovery and cleanup", async () => {
