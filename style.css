@@ -1726,7 +1726,7 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
   z-index:999999;
   background:#000;
   opacity:0;
-  pointer-events:none;
+  pointer-events:auto;
   transition:opacity 2.1s cubic-bezier(.55,0,.9,.35);
 }
 .sephrus-void-transition.active {
