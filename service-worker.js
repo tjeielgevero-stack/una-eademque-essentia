@@ -1,10 +1,10 @@
-const CACHE_NAME = "uee-app-shell-v5";
+const CACHE_NAME = "uee-app-shell-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css?v=20261127-vibe105",
+  "./style.css?v=20261127-vibe106",
   "./data.js",
-  "./script.js?v=20261127-vibe105",
+  "./script.js?v=20261127-vibe106",
   "./multiplayer.js",
   "./manifest.webmanifest",
   "./app-icon.svg",
