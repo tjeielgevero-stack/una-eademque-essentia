@@ -312,8 +312,97 @@ let index=0,answers={},characterName="",creationMode="simple",editingOcId=null;
 const OC_STORAGE_KEY="uee_oc_archive_v1";
 function readOcArchive(){try{const x=JSON.parse(localStorage.getItem(OC_STORAGE_KEY)||"[]");return Array.isArray(x)?x:[];}catch{return [];}}
 function writeOcArchive(x){try{localStorage.setItem(OC_STORAGE_KEY,JSON.stringify(x));}catch{}}
+
+function profileAnswerText(value){
+ if(value==null)return "";
+ if(Array.isArray(value))return value.map(profileAnswerText).filter(Boolean).join(", ");
+ if(typeof value==="object"){
+  if(value.sinner_ego!==undefined)return value.sinner_ego||"";
+  const parts=[value.synergy&&"Synergy: "+value.synergy,value.suit&&"Suit: "+value.suit,value.category4&&"E.G.O. Weapon: "+value.category4,value.gift&&"Gift: "+value.gift].filter(Boolean);
+  return parts.join("; ");
+ }
+ return String(value).trim();
+}
+function profileFieldsFromAnswers(a){
+ const get=id=>{
+  const item=a[id];
+  if(!item)return "";
+  if(item.choice==="Other / custom answer"&&item.custom)return String(item.custom).trim();
+  return profileAnswerText(item.value??item.custom);
+ };
+ const first=(...ids)=>ids.map(get).find(Boolean)||"";
+ const combine=(...ids)=>[...new Set(ids.map(get).filter(Boolean))].join(" · ");
+ const detailText=first("dossier_details","profile_details","advanced_abilities","complex_abilities");
+ const labelled=(label,source=detailText)=>{
+  if(!source)return "";
+  const escaped=label.replace(/[.*+?^${}()|[\]\\]/g,"\\function writeOcArchive(x){try{localStorage.setItem(OC_STORAGE_KEY,JSON.stringify(x));}catch{}}
+");
+  const match=source.match(new RegExp("(?:^|\\n)\\s*"+escaped+"\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:Ability \\d+|Ultimate Ability \\d+|Passive Ability|Title|Race|Likes|Dislikes)\\s*:|$)","i"));
+  return match?.[1]?.trim()||"";
+ };
+ return {get,first,combine,detailText,labelled};
+}
+function formatCharacterDossier(name,mode,answersSource){
+ const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
+ const notSet="Not specified.";
+ const title=first("title","epithet","color_title")||labelled("Title")||notSet;
+ const race=first("race","species","complex_race")||labelled("Race")||notSet;
+ const occupation=first("occupation","complex_occupation");
+ const affiliation=combine("affiliation","association","office","syndicate","workshop","wing_role")||occupation||labelled("Affiliation")||notSet;
+ const grade=combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","color_title")||first("grade","classification")||labelled("Grade")||notSet;
+ const appearance=combine("advanced_appearance","appearance","complex_09","augmentation","ego_appearance","advanced_ego_appearance","complex_44")||labelled("Appearance")||notSet;
+ const origin=combine("origin_type","district","upbringing","backstreet_environment","complex_14")||labelled("Origin")||notSet;
+ const egoStatus=first("ego_status","complex_41");
+ const egoName=first("ego_name","complex_43");
+ const egoLoadout=get("ego_equipment_customizer");
+ const egoAppearance=first("ego_appearance","advanced_ego_appearance","complex_44");
+ const egoFunction=first("ego_function","advanced_ego_function","complex_61");
+ let egoType="Not specified.";
+ if(egoStatus.includes("Personally manifested"))egoType="Personal E.G.O.";
+ else if(egoStatus.includes("Volatile"))egoType="Volatile E.G.O.";
+ else if(egoStatus.includes("Distortion"))egoType="Distortion";
+ else if(egoStatus.includes("Abnormality-derived"))egoType="Abnormality-derived";
+ else if(egoStatus.includes("Sinner-issued"))egoType="Abnormality-based (Sinner-issued)";
+ else if(egoStatus.includes("Lobotomy"))egoType="Artificial / refined Lobotomy E.G.O.";
+ else if(egoStatus.includes("No known"))egoType="Absent";
+ else if(egoStatus)egoType=egoStatus;
+ const egoDescription=egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded."
+  :[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet;
+ const abilitySource=first("advanced_abilities","complex_47","complex_50","complex_51");
+ const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||(n===1?abilitySource:"")||notSet;
+ const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||notSet;
+ const passive=labelled("Passive Ability")||first("passive_ability","complex_passive")||notSet;
+ const personality=combine("personality","advanced_personality","complex_03","complex_21","complex_24")||labelled("Personality")||notSet;
+ const backstory=combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59")||notSet;
+ const likes=combine("likes","complex_32","complex_33")||labelled("Likes")||notSet;
+ const dislikes=combine("dislikes","complex_37","complex_29")||labelled("Dislikes")||notSet;
+ const overall=first("advanced_concept","complex_60","notes")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
+ return [
+  "Name: "+(name||"Unnamed Variant"),
+  "Title: "+title,
+  "Race: "+race,
+  "Affiliation: "+affiliation,
+  "Grade: "+grade,
+  "Appearance: "+appearance,
+  "Origin: "+origin,
+  "E.G.O: "+egoDescription,
+  "E.G.O Type: "+egoType,
+  "Ability 1: "+ability(1),
+  "Ability 2: "+ability(2),
+  "Ability 3: "+ability(3),
+  "Ability 4: "+ability(4),
+  "Ultimate Ability 1: "+ultimate(1),
+  "Ultimate Ability 2: "+ultimate(2),
+  "Passive Ability: "+passive,
+  "Personality: "+personality,
+  "Backstory: "+backstory,
+  "Likes: "+likes,
+  "Dislikes: "+dislikes,
+  "Overall: "+overall
+ ].join("\\n\\n");
+}
 function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
-function saveCurrentOc(){const rows=readOcArchive();const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:JSON.parse(JSON.stringify(answers)),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
+function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
 function activeQuestions(){return creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
@@ -539,10 +628,9 @@ function finish(){
  pruneHiddenAnswers();
  saveCurrentOc();
  $("result-character-name").textContent=characterName||"UNNAMED VARIANT";const modeStamp=$("result-creation-mode");if(modeStamp)modeStamp.textContent=(creationMode==="complex"?"COMPLEX":creationMode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION DOSSIER";
- const qs=visible();$("summary-list").innerHTML="";
- const modeRow=document.createElement("div");modeRow.className="summary-row";const modeKey=document.createElement("strong"),modeValue=document.createElement("span");modeKey.textContent="Creation Mode";modeValue.textContent=creationMode==="complex"?"Complex Creation":creationMode==="advanced"?"Advanced Creation":"Simple Creation";modeRow.append(modeKey,modeValue);$("summary-list").append(modeRow);
- const nameRow=document.createElement("div");nameRow.className="summary-row";const nameKey=document.createElement("strong"),nameValue=document.createElement("span");nameKey.textContent="Name";nameValue.textContent=characterName||"Unnamed Variant";nameRow.append(nameKey,nameValue);$("summary-list").append(nameRow);
- qs.forEach(q=>{const row=document.createElement("div");row.className="summary-row";const k=document.createElement("strong"),v=document.createElement("span");k.textContent=q.title;const answer=answers[q.id]?.value;v.textContent=Array.isArray(answer)?(answers[q.id]?.choice==="Other / custom answer"?(answers[q.id]?.custom||"Custom"):answer.join(", ")):answer&&typeof answer==="object"?(answer.sinner_ego!==undefined?`Abnormality E.G.O.: ${answer.sinner_ego||"—"}`:[`Synergy: ${answer.synergy||"—"}`,`Suit: ${answer.suit||"—"}`,`E.G.O Weapon: ${answer.category4||"—"}`,`Gift: ${answer.gift||"—"}`].join(" · ")):answer||"Not specified";row.append(k,v);$("summary-list").append(row);});
+ const profile=formatCharacterDossier(characterName,creationMode,answers);
+ $("summary-list").innerHTML="";
+ const dossier=document.createElement("pre");dossier.className="profile-summary";dossier.textContent=profile;$("summary-list").append(dossier);
  screen("result");
 }
 function advance(){pruneHiddenAnswers();index++;if(index>=visible().length)finish();else render();}
@@ -601,7 +689,7 @@ function randomizeAll(mode=creationMode){
  }
  pruneHiddenAnswers();finish();
 }
-function summary(){return ["PROJECT MOON VARIANT BUILDER — CHARACTER RECORD",`Name: ${characterName||"Unnamed Variant"}`,`Creation Mode: ${creationMode==="complex"?"Complex Creation":creationMode==="advanced"?"Advanced Creation":"Simple Creation"}`,"Shared setting note: use this builder for original Project Moon-inspired characters and Mirror World variants.","",...visible().map(q=>{const v=answers[q.id]?.value;if(v&&typeof v==="object"&&v.sinner_ego!==undefined)return `${q.title}: Abnormality E.G.O.: ${v.sinner_ego||"Not specified"}`;if(v&&typeof v==="object")return `${q.title}: E.G.O. Synergy: ${v.synergy||"Not specified"}; Suit: ${v.suit||"Not specified"}; E.G.O Weapon: ${v.category4||"Not specified"}; Gift: ${v.gift||"Not specified"}`;return `${q.title}: ${v||"Not specified"}`;})].join("\n");}
+function summary(){return formatCharacterDossier(characterName,creationMode,answers);}
 $("begin-button").onclick=()=>{editingOcId=null;answers={};characterName="";$("character-name").value="";$("name-validation").textContent="";screen("mode");};
 $("name-back").onclick=()=>screen("mode");
 $("name-continue").onclick=()=>{
