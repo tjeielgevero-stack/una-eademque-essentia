@@ -711,7 +711,7 @@ function unlockEssentiaMainTitle(){
 }
 applyEssentiaMainTitle();
 function normalizeSephrusCharacterName(name){
- const key=String(name||"").trim().toLowerCase().replace(/\\s+/g," ");
+ const key=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
  const aliases=["sephrus","zephyrus","aztiluth","sephrus zephyrus","sephrus aztiluth","zephyrus aztiluth","sephrus zephyrus aztiluth"];
  return aliases.includes(key)?"Sephrus Aztiluth":String(name||"").trim();
 }
@@ -833,6 +833,12 @@ function returnHomeFromSephrusSecret(){
  document.body.append(overlay);
  requestAnimationFrame(()=>overlay.classList.add("active"));
  window.setTimeout(()=>{
+  const canonicalName=normalizeSephrusCharacterName(characterName);
+  if(canonicalName==="Sephrus Aztiluth"){
+   characterName=canonicalName;
+   completeGeneratedCharacter(characterName,answers);
+   saveCurrentOc();
+  }
   answers={};characterName="";creationMode="simple";editingOcId=null;index=0;
   $("character-name").value="";$("name-validation").textContent="";
   $("validation-message").textContent="";
@@ -1255,7 +1261,7 @@ $("name-back").onclick=()=>screen("mode");
 $("name-continue").onclick=()=>{
  const entered=$("character-name").value.trim();
  if(!entered){$("name-validation").textContent="PLEASE ENTER A NAME TO BEGIN YOUR RECORD."; $("character-name").focus(); return;}
- resetSephrusSecretState();characterName=normalizeSephrusCharacterName(entered);$("character-name").value=characterName;index=0;render();screen("picker");
+ resetSephrusSecretState();characterName=entered;index=0;render();screen("picker");
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>screen("home");
