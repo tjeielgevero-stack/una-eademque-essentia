@@ -446,7 +446,7 @@ function completeGeneratedCharacter(name,source){
  if(![v.advanced_concept,v.advanced_motivation,v.advanced_conflict,v.advanced_code,v.advanced_relationships,v.advanced_arc,v.complex_15,v.complex_16,v.complex_17,v.complex_18,v.complex_19,v.complex_20,v.complex_51,v.complex_52,v.complex_59].some(value=>String(value||"").trim()))putGenerated(a,"generated_backstory",story);
  if(![v.likes,v.complex_32,v.complex_33].some(value=>String(value||"").trim()))putGenerated(a,"generated_likes",generatedPick(["Quiet libraries, carefully prepared tea, old orchestral recordings, and people who keep their promises","Rain against windows, intricate craftsmanship, formal attire, and thoughtful conversation","Antique books, orderly rooms, subtle humor, and well-made objects","Late-night city lights, refined cuisine, handwritten notes, and dependable companions"]));
  if(![v.dislikes,v.complex_37,v.complex_29].some(value=>String(value||"").trim()))putGenerated(a,"generated_dislikes",generatedPick(["Careless promises, needless cruelty, loud self-importance, and being treated as a possession","Wastefulness, public humiliation, broken agreements, and false authority","Intrusive questions, deliberate dishonesty, and avoidable collateral damage","Condescension, performative loyalty, and having choices made for them"]));
- putGenerated(a,"generated_overall","This variant is a "+rank+" member of "+affiliation+", shaped by "+originPlace+" and the circumstances of "+upbringing.toLowerCase()+". Their professional standing gives them a defined place in the City's social structure, but their personal history and relationship with "+egoTheme.toLowerCase()+" give that role a more individual meaning. Through "+approach+" choices and the distinctive expression of their E.G.O., they occupy a morally complicated space in which responsibility, ambition, and personal conviction do not always agree.");
+ putGenerated(a,"generated_overall","This variant is a "+rank+" member of "+affiliation+", shaped by "+originPlace+" and "+upbringingContext+". Their professional standing gives them a defined place in the City's social structure, but their personal history and relationship with "+egoTheme.toLowerCase()+" give that role a more individual meaning. Through "+approach+" choices and the distinctive expression of their E.G.O., they occupy a morally complicated space in which responsibility, ambition, and personal conviction do not always agree.");
  if(sephrus){
   putGenerated(a,"generated_title","The Same Essence");
   putGenerated(a,"generated_race",v.race||"Human");
@@ -688,34 +688,40 @@ const DOWNSTREAM={
 // Generated details are dependent on the answers that shaped them. Clear only affected
 // generated fields when editing a saved character, so the next completion regenerates them.
 const GENERATED_DOWNSTREAM={
- title:["generated_title"],epithet:["generated_title"],color_title:["generated_title"],
+ title:["generated_title","generated_title_description"],epithet:["generated_title","generated_title_description"],color_title:["generated_title","generated_title_description"],
  race:["generated_race"],
- origin_type:["generated_backstory","generated_overall"],district:["generated_backstory","generated_overall"],
- upbringing:["generated_backstory","generated_overall"],backstreet_environment:["generated_backstory","generated_overall"],
- occupation:["generated_appearance","generated_backstory","generated_overall"],
- head_role:["generated_appearance","generated_backstory","generated_overall"],
- syndicate_type:["generated_appearance","generated_backstory","generated_overall"],
- syndicate:["generated_appearance","generated_backstory","generated_overall"],
- finger_rank:["generated_appearance","generated_backstory","generated_overall"],
- syndicate_hierarchy:["generated_appearance","generated_backstory","generated_overall"],
- fixer_grade:["generated_backstory","generated_overall"],association_position:["generated_backstory","generated_overall"],
- association:["generated_appearance","generated_backstory","generated_overall"],
- office:["generated_backstory","generated_overall"],workshop:["generated_appearance","generated_backstory","generated_overall"],
- wing_role:["generated_appearance","generated_backstory","generated_overall"],
+ origin_type:["generated_origin","generated_backstory","generated_overall"],district:["generated_origin","generated_backstory","generated_overall"],
+ upbringing:["generated_origin","generated_backstory","generated_overall"],backstreet_environment:["generated_origin","generated_backstory","generated_overall"],
+ occupation:["generated_affiliation","generated_grade","generated_appearance","generated_backstory","generated_overall"],
+ head_role:["generated_affiliation","generated_grade","generated_appearance","generated_backstory","generated_overall"],
+ syndicate_type:["generated_affiliation","generated_grade","generated_appearance","generated_backstory","generated_overall"],
+ syndicate:["generated_affiliation","generated_grade","generated_appearance","generated_backstory","generated_overall"],
+ finger_rank:["generated_affiliation","generated_grade","generated_appearance","generated_backstory","generated_overall"],
+ syndicate_hierarchy:["generated_affiliation","generated_grade","generated_appearance","generated_backstory","generated_overall"],
+ fixer_grade:["generated_grade","generated_backstory","generated_overall"],association_position:["generated_affiliation","generated_grade","generated_backstory","generated_overall"],
+ association_branch:["generated_affiliation","generated_grade"],association_section:["generated_affiliation","generated_grade"],
+ association:["generated_affiliation","generated_appearance","generated_backstory","generated_overall"],
+ office:["generated_affiliation","generated_backstory","generated_overall"],workshop:["generated_affiliation","generated_appearance","generated_backstory","generated_overall"],
+ wing_role:["generated_affiliation","generated_appearance","generated_backstory","generated_overall"],
  advanced_concept:["generated_backstory"],advanced_motivation:["generated_backstory"],advanced_conflict:["generated_backstory"],
- backstory:["generated_backstory"],complex_15:["generated_backstory"],complex_59:["generated_backstory"],
+ backstory:["generated_backstory"],complex_15:["generated_backstory"],complex_16:["generated_backstory"],complex_17:["generated_backstory"],complex_18:["generated_backstory"],complex_19:["generated_backstory"],complex_20:["generated_backstory"],complex_51:["generated_backstory"],complex_52:["generated_backstory"],complex_59:["generated_backstory"],
  likes:["generated_likes"],complex_32:["generated_likes"],complex_33:["generated_likes"],
  dislikes:["generated_dislikes"],complex_37:["generated_dislikes"],complex_29:["generated_dislikes"],
- 
+ personality:["generated_personality"],advanced_personality:["generated_personality"],
  complex_47:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  complex_50:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  complex_51:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  ability_1:["generated_ability_1"],ability_2:["generated_ability_2"],ability_3:["generated_ability_3"],ability_4:["generated_ability_4"],
- ego_status:["generated_ego_name","generated_overall"],
- ego_name:["generated_overall"],
- ego_theme:["generated_ability_1","generated_ability_4","generated_ultimate_1","generated_overall"],
- distortion_theme:["generated_ability_1","generated_ability_4","generated_ultimate_1","generated_overall"],
- combat_approach:["generated_ability_2","generated_overall"]
+ ego_status:["generated_ego_name","generated_ego_description","generated_ego_type","generated_overall"],
+ ego_name:["generated_ego_description","generated_overall"],
+ ego_appearance:["generated_ego_description"],advanced_ego_appearance:["generated_ego_description"],
+ ego_function:["generated_ego_description"],advanced_ego_function:["generated_ego_description"],
+ ego_trigger:["generated_ego_description"],ego_form:["generated_ego_description"],
+ ego_theme:["generated_ability_1","generated_ability_4","generated_ultimate_1","generated_ultimate_2","generated_ego_description","generated_overall"],
+ distortion_theme:["generated_ability_1","generated_ability_4","generated_ultimate_1","generated_ultimate_2","generated_ego_description","generated_overall"],
+ status_infliction:["generated_ability_3"],
+ passive_activation:["generated_passive"],
+ combat_approach:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4","generated_overall"]
 };
 function clearDownstream(id){
  const children=new Set([...(DOWNSTREAM[id]||[]),...(GENERATED_DOWNSTREAM[id]||[])]);
