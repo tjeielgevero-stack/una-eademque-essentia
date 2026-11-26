@@ -1221,9 +1221,10 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
  const status=document.getElementById("ambient-music-status");
  if(!toggle)return;
  const storageKey="uee_ambient_music_enabled_v1";
- let wanted=false,context=null,master=null,nodes=[];
- try{wanted=localStorage.getItem(storageKey)==="true";}catch{}
- toggle.checked=wanted;
+ let savedPreference=false,context=null,master=null,nodes=[];
+ try{savedPreference=localStorage.getItem(storageKey)==="true";}catch{}
+ // Browsers require a fresh user gesture before audio can begin; never show a playing toggle on page load.
+ toggle.checked=false;
  function stop(){
   if(master){try{master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(0,context.currentTime,.8);}catch{}}
   const oldNodes=nodes.slice();nodes=[];
@@ -1244,5 +1245,5 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
   return true;
  }
  toggle.addEventListener("change",()=>{wanted=toggle.checked;try{localStorage.setItem(storageKey,String(wanted));}catch{}if(wanted){if(!start()){wanted=false;toggle.checked=false;try{localStorage.setItem(storageKey,"false");}catch{}}}else stop();});
- if(wanted&&status)status.textContent="MUSIC ENABLED · PRESS PLAY TO START";
+ if(savedPreference&&status)status.textContent="MUSIC AVAILABLE · ENABLE TO START";
 })();
