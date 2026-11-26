@@ -504,14 +504,14 @@ export class RoomHub extends DurableObject {
       this.addLog("action", player.name + " takes a defensive stance.");
       this.advanceTurn(player);
       await this.saveAndBroadcast("action");
-      return json({ room: this.publicState() });
+      return json({ room: this.publicState(player.id) });
     }
     if (type === "pass") {
       player.status = "WAITING";
       this.addLog("action", player.name + " passes their turn.");
       this.advanceTurn(player);
       await this.saveAndBroadcast("action");
-      return json({ room: this.publicState() });
+      return json({ room: this.publicState(player.id) });
     }
     if (type === "ultimate") {
       if (player.ultimateUsed) return json({ error: "This character has already used their ultimate in this match." }, 409);
