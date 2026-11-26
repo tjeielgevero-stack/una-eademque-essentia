@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-sephrus-nochains-fix1">
+  <link rel="stylesheet" href="style.css?v=20261126-ambient-brokenletters1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -59,6 +59,10 @@
         <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">20</span></button>
       </div>
       <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
+      <div class="ambient-music-setting">
+        <div class="ambient-music-copy"><strong>AMBIENT ARCHIVE MUSIC</strong><span>Original, quiet atmospheric drone. Starts only when enabled.</span><small id="ambient-music-status" aria-live="polite">AMBIENT MUSIC OFF</small></div>
+        <label class="ambient-music-switch" for="ambient-music-toggle"><input id="ambient-music-toggle" type="checkbox"><span class="ambient-music-track" aria-hidden="true"></span><span class="sr-only">Enable ambient music</span></label>
+      </div>
       <div class="color-picker-section">
         <div class="color-picker-heading">
           <span>ACCENT COLOR</span>
@@ -381,7 +385,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-sephrus-nochains-fix1"></script>
+  <script src="script.js?v=20261126-ambient-brokenletters1"></script>
   <script src="multiplayer.js?v=20261126-parry-ultimate1"></script>
 </body>
 </html>
