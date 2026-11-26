@@ -421,8 +421,9 @@
     $("mp-qte-step").textContent = challenge.type === "parry" ? "ONE RESPONSE · " + (challenge.windowMs / 1000).toFixed(2) + "s" : "ACTIVATION " + (challenge.step + 1) + " / " + challenge.totalSteps + " · " + (challenge.windowMs / 1000).toFixed(2) + "s";
     const buttons = document.querySelectorAll("[data-qte-input]");
     buttons.forEach(button => button.disabled = !isOwner || qteSubmitting);
-    if (activeChallengeId !== challenge.id) {
-      activeChallengeId = challenge.id;
+    const challengeStateId = challenge.id + ":" + challenge.step;
+    if (activeChallengeId !== challengeStateId) {
+      activeChallengeId = challengeStateId;
       qteSubmitting = false;
       stopQteTimer();
     }
