@@ -232,89 +232,42 @@ const $=id=>document.getElementById(id);
 
 // Accessible Settings tabs and persistent visual-effect toggles.
 (function setupSettingsTabsAndEffects(){
- const tabs=[...document.querySelectorAll("[data-settings-tab]")];
- const panels=[...document.querySelectorAll("[data-settings-panel]")];
- const tablist=document.querySelector(".settings-tabs");
- function activateTab(name,focus=false){
-  tabs.forEach(tab=>{
-   const active=tab.dataset.settingsTab===name;
-   tab.classList.toggle("active",active);
-   tab.setAttribute("aria-selected",String(active));
-   tab.tabIndex=active?0:-1;
-   if(active&&focus)tab.focus();
-  });
-  panels.forEach(panel=>{panel.hidden=panel.dataset.settingsPanel!==name;});
- }
+ const tabs=[...document.querySelectorAll("[data-settings-tab]")],panels=[...document.querySelectorAll("[data-settings-panel]")],tablist=document.querySelector(".settings-tabs");
+ function activateTab(name,focus=false){tabs.forEach(tab=>{const active=tab.dataset.settingsTab===name;tab.classList.toggle("active",active);tab.setAttribute("aria-selected",String(active));tab.tabIndex=active?0:-1;if(active&&focus)tab.focus();});panels.forEach(panel=>{panel.hidden=panel.dataset.settingsPanel!==name;});}
  tabs.forEach(tab=>tab.addEventListener("click",()=>activateTab(tab.dataset.settingsTab)));
- tablist?.addEventListener("keydown",event=>{
-  const current=tabs.indexOf(document.activeElement);
-  let next=current;
-  if(event.key==="ArrowRight")next=(current+1)%tabs.length;
-  else if(event.key==="ArrowLeft")next=(current-1+tabs.length)%tabs.length;
-  else if(event.key==="Home")next=0;
-  else if(event.key==="End")next=tabs.length-1;
-  else return;
-  event.preventDefault();
-  activateTab(tabs[next].dataset.settingsTab,true);
- });
- const switches=[...document.querySelectorAll("[data-effect-toggle]")];
- const effectsRoot=document.documentElement;
- const impactOverlay=document.querySelector(".fx-impact");
- const pauseHoverMotion=()=>{
-  effectsRoot.classList.add("effects-pointer-paused");
-  effectsRoot.classList.remove("screenquake-hovering");
- };
- // Pause hover-only motion after a click. Re-arm only after the pointer leaves
- // the button area, so a newly-rendered question cannot inherit the old hover.
- document.addEventListener("pointerdown",event=>{
-  if(event.pointerType!=="touch")pauseHoverMotion();
- },true);
- document.addEventListener("click",()=>{
-  pauseHoverMotion();
-  if(!effectsRoot.classList.contains("effect-impactframe")||!impactOverlay)return;
-  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
-  impactOverlay.classList.remove("impact-hit");
-  void impactOverlay.offsetWidth;
-  impactOverlay.classList.add("impact-hit");
- },true);
- document.addEventListener("pointermove",event=>{
-  if(event.pointerType==="touch")return;
-  const target=event.target instanceof Element?event.target:null;
-  const overButton=!!target?.closest("button");
-  if(effectsRoot.classList.contains("effects-pointer-paused")){
-   if(overButton)return;
-   effectsRoot.classList.remove("effects-pointer-paused");
-  }
-  effectsRoot.classList.toggle("screenquake-hovering",effectsRoot.classList.contains("effect-screenquake")&&overButton);
- });
- document.addEventListener("pointerout",event=>{
-  if(!event.relatedTarget)effectsRoot.classList.remove("screenquake-hovering","effects-pointer-paused");
- });
- const storageKey="uee_visual_effects_v1";
- let saved={};
- try{
-  const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
-  if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved=parsed;
- }catch{}
- function applyEffect(key,enabled,persist=false){
-  document.documentElement.classList.toggle("effect-"+key,enabled);
-  const control=switches.find(item=>item.dataset.effectToggle===key);
-  if(control)control.checked=enabled;
-  if(persist){
-   saved[key]=enabled;
-   try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}
-  }
+ tablist?.addEventListener("keydown",event=>{const current=tabs.indexOf(document.activeElement);let next=current;if(event.key==="ArrowRight")next=(current+1)%tabs.length;else if(event.key==="ArrowLeft")next=(current-1+tabs.length)%tabs.length;else if(event.key==="Home")next=0;else if(event.key==="End")next=tabs.length-1;else return;event.preventDefault();activateTab(tabs[next].dataset.settingsTab,true);});
+ const switches=[...document.querySelectorAll("[data-effect-toggle]")],root=document.documentElement,sensitive=["rainbowapocalypse","impactframe"],storageKey="uee_visual_effects_v1",warningKey="uee_flash_warning_suppressed_v1";
+ let saved={};try{const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved=parsed;}catch{}
+ let warningSuppressed=false;try{warningSuppressed=localStorage.getItem(warningKey)==="1";}catch{}
+ const warningDialog=$("flash-warning-dialog"),pending=[];
+ function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}}
+ function applyEffect(key,enabled,write=true){root.classList.toggle("effect-"+key,enabled);const control=switches.find(x=>x.dataset.effectToggle===key);if(control)control.checked=enabled;saved[key]=enabled;if(write)persist();}
+ function updateWarningStatus(){const node=$("flash-warning-settings-status");if(node)node.textContent=warningSuppressed?"Flashing-effects warning: hidden. Use this control to show it again.":"Flashing-effects warning: shown whenever you try to enable Rainbow Apocalypse or Impact Frame.";}
+ function requestEnable(keys){
+  const gate=[];keys.forEach(key=>{if(sensitive.includes(key)&&!warningSuppressed)gate.push(key);else applyEffect(key,true,false);});
+  if(gate.length){pending.splice(0,pending.length,...gate);const hide=$("flash-warning-never");if(hide)hide.checked=false;if(warningDialog&&!warningDialog.open)warningDialog.showModal();}else persist();
  }
  switches.forEach(control=>{
-  const key=control.dataset.effectToggle;
-  applyEffect(key,saved[key]===true);
-  control.addEventListener("change",()=>applyEffect(key,control.checked,true));
+  const key=control.dataset.effectToggle;let enabled=saved[key]===true;
+  if(sensitive.includes(key)&&!warningSuppressed)enabled=false;
+  applyEffect(key,enabled,false);
+  control.addEventListener("change",()=>{if(control.checked)requestEnable([key]);else applyEffect(key,false,true);});
  });
- $("effects-apply-all")?.addEventListener("click",()=>{switches.forEach(x=>applyEffect(x.dataset.effectToggle,true));try{localStorage.setItem(storageKey,JSON.stringify(Object.fromEntries(switches.map(x=>[x.dataset.effectToggle,true]))));}catch{}});
- $("effects-disable-all")?.addEventListener("click",()=>{switches.forEach(x=>applyEffect(x.dataset.effectToggle,false));try{localStorage.setItem(storageKey,"{}");}catch{}});
- document.addEventListener("pointerdown",event=>{effectsRoot.style.setProperty("--impact-x",Math.round(event.clientX/window.innerWidth*100)+"%");effectsRoot.style.setProperty("--impact-y",Math.round(event.clientY/window.innerHeight*100)+"%");},{passive:true});
+ if(sensitive.some(key=>saved[key]===true)&&!warningSuppressed)persist();
+ $("flash-warning-accept")?.addEventListener("click",()=>{if($("flash-warning-never")?.checked){warningSuppressed=true;try{localStorage.setItem(warningKey,"1");}catch{}}pending.splice(0).forEach(key=>applyEffect(key,true,false));persist();updateWarningStatus();warningDialog?.close();});
+ $("flash-warning-cancel")?.addEventListener("click",()=>{pending.splice(0);warningDialog?.close();});
+ warningDialog?.addEventListener("cancel",()=>{pending.splice(0);});
+ $("flash-warning-reset-button")?.addEventListener("click",()=>{warningSuppressed=false;try{localStorage.removeItem(warningKey);}catch{}updateWarningStatus();});
+ $("effects-apply-all")?.addEventListener("click",()=>{const all=switches.map(x=>x.dataset.effectToggle);all.filter(key=>!sensitive.includes(key)).forEach(key=>applyEffect(key,true,false));requestEnable(all.filter(key=>sensitive.includes(key)));persist();});
+ $("effects-disable-all")?.addEventListener("click",()=>{switches.forEach(x=>applyEffect(x.dataset.effectToggle,false,false));persist();});
+ const impactOverlay=document.querySelector(".fx-impact");
+ const pauseHoverMotion=()=>{root.classList.add("effects-pointer-paused");root.classList.remove("screenquake-hovering");};
+ document.addEventListener("pointerdown",event=>{if(event.pointerType!=="touch")pauseHoverMotion();root.style.setProperty("--impact-x",Math.round(event.clientX/window.innerWidth*100)+"%");root.style.setProperty("--impact-y",Math.round(event.clientY/window.innerHeight*100)+"%");},{passive:true});
+ document.addEventListener("click",()=>{pauseHoverMotion();if(!root.classList.contains("effect-impactframe")||!impactOverlay)return;if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;impactOverlay.classList.remove("impact-hit");void impactOverlay.offsetWidth;impactOverlay.classList.add("impact-hit");},true);
+ document.addEventListener("pointermove",event=>{if(event.pointerType==="touch")return;const target=event.target instanceof Element?event.target:null;const overButton=!!target?.closest("button");if(root.classList.contains("effects-pointer-paused")){if(overButton)return;root.classList.remove("effects-pointer-paused");}root.classList.toggle("screenquake-hovering",root.classList.contains("effect-screenquake")&&overButton);});
+ document.addEventListener("pointerout",event=>{if(!event.relatedTarget)root.classList.remove("screenquake-hovering","effects-pointer-paused");});
+ updateWarningStatus();
 })();
-
 // Show the community disclaimer once per browser tab session.
 (function setupWelcomeNotice(){
  const overlay=$("welcome-notice"),button=$("notice-continue");
@@ -386,7 +339,7 @@ function setAnswer(q,choice,value,custom=""){
  answers[q.id]={choice,value,custom};
  pruneHiddenAnswers();
 }
-function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
+function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
 function renderSinnerEgo(saved){
   const savedValue=(saved.value&&saved.value.sinner_ego)||"";
   const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal";panel.dataset.egoPath="sinner";
@@ -653,3 +606,50 @@ $("next-button").onclick=submit;
 $("edit-button").onclick=()=>{index=0;render();screen("picker");};
 $("restart-button").onclick=()=>{answers={};characterName="";creationMode="simple";editingOcId=null;index=0;$("character-name").value="";renderOcHistory();screen("home");};
 $("copy-button").onclick=async()=>{try{await navigator.clipboard.writeText(summary());$("copy-status").textContent="SUMMARY COPIED TO CLIPBOARD.";}catch{$("copy-status").textContent="CLIPBOARD UNAVAILABLE. PLEASE COPY MANUALLY.";}}
+
+// MIRROR ARENA: a lightweight fictional OC matchup simulator.
+let simMode="1v1",simMatch=null;
+const SIM_MODE_INFO={"1v1":{count:2,description:"Two saved OCs enter a one-on-one match.",labels:["TEAM A · FIGHTER 1","TEAM B · FIGHTER 1"]},"2v2":{count:4,description:"Two pairs compete as teams, with teammates able to support each other.",labels:["TEAM A · FIGHTER 1","TEAM A · FIGHTER 2","TEAM B · FIGHTER 1","TEAM B · FIGHTER 2"]},"ffa":{count:4,description:"Three or four OCs compete individually. The last active character wins.",labels:["FREE AGENT 1","FREE AGENT 2","FREE AGENT 3","FREE AGENT 4"]}};
+const SIM_DIALOGUE={aloof:["That was your opening?","Wake me when this becomes interesting.","...Predictable."],reserved:["I would rather settle this quickly.","There is no need for a spectacle.","Understood. My turn."],stoic:["I will remain composed.","Noted.","I can continue."],cheerful:["This is getting exciting!","Come on, show me what you can do!","That was a good one!"],sarcastic:["Was that supposed to impress me?","I have seen paperwork more threatening than that.","Lovely. Truly inspired."],analytical:["Your timing is becoming predictable.","I have adjusted my approach.","Interesting pattern."],pragmatic:["Let's keep this efficient.","No wasted movement.","Enough talking. Next exchange."],proud:["Remember who you are facing.","I will not be outdone.","You will have to do better."],cynical:["Of course it came to this.","Nothing ever goes smoothly, does it?","I expected as much."],gentle:["Are you alright? We can take a moment.","I do not want this to go too far.","Let's finish this fairly."],mischievous:["Oh, you fell for that?","I have another surprise.","Try to keep up!"],protective:["Stay behind me. I have this.","I will not let my team down.","I've got your back."],loyal:["We stand together.","I will support you.","Not abandoning this match."],default:["Let's see how this goes.","Your move.","I am not finished yet."]};
+const SIM_MOVES=["measured feint","momentum shift","careful pressure","a clean counter","a clever change of pace","a focused flourish"];
+const SIM_REACTIONS=["steadies their footing","reconsiders their approach","answers with a guarded stance","takes a breath and regroups","looks for a new opening","shakes off the surprise"];
+function simPersonality(record){const p=record.answers?.personality;if(!p)return[];if(p.choice==="Other / custom answer")return[p.custom||"custom"];return Array.isArray(p.value)?p.value:[String(p.value||"")];}
+function simQuote(fighter){for(const trait of fighter.personality){const key=String(trait).toLowerCase().split(" ")[0];if(SIM_DIALOGUE[key]){const lines=SIM_DIALOGUE[key];return lines[Math.floor(Math.random()*lines.length)];}}const lines=SIM_DIALOGUE.default;return lines[Math.floor(Math.random()*lines.length)];}
+function simSelectCount(){
+ const info=SIM_MODE_INFO[simMode];$("sim-participant-count").textContent=simMode==="ffa"?"3–4 FIGHTERS":info.count+" FIGHTERS";$("sim-mode-description").textContent=info.description;
+ const records=readOcArchive(),box=$("sim-fighter-selectors");box.innerHTML="";
+ info.labels.forEach((label,index)=>{const wrap=document.createElement("label");wrap.className="sim-slot-label";wrap.textContent=label;const select=document.createElement("select");select.dataset.simSlot=String(index);select.setAttribute("aria-label",label);const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent="SELECT A SAVED OC";select.append(placeholder);records.forEach(record=>{const opt=document.createElement("option");opt.value=record.id;opt.textContent=record.name||"Unnamed Variant";select.append(opt);});wrap.append(select);box.append(wrap);});
+ $("sim-setup-message").textContent=records.length<2?"Save at least two OCs in the creator before starting a match.":records.length<info.count&&simMode!=="1v1"?"You have "+records.length+" saved OCs. Free For All needs at least three; 2v2 needs four.":"";
+ $("sim-start-button").disabled=records.length<2;
+}
+function simSetMode(mode){if(!SIM_MODE_INFO[mode])return;simMode=mode;document.querySelectorAll("[data-sim-mode]").forEach(button=>button.classList.toggle("active",button.dataset.simMode===mode));$("simulator-setup").classList.remove("hidden");$("simulator-match").classList.add("hidden");simSelectCount();}
+function simAddLog(kind,speaker,message){const log=$("sim-log"),item=document.createElement("article");item.className="sim-log-entry sim-log-"+kind;const label=document.createElement("span");label.className="sim-log-label";label.textContent=kind==="chat"?"CHARACTER CHAT":kind==="system"?"ARENA RECORD":"INTERACTION";const content=document.createElement("p");content.textContent=speaker?speaker+": "+message:message;item.append(label,content);log.append(item);while(log.children.length>70)log.firstElementChild.remove();log.scrollTop=log.scrollHeight;}
+function simRenderArena(){const arena=$("sim-arena-cards");arena.innerHTML="";if(!simMatch)return;simMatch.fighters.forEach(f=>{const card=document.createElement("article");card.className="sim-fighter-card"+(f.alive?"":" sim-fighter-out");const top=document.createElement("div");top.className="sim-fighter-top";const team=document.createElement("span");team.className="sim-team-tag";team.textContent=f.team==="ffa"?"FREE AGENT":"TEAM "+f.team;const state=document.createElement("span");state.className="sim-fighter-state";state.textContent=f.alive?"ACTIVE":"OUT";top.append(team,state);const name=document.createElement("h4");name.textContent=f.name;const traits=document.createElement("p");traits.className="sim-fighter-traits";traits.textContent=f.personality.length?f.personality.join(" · "):"PERSONALITY NOT RECORDED";const hp=document.createElement("div");hp.className="sim-hp-track";const fill=document.createElement("span");fill.style.width=Math.max(0,f.hp)+"%";hp.append(fill);const hpText=document.createElement("div");hpText.className="sim-hp-text";hpText.textContent="STAMINA "+f.hp+" / 100";const status=document.createElement("p");status.className="sim-fighter-status";status.textContent=f.status||"READY";card.append(top,name,traits,hp,hpText,status);arena.append(card);});$("sim-turn-count").textContent="TURN "+String(simMatch.turn).padStart(2,"0");}
+function simAlive(){return simMatch.fighters.filter(f=>f.alive);}
+function simWinner(){const alive=simAlive();if(simMatch.mode==="ffa")return alive.length<=1?(alive[0]||null):false;const teams=[...new Set(simMatch.fighters.map(f=>f.team))],active=teams.filter(team=>alive.some(f=>f.team===team));return active.length<=1?(active[0]||null):false;}
+function simFinish(winner){simMatch.finished=true;$("sim-next-turn-button").disabled=true;$("sim-run-all-button").disabled=true;$("sim-match-status").textContent=winner?(simMatch.mode==="ffa"?winner.name+" WINS THE FREE-FOR-ALL.":"TEAM "+winner+" WINS THE MATCH."):"MATCH ENDED.";$("sim-feed-status").textContent="MATCH COMPLETE";simAddLog("system","",winner?(simMatch.mode==="ffa"?winner.name+" is the last OC standing.":"Team "+winner+" takes the match."):"The match ends in a draw.");$("sim-rematch-button").classList.remove("hidden");simRenderArena();}
+function simRunTurn(){
+ if(!simMatch||simMatch.finished)return;const active=simAlive();if(active.length<=1){simFinish(active[0]||null);return;}
+ const actor=active[Math.floor(Math.random()*active.length)],opponents=active.filter(f=>f.id!==actor.id&&(simMatch.mode==="ffa"||f.team!==actor.team));if(!opponents.length){simFinish(actor.team);return;}
+ const target=opponents[Math.floor(Math.random()*opponents.length)],move=SIM_MOVES[Math.floor(Math.random()*SIM_MOVES.length)];simMatch.turn++;
+ let impact=9+Math.floor(Math.random()*10);if(Math.random()<.18){impact=Math.max(5,impact-5);target.status="BRACED";}else target.status="REPOSITIONING";target.hp=Math.max(0,target.hp-impact);actor.status="MOMENTUM +";
+ simAddLog("action",actor.name,"uses "+move+". "+target.name+" loses "+impact+" stamina.");simAddLog("chat",actor.name,'"'+simQuote(actor)+'"');
+ if(target.hp===0){target.alive=false;target.status="MATCH COMPLETE";simAddLog("system","",target.name+" is out of the match.");}else simAddLog("chat",target.name,'"'+SIM_REACTIONS[Math.floor(Math.random()*SIM_REACTIONS.length)]+'."');
+ simMatch.fighters.filter(f=>f.team===actor.team&&f.id!==actor.id&&f.alive).forEach(teammate=>{if(Math.random()<.26){teammate.status="SUPPORTING";simAddLog("chat",teammate.name,'"'+simQuote(teammate)+'"');}});
+ simRenderArena();const winner=simWinner();if(winner!==false)simFinish(winner);else $("sim-match-status").textContent="TURN "+simMatch.turn+" RESOLVED — NEXT EXCHANGE READY.";
+}
+function simBuildMatch(ids){const records=readOcArchive(),teamMap=simMode==="1v1"?["A","B"]:simMode==="2v2"?["A","A","B","B"]:["ffa","ffa","ffa","ffa"];const fighters=ids.map((id,index)=>{const record=records.find(r=>r.id===id);return{id:record.id,name:record.name||"Unnamed Variant",team:teamMap[index],hp:100,alive:true,status:"READY",personality:simPersonality(record)};});simMatch={mode:simMode,fighters,turn:0,finished:false,ids:ids.slice()};$("simulator-setup").classList.add("hidden");$("simulator-match").classList.remove("hidden");$("sim-match-title").textContent=simMode==="ffa"?"FREE FOR ALL":simMode.toUpperCase();$("sim-log").innerHTML="";$("sim-feed-status").textContent="MATCH LIVE";$("sim-next-turn-button").disabled=false;$("sim-run-all-button").disabled=false;$("sim-rematch-button").classList.add("hidden");$("sim-match-status").textContent="MATCH INITIALIZED. AWAITING FIRST EXCHANGE.";simRenderArena();simAddLog("system","","Match initialized — "+(simMode==="ffa"?"Free For All":simMode.toUpperCase())+".");fighters.forEach(f=>simAddLog("chat",f.name,'"'+simQuote(f)+'"'));}
+function simStart(){const ids=[...document.querySelectorAll("[data-sim-slot]")].map(x=>x.value).filter(Boolean),min=simMode==="ffa"?3:SIM_MODE_INFO[simMode].count;if(ids.length<min){$("sim-setup-message").textContent=simMode==="ffa"?"Choose at least three OCs.":"Choose every fighter slot.";return;}if(new Set(ids).size!==ids.length){$("sim-setup-message").textContent="Choose a different saved OC for each slot.";return;}if(simMode!=="ffa"&&ids.length!==SIM_MODE_INFO[simMode].count){$("sim-setup-message").textContent="Fill every fighter slot before starting.";return;}simBuildMatch(ids);$("sim-setup-message").textContent="";}
+function simRematch(){if(simMatch)simBuildMatch(simMatch.ids);}
+function simRunAll(){let guard=0;while(simMatch&&!simMatch.finished&&guard<80){simRunTurn();guard++;}if(simMatch&&!simMatch.finished)simFinish(simWinner());}
+function transitionDelay(){return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches?1:720;}
+function openSimulator(){document.body.classList.add("simulator-opening");window.setTimeout(()=>{screen("simulator");document.body.classList.remove("simulator-opening");document.body.classList.add("simulator-entered");simSetMode("1v1");},transitionDelay());}
+function closeSimulator(){document.body.classList.remove("simulator-entered");document.body.classList.add("simulator-closing");window.setTimeout(()=>{screen("home");document.body.classList.remove("simulator-closing");document.body.classList.add("home-returning");window.setTimeout(()=>document.body.classList.remove("home-returning"),transitionDelay());},transitionDelay());}
+$("open-simulator-button")?.addEventListener("click",openSimulator);
+$("simulator-back-button")?.addEventListener("click",closeSimulator);
+document.querySelectorAll("[data-sim-mode]").forEach(button=>button.addEventListener("click",()=>simSetMode(button.dataset.simMode)));
+$("sim-start-button")?.addEventListener("click",simStart);
+$("sim-next-turn-button")?.addEventListener("click",simRunTurn);
+$("sim-run-all-button")?.addEventListener("click",simRunAll);
+$("sim-rematch-button")?.addEventListener("click",simRematch);
+$("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList.remove("simulator-entered");screen("home");$("begin-button").click();});
