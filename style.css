@@ -1267,7 +1267,7 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 
 
 /* OVER-THE-TOP EFFECTS — choose how ridiculous the archive should become. */
-.effect-superbobble button:hover {
+.effect-superbobble:not(.effects-pointer-paused) button:hover {
   position:relative;
   z-index:30;
   transform-origin:center;
@@ -1280,10 +1280,10 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
   50% { transform:translateY(2px) scale(1.34) rotate(-1deg); }
   75% { transform:translateY(-8px) scale(1.52) rotate(2deg); }
 }
-.effect-screenquake body:has(button:hover) main,
-.effect-screenquake body:has(button:hover) .site-header,
-.effect-screenquake body:has(button:hover) footer,
-.effect-screenquake body:has(button:hover) .settings-panel {
+.effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) main,
+.effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .site-header,
+.effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) footer,
+.effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .settings-panel {
   animation:overdrive-screen-quake .42s steps(2,end) infinite;
 }
 @keyframes overdrive-screen-quake {
@@ -1332,10 +1332,10 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 }
 @media(prefers-reduced-motion:reduce) {
   .effect-superbobble button:hover,
-  .effect-screenquake body:has(button:hover) main,
-  .effect-screenquake body:has(button:hover) .site-header,
-  .effect-screenquake body:has(button:hover) footer,
-  .effect-screenquake body:has(button:hover) .settings-panel,
+  .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) main,
+  .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .site-header,
+  .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) footer,
+  .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .settings-panel,
   .effect-rainbowapocalypse main,
   .effect-rainbowapocalypse .site-header,
   .effect-rainbowapocalypse footer,
@@ -1347,4 +1347,92 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
     translate:none!important;
     transform:none!important;
   }
+}
+
+
+/* IMPACT FRAME — a one-shot monochrome manga-style frame on every click. */
+.effect-impactframe .fx-impact.impact-hit { z-index:30; opacity:1; }
+.effect-impactframe .fx-impact.impact-hit::before,
+.effect-impactframe .fx-impact.impact-hit::after {
+  content:""; position:absolute; inset:0; display:block; pointer-events:none;
+}
+.effect-impactframe .fx-impact.impact-hit::before {
+  background:#f4f0e7;
+  animation:archive-impact-flash .26s steps(1,end) both;
+}
+.effect-impactframe .fx-impact.impact-hit::after {
+  background:repeating-conic-gradient(from 8deg at 50% 50%,rgba(6,6,7,.9) 0deg 1.1deg,transparent 1.1deg 5.2deg);
+  -webkit-mask-image:radial-gradient(circle at center,transparent 0 8%,#000 23% 100%);
+  mask-image:radial-gradient(circle at center,transparent 0 8%,#000 23% 100%);
+  animation:archive-impact-ink .26s steps(1,end) both;
+}
+@keyframes archive-impact-flash {
+  0%,100% { opacity:0; }
+  22% { opacity:.88; background:#09090b; }
+  48% { opacity:.92; background:#f7f2e9; }
+  72% { opacity:.56; background:#09090b; }
+}
+@keyframes archive-impact-ink {
+  0%,18%,100% { opacity:0; }
+  28% { opacity:.76; }
+  52% { opacity:.9; }
+  78% { opacity:.28; }
+}
+
+/* ONE PIECE PACING — slower transitions and lingering decorative motion. */
+.effect-onepiecepacing *,
+.effect-onepiecepacing *::before,
+.effect-onepiecepacing *::after { transition-duration:2.8s!important; }
+.effect-onepiecepacing .archive-seal { animation-duration:64s,24s!important; }
+.effect-onepiecepacing .archive-seal:before { animation-duration:28s!important; }
+.effect-onepiecepacing .archive-seal:after { animation-duration:84s!important; }
+.effect-onepiecepacing .system-light { animation-duration:12s!important; }
+.effect-onepiecepacing .screen-enter,
+.effect-onepiecepacing .question-enter { animation-duration:1.25s!important; }
+.effect-onepiecepacing .choice-list .choice { animation-duration:1.1s!important; }
+.effect-onepiecepacing .loadout-customizer.archive-reveal,
+.effect-onepiecepacing .abno-entry-card { animation-duration:1.35s!important; }
+.effect-onepiecepacing .effect-particles .visual-effects-layer:before { animation-duration:180s!important; }
+.effect-onepiecepacing .effect-embers .fx-embers { animation-duration:110s!important; }
+.effect-onepiecepacing .effect-rain .fx-rain { animation-duration:13s!important; }
+.effect-onepiecepacing .effect-vignette .fx-vignette { animation-duration:35s!important; }
+.effect-onepiecepacing .effect-shimmer .fx-shimmer { animation-duration:90s!important; }
+.effect-onepiecepacing .effect-glow .site-header .wordmark,
+.effect-onepiecepacing .effect-glow .hero .eyebrow,
+.effect-onepiecepacing .effect-glow .feature-card strong,
+.effect-onepiecepacing .effect-glow .record-stamp,
+.effect-onepiecepacing .effect-glow .result h2 { animation-duration:24s!important; }
+.effect-onepiecepacing .effect-glitch .wordmark,
+.effect-onepiecepacing .effect-glitch .archive-system-bar,
+.effect-onepiecepacing .effect-glitch .hero h1 span { animation-duration:36s!important; }
+.effect-onepiecepacing .effect-borderflow .feature-card:hover,
+.effect-onepiecepacing .effect-borderflow .creation-mode-card:hover { animation-duration:18s!important; }
+.effect-onepiecepacing .effect-idlefloat .site-header .header-tag { animation-duration:22s!important; }
+.effect-onepiecepacing .effect-buttonbounce .primary-button:hover,
+.effect-onepiecepacing .effect-buttonbounce .secondary-button:hover { animation-duration:3.5s!important; }
+.effect-onepiecepacing .effect-hoverwiggle .feature-card:hover,
+.effect-onepiecepacing .effect-hoverwiggle .choice:hover,
+.effect-onepiecepacing .effect-hoverwiggle .creation-mode-card:hover { animation-duration:3.2s!important; }
+.effect-onepiecepacing .effect-sparkle .settings-gear { animation-duration:18s!important; }
+.effect-onepiecepacing .effect-superbobble:not(.effects-pointer-paused) button:hover { animation-duration:4.8s!important; }
+.effect-onepiecepacing .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) main,
+.effect-onepiecepacing .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .site-header,
+.effect-onepiecepacing .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) footer,
+.effect-onepiecepacing .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .settings-panel { animation-duration:4.2s!important; }
+.effect-onepiecepacing .effect-rainbowapocalypse main,
+.effect-onepiecepacing .effect-rainbowapocalypse .site-header,
+.effect-onepiecepacing .effect-rainbowapocalypse footer,
+.effect-onepiecepacing .effect-rainbowapocalypse .settings-panel { animation-duration:54s!important; }
+.effect-onepiecepacing .effect-bossintro .screen-enter { animation-duration:2.2s!important; }
+.effect-onepiecepacing .effect-bossintro .question-enter { animation-duration:1.9s!important; }
+/* Impact frames stay brief even while the rest of the archive is crawling. */
+.effect-onepiecepacing .effect-impactframe .fx-impact.impact-hit::before,
+.effect-onepiecepacing .effect-impactframe .fx-impact.impact-hit::after { animation-duration:.26s!important; }
+
+@media(prefers-reduced-motion:reduce) {
+  .effect-onepiecepacing *,
+  .effect-onepiecepacing *::before,
+  .effect-onepiecepacing *::after { transition:none!important; animation:none!important; }
+  .effect-impactframe .fx-impact.impact-hit::before,
+  .effect-impactframe .fx-impact.impact-hit::after { display:none!important; animation:none!important; }
 }
