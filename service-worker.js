@@ -2,9 +2,9 @@ const CACHE_NAME = "uee-app-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
+  "./style.css?v=20261127-vibe102",
   "./data.js",
-  "./script.js",
+  "./script.js?v=20261127-vibe102",
   "./multiplayer.js",
   "./manifest.webmanifest",
   "./app-icon.svg",
