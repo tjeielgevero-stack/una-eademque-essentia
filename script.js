@@ -264,9 +264,24 @@ const $=id=>document.getElementById(id);
   if(event.key==="Tab"){event.preventDefault();button.focus();}
  });
 })();
-let index=0,answers={},characterName="";
-function values(){const v={};for(const q of QUESTIONS)if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
-function visible(){return QUESTIONS.filter(q=>!q.showIf||q.showIf(values()));}
+
+const ADVANCED_QUESTIONS = [
+ {id:"advanced_concept",category:"ADVANCED PROFILE / CORE IDENTITY",title:"Core Character Concept",description:"What is the central idea behind this character? Describe the concept, themes, and the impression you want the character to leave.",freeText:true,inputLabel:"CORE CONCEPT"},
+ {id:"advanced_appearance",category:"ADVANCED PROFILE / VISUAL IDENTITY",title:"Appearance & Visual Design",description:"Describe the character's overall appearance: clothing, silhouette, colors, distinguishing details, and any visual motifs.",freeText:true,inputLabel:"APPEARANCE & VISUAL DETAILS"},
+ {id:"advanced_personality",category:"ADVANCED PROFILE / PERSONALITY",title:"Personality Profile",description:"Go beyond a broad moral outlook. Describe their temperament, social behavior, habits, strengths, flaws, and how they act under pressure.",freeText:true,inputLabel:"PERSONALITY DETAILS"},
+ {id:"advanced_motivation",category:"ADVANCED PROFILE / MOTIVATION",title:"Core Motivation",description:"What does this character actively want, why does it matter to them, and what are they willing to give up to pursue it?",freeText:true,inputLabel:"GOALS & MOTIVATION"},
+ {id:"advanced_conflict",category:"ADVANCED PROFILE / INNER CONFLICT",title:"Internal Conflict",description:"What contradiction, fear, unresolved question, or personal struggle makes this character difficult to understand—even to themselves?",freeText:true,inputLabel:"INNER CONFLICT"},
+ {id:"advanced_code",category:"ADVANCED PROFILE / PERSONAL PRINCIPLES",title:"Personal Code & Boundaries",description:"What rules does this character try to live by? Which principles are non-negotiable, and what might tempt them to break those rules?",freeText:true,inputLabel:"PERSONAL CODE"},
+ {id:"advanced_relationships",category:"ADVANCED PROFILE / CONNECTIONS",title:"Important Relationships — Detailed",description:"Describe the most important people in this character's life. Include names, history, current dynamics, and how those relationships affect their choices.",freeText:true,inputLabel:"RELATIONSHIP DETAILS"},
+ {id:"advanced_abilities",category:"ADVANCED PROFILE / CAPABILITIES",title:"Signature Capabilities & Techniques",description:"Describe their distinctive fictional capabilities, signature techniques, limitations, and the visual or thematic identity behind them. Keep the description at a story-design level.",freeText:true,inputLabel:"SIGNATURE CAPABILITIES"},
+ {id:"advanced_arc",category:"ADVANCED PROFILE / STORY DIRECTION",title:"Character Arc & Narrative Direction",description:"Where does the character begin, what could challenge or change them, and what kind of future—or unresolved ending—do you envision for them?",freeText:true,inputLabel:"CHARACTER ARC"},
+ {id:"advanced_extra_lore",category:"ADVANCED PROFILE / ARCHIVE NOTES",title:"Additional Advanced Lore",description:"Add any other details that deserve a place in the full archive: symbols, recurring motifs, secrets, personal rituals, or connections to other records.",freeText:true,inputLabel:"ADDITIONAL LORE"}
+];
+
+let index=0,answers={},characterName="",creationMode="simple";
+function activeQuestions(){return creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;}
+function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
+function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
  origin_type:["district","nest_status","backstreet_environment"],
  occupation:["fixer_grade","color_title","association","association_branch","association_section","association_position","office","syndicate","finger_rank","wing_role","workshop"],
@@ -283,7 +298,7 @@ function pruneHiddenAnswers(){
  while(changed){
   changed=false;
   const v=values();
-  const allowed=new Set(QUESTIONS.filter(q=>!q.showIf||q.showIf(v)).map(q=>q.id));
+  const allowed=new Set(activeQuestions().filter(q=>!q.showIf||q.showIf(v)).map(q=>q.id));
   for(const id of Object.keys(answers))if(!allowed.has(id)){delete answers[id];changed=true;}
  }
 }
@@ -293,7 +308,7 @@ function setAnswer(q,choice,value,custom=""){
  answers[q.id]={choice,value,custom};
  pruneHiddenAnswers();
 }
-function screen(n){["home-screen","name-screen","picker-screen","result-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
+function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
 function renderSinnerEgo(saved){
   const savedValue=(saved.value&&saved.value.sinner_ego)||"";
   const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal";panel.dataset.egoPath="sinner";
@@ -353,6 +368,20 @@ function render(){
  $("choice-list").innerHTML="";$("validation-message").textContent="";$("back-button").disabled=index===0;$("back-button").style.opacity=index===0?".35":"1";
  $("next-button").innerHTML=index===qs.length-1?'CONFIRM & COMPLETE <span>↗</span>':'CONFIRM CUSTOM ANSWER <span>→</span>';
  $("next-button").classList.toggle("hidden",saved.choice!=="Other / custom answer");
+ $("custom-label").htmlFor="custom-answer";
+ $("custom-answer").classList.remove("hidden");
+ $("advanced-answer").classList.add("hidden");
+ if(q.freeText){
+   $("custom-wrap").classList.remove("hidden");
+   $("custom-label").htmlFor="advanced-answer";
+   $("custom-label").textContent=q.inputLabel||q.title.toUpperCase();
+   $("custom-answer").classList.add("hidden");
+   $("advanced-answer").classList.remove("hidden");
+   $("advanced-answer").value=saved.value||"";
+   $("next-button").classList.remove("hidden");
+   $("next-button").innerHTML=index===qs.length-1?'CONFIRM & COMPLETE <span>↗</span>':'SAVE DETAIL & CONTINUE <span>→</span>';
+   return;
+ }
  if(q.customizer){
    if(egoPathOf(values().ego_status)==="sinner"){renderSinnerEgo(saved);return;}
    const savedLoadout=saved.value||{};
@@ -470,6 +499,7 @@ function finish(){
  pruneHiddenAnswers();
  $("result-character-name").textContent=characterName||"UNNAMED VARIANT";
  const qs=visible();$("summary-list").innerHTML="";
+ const modeRow=document.createElement("div");modeRow.className="summary-row";const modeKey=document.createElement("strong"),modeValue=document.createElement("span");modeKey.textContent="Creation Mode";modeValue.textContent=creationMode==="advanced"?"Advanced Creation":"Simple Creation";modeRow.append(modeKey,modeValue);$("summary-list").append(modeRow);
  const nameRow=document.createElement("div");nameRow.className="summary-row";const nameKey=document.createElement("strong"),nameValue=document.createElement("span");nameKey.textContent="Name";nameValue.textContent=characterName||"Unnamed Variant";nameRow.append(nameKey,nameValue);$("summary-list").append(nameRow);
  qs.forEach(q=>{const row=document.createElement("div");row.className="summary-row";const k=document.createElement("strong"),v=document.createElement("span");k.textContent=q.title;const answer=answers[q.id]?.value;v.textContent=answer&&typeof answer==="object"?(answer.sinner_ego!==undefined?`Abnormality E.G.O.: ${answer.sinner_ego||"—"}`:[`Synergy: ${answer.synergy||"—"}`,`Suit: ${answer.suit||"—"}`,`E.G.O Weapon: ${answer.category4||"—"}`,`Gift: ${answer.gift||"—"}`].join(" · ")):answer||"Not specified";row.append(k,v);$("summary-list").append(row);});
  screen("result");
@@ -477,6 +507,11 @@ function finish(){
 function advance(){pruneHiddenAnswers();index++;if(index>=visible().length)finish();else render();}
 function submit(){
  const q=visible()[index];
+ if(q.freeText){
+  const detail=$("advanced-answer").value.trim();
+  if(!detail){$("validation-message").textContent="PLEASE ADD A DETAIL BEFORE CONTINUING.";return;}
+  setAnswer(q,"Detailed response",detail,detail);advance();return;
+ }
  if(q.customizer){
   if(egoPathOf(values().ego_status)==="sinner"){
    const ego=$("loadout-sinner_ego").value.trim();
@@ -495,8 +530,8 @@ function submit(){
  setAnswer(q,choice,value,custom);advance();
 }
 function randomizeAll(){
- answers={};index=0;
- for(const q of QUESTIONS){
+ creationMode="simple";answers={};index=0;
+ for(const q of activeQuestions()){
   if(q.showIf&&!q.showIf(values()))continue;
   if(q.customizer){
    const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
@@ -514,19 +549,25 @@ function randomizeAll(){
  pruneHiddenAnswers();
  finish();
 }
-function summary(){return ["PROJECT MOON VARIANT BUILDER — CHARACTER RECORD",`Name: ${characterName||"Unnamed Variant"}`,"Shared setting note: use this builder for original Project Moon-inspired characters and Mirror World variants.","",...visible().map(q=>{const v=answers[q.id]?.value;if(v&&typeof v==="object"&&v.sinner_ego!==undefined)return `${q.title}: Abnormality E.G.O.: ${v.sinner_ego||"Not specified"}`;if(v&&typeof v==="object")return `${q.title}: E.G.O. Synergy: ${v.synergy||"Not specified"}; Suit: ${v.suit||"Not specified"}; E.G.O Weapon: ${v.category4||"Not specified"}; Gift: ${v.gift||"Not specified"}`;return `${q.title}: ${v||"Not specified"}`;})].join("\n");}
+function summary(){return ["PROJECT MOON VARIANT BUILDER — CHARACTER RECORD",`Name: ${characterName||"Unnamed Variant"}`,`Creation Mode: ${creationMode==="advanced"?"Advanced Creation":"Simple Creation"}`,"Shared setting note: use this builder for original Project Moon-inspired characters and Mirror World variants.","",...visible().map(q=>{const v=answers[q.id]?.value;if(v&&typeof v==="object"&&v.sinner_ego!==undefined)return `${q.title}: Abnormality E.G.O.: ${v.sinner_ego||"Not specified"}`;if(v&&typeof v==="object")return `${q.title}: E.G.O. Synergy: ${v.synergy||"Not specified"}; Suit: ${v.suit||"Not specified"}; E.G.O Weapon: ${v.category4||"Not specified"}; Gift: ${v.gift||"Not specified"}`;return `${q.title}: ${v||"Not specified"}`;})].join("\n");}
 $("begin-button").onclick=()=>{ $("character-name").value=characterName; $("name-validation").textContent=""; screen("name"); $("character-name").focus(); };
 $("name-back").onclick=()=>screen("home");
 $("name-continue").onclick=()=>{
  const entered=$("character-name").value.trim();
  if(!entered){$("name-validation").textContent="PLEASE ENTER A NAME TO BEGIN YOUR RECORD."; $("character-name").focus(); return;}
- characterName=entered;index=0;render();screen("picker");
+ characterName=entered;screen("mode-screen");
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
+$("mode-back").onclick=()=>{ $("character-name").value=characterName;screen("name"); };
+function beginSelectedMode(mode){
+ creationMode=mode;answers={};index=0;render();screen("picker");
+}
+$("mode-simple").onclick=()=>beginSelectedMode("simple");
+$("mode-advanced").onclick=()=>beginSelectedMode("advanced");
 $("randomize-button").onclick=randomizeAll;
 $("home-button").onclick=()=>screen("home");
-$("back-button").onclick=()=>{if(index>0){index--;render();}else{ $("character-name").value=characterName;screen("name"); }};
+$("back-button").onclick=()=>{if(index>0){index--;render();}else{screen("mode-screen");}};
 $("next-button").onclick=submit;
 $("edit-button").onclick=()=>{index=0;render();screen("picker");};
-$("restart-button").onclick=()=>{answers={};characterName="";index=0;$("character-name").value="";screen("home");};
+$("restart-button").onclick=()=>{answers={};characterName="";creationMode="simple";index=0;$("character-name").value="";screen("home");};
 $("copy-button").onclick=async()=>{try{await navigator.clipboard.writeText(summary());$("copy-status").textContent="SUMMARY COPIED TO CLIPBOARD.";}catch{$("copy-status").textContent="CLIPBOARD UNAVAILABLE. PLEASE COPY MANUALLY.";}}
