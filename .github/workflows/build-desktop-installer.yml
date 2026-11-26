@@ -1,0 +1,58 @@
+name: Build UEE Desktop Installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "src-tauri/**"
+      - "app-icon.svg"
+      - "index.html"
+      - "style.css"
+      - "script.js"
+      - "data.js"
+      - "multiplayer.js"
+      - "lore-book.js"
+      - ".github/workflows/build-desktop-installer.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uee-desktop-installer
+  cancel-in-progress: false
+
+jobs:
+  build-windows:
+    name: Build Windows installer
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+
+      - name: Generate application icons
+        working-directory: src-tauri
+        run: cargo tauri icon ../app-icon.svg
+
+      - name: Build and publish draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          tagName: desktop-v__VERSION__
+          releaseName: "Una Eademque Essentia Desktop v__VERSION__"
+          releaseBody: |
+            Windows installer for Una Eademque Essentia.
+
+            This is an automated desktop build. Please report bugs through the repository.
+          releaseDraft: true
+          prerelease: false
+          args: --bundles nsis
