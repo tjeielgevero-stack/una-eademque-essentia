@@ -148,14 +148,26 @@ export class RoomHub extends DurableObject {
   async indexAdd(request) {
     const item = await request.json();
     const list = await this.ctx.storage.get("publicRooms") || [];
-    const next = [item, ...list.filter(room => room.code !== item.code && Date.now() - room.createdAt < 12 * 60 * 60 * 1000)].slice(0, 40);
+    const now = Date.now();
+    const retained = list.filter(room =>
+      room.code !== item.code &&
+      room.status === "lobby" &&
+      now - room.createdAt < 12 * 60 * 60 * 1000
+    );
+    const next = (item.status === "lobby" ? [item, ...retained] : retained).slice(0, 40);
     await this.ctx.storage.put("publicRooms", next);
     return json({ ok: true });
   }
 
   async indexList() {
     const list = await this.ctx.storage.get("publicRooms") || [];
-    return json({ rooms: list });
+    const now = Date.now();
+    const rooms = list.filter(room =>
+      room.status === "lobby" &&
+      now - room.createdAt < 12 * 60 * 60 * 1000
+    );
+    if (rooms.length !== list.length) await this.ctx.storage.put("publicRooms", rooms);
+    return json({ rooms });
   }
 
   publicState() {
@@ -170,6 +182,7 @@ export class RoomHub extends DurableObject {
     return {
       code: this.room.code, mode: this.room.mode, visibility: this.room.visibility,
       maxPlayers: this.room.maxPlayers, status: this.room.status,
+      hostPlayerId: this.room.players[0]?.id || null,
       players, turnPlayerId: active?.id || null, round: this.room.round,
       log: this.room.log.slice(-35), winner: this.room.winner || null
     };
@@ -307,14 +320,41 @@ export class RoomHub extends DurableObject {
     const body = await request.json().catch(() => ({}));
     const player = this.auth(request, body);
     if (!player) return json({ error: "Invalid room credentials." }, 403);
+
+    const wasActive = this.room.status === "active";
+    const livingBefore = wasActive ? this.room.players.filter(item => item.hp > 0) : [];
+    const currentTurnPlayer = livingBefore.length
+      ? livingBefore[this.room.turnIndex % livingBefore.length]
+      : null;
+
     this.room.log.push({ at: Date.now(), text: player.name + " left the room." });
     if (this.room.status === "lobby") this.room.players = this.room.players.filter(item => item.id !== player.id);
     else player.hp = 0;
+
     if (!this.room.players.length) {
       this.room.status = "closed";
+      await this.saveAndBroadcast("room-closed");
       await this.ctx.storage.delete("room");
       return json({ ok: true });
     }
+
+    if (wasActive) {
+      const survivors = this.room.players.filter(item => item.hp > 0);
+      const survivorTeams = new Set(survivors.map(item => item.team));
+      if (survivors.length <= 1 || (this.room.mode === "2v2" && survivorTeams.size <= 1)) {
+        this.room.status = "finished";
+        this.room.winner = survivors.length
+          ? (this.room.mode === "ffa" ? survivors[0].name : "Team " + survivors[0].team)
+          : "Draw";
+        this.room.log.push({ at: Date.now(), text: "Match finished. Winner: " + this.room.winner + "." });
+      } else {
+        const nextPlayer = currentTurnPlayer?.id === player.id
+          ? livingBefore[(this.room.turnIndex + 1) % livingBefore.length]
+          : currentTurnPlayer;
+        this.room.turnIndex = Math.max(0, survivors.findIndex(item => item.id === nextPlayer?.id));
+      }
+    }
+
     await this.saveAndBroadcast("player-left");
     return json({ ok: true, room: this.publicState() });
   }
@@ -338,7 +378,7 @@ export class RoomHub extends DurableObject {
     }
   }
 
-  webSocketClose(ws, code, reason) {
-    try { ws.close(code, reason); } catch { /* already closed */ }
+  webSocketClose() {
+    // The socket is already closed when this lifecycle callback runs.
   }
 }
