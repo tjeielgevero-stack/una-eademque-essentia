@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-syndicate-fx1">
+  <link rel="stylesheet" href="style.css?v=20261126-overdrive1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -55,7 +55,7 @@
       </div>
       <div class="settings-tabs" role="tablist" aria-label="Settings categories">
         <button id="settings-tab-appearance" class="settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="settings-appearance" tabindex="0" data-settings-tab="appearance">APPEARANCE</button>
-        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">14</span></button>
+        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">18</span></button>
       </div>
       <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
       <div class="color-picker-section">
@@ -89,7 +89,7 @@
             <span class="effects-overline">PERSONALIZE THE ARCHIVE</span>
             <h3>VISUAL EFFECTS</h3>
           </div>
-          <span class="effects-count">14 SWITCHES</span>
+          <span class="effects-count">18 SWITCHES</span>
         </div>
         <p class="effects-description">Combine any of these effects, or leave them all off for a quieter page. Each switch is saved on this device.</p>
                 <div class="effects-subheading"><strong>ATMOSPHERE / VISUAL EFFECTS</strong><span>10 OPTIONAL LAYERS</span></div>
@@ -168,7 +168,30 @@
             <input id="effect-sparkle" class="effect-switch" type="checkbox" data-effect-toggle="sparkle">
           </label>
         </div>
-        <p class="effects-footnote">Every switch is saved on this device. Animated effects respect your device's reduced-motion setting.</p>Animated effects respect your device's reduced-motion setting.</p>
+        <div class="effects-subheading"><strong>OVER-THE-TOP EFFECTS</strong><span>4 UNREASONABLY EXTRA SETTINGS</span></div>
+        <div class="effects-grid overdrive-effects">
+          <label class="effect-card" for="effect-superbobble">
+            <span class="effect-symbol" aria-hidden="true">◉</span>
+            <span class="effect-copy"><strong>SUPER NECESSARY BOBBLE</strong><small>Every hovered button inflates, wobbles, and bounces dramatically.</small></span>
+            <input id="effect-superbobble" class="effect-switch" type="checkbox" data-effect-toggle="superbobble">
+          </label>
+          <label class="effect-card" for="effect-screenquake">
+            <span class="effect-symbol" aria-hidden="true">〽</span>
+            <span class="effect-copy"><strong>DRAMATIC SCREEN QUAKE</strong><small>Hover a button and the entire archive performs a theatrical earthquake.</small></span>
+            <input id="effect-screenquake" class="effect-switch" type="checkbox" data-effect-toggle="screenquake">
+          </label>
+          <label class="effect-card" for="effect-rainbowapocalypse">
+            <span class="effect-symbol" aria-hidden="true">🌈</span>
+            <span class="effect-copy"><strong>RAINBOW APOCALYPSE</strong><small>The whole interface cycles through an aggressively colorful spectrum.</small></span>
+            <input id="effect-rainbowapocalypse" class="effect-switch" type="checkbox" data-effect-toggle="rainbowapocalypse">
+          </label>
+          <label class="effect-card" for="effect-bossintro">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>MAIN CHARACTER ENTRANCE</strong><small>Every screen and question arrives like a dramatic boss introduction.</small></span>
+            <input id="effect-bossintro" class="effect-switch" type="checkbox" data-effect-toggle="bossintro">
+          </label>
+        </div>
+        <p class="effects-footnote">Every switch is saved on this device. Animated effects respect your device's reduced-motion setting.</p>
       </section>
       <div class="settings-panel-footer">
         <span>CHANGES APPLY IMMEDIATELY</span>
