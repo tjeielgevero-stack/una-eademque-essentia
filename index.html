@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-lore1">
+  <link rel="stylesheet" href="style.css?v=20261127-desktop1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -40,6 +40,56 @@
     </div>
   </div>
   <div class="ornament ornament-top" aria-hidden="true">✦ ───────────────────────── ✦</div>
+
+  <section id="desktop-dashboard" aria-label="Una Eademque Essentia desktop dashboard" hidden>
+    <div class="desktop-dashboard-top">
+      <span class="desktop-dashboard-kicker">MIRROR WORLD ARCHIVE / DESKTOP EDITION</span>
+      <span class="desktop-dashboard-status"><i></i> ARCHIVE SYSTEM ONLINE</span>
+    </div>
+    <div class="desktop-dashboard-hero">
+      <img src="./app-icon.svg" alt="" class="desktop-dashboard-emblem">
+      <p class="desktop-dashboard-overline">UNA EADEMQUE ESSENTIA</p>
+      <h1>THE ARCHIVE</h1>
+      <p>Infinite worlds. Different circumstances. One and the same essence.</p>
+    </div>
+    <div class="desktop-dashboard-grid">
+      <button class="desktop-dashboard-card desktop-dashboard-card-primary" data-desktop-action="create" type="button">
+        <span class="desktop-dashboard-index">01 / CREATE</span><strong>Character Creation</strong><small>Begin a new record or build another Mirror World identity.</small><b>OPEN CREATION ↗</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="archive" type="button">
+        <span class="desktop-dashboard-index">02 / RECORDS</span><strong>Character Archive</strong><small>Review and continue characters saved on this device.</small><b>VIEW RECORDS →</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="lore" type="button">
+        <span class="desktop-dashboard-index">03 / REFERENCE</span><strong>Lore Encyclopedia</strong><small>Browse the City and the worlds of Project Moon.</small><b>OPEN ENCYCLOPEDIA →</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="simulator" type="button">
+        <span class="desktop-dashboard-index">04 / COMBAT</span><strong>Fighting Simulator</strong><small>Test saved characters in a fictional combat simulation.</small><b>ENTER SIMULATOR →</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="multiplayer" type="button">
+        <span class="desktop-dashboard-index">05 / NETWORK</span><strong>Multiplayer Arena</strong><small>Create or join an online character battle room.</small><b>OPEN ARENA →</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="settings" type="button">
+        <span class="desktop-dashboard-index">06 / PREFERENCES</span><strong>Settings</strong><small>Adjust the archive's appearance and visual effects.</small><b>CONFIGURE →</b>
+      </button>
+    </div>
+    <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>U.E.E. / DESKTOP</span></div>
+    <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
+    <button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER <span>↗</span></button>
+  </section>
+  <dialog id="desktop-sephrus-prompt" class="desktop-sephrus-prompt" aria-labelledby="desktop-sephrus-title">
+    <form method="dialog" class="desktop-sephrus-panel" id="desktop-sephrus-form">
+      <p class="desktop-dashboard-kicker">RESTRICTED ARCHIVE ACCESS</p>
+      <h2 id="desktop-sephrus-title">IDENTITY VERIFICATION</h2>
+      <p>State the name associated with this record.</p>
+      <input id="desktop-sephrus-answer" type="text" autocomplete="off" spellcheck="false" placeholder="Enter name..." aria-label="Archive access name">
+      <p id="desktop-sephrus-feedback" role="status" aria-live="polite"></p>
+      <div class="desktop-sephrus-actions">
+        <button type="button" id="desktop-sephrus-cancel">CANCEL</button>
+        <button type="submit" id="desktop-sephrus-submit">VERIFY ↗</button>
+      </div>
+    </form>
+  </dialog>
+
   <header class="site-header">
     <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
     <div class="header-tools">
@@ -575,11 +625,86 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261127-vibe106", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261127-desktop1", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
     }
   </script>
+
+  <script id="desktop-dashboard-controller">
+    (() => {
+      if (!window.__TAURI_INTERNALS__) return;
+      const root = document.documentElement;
+      const dashboard = document.getElementById("desktop-dashboard");
+      const gate = document.getElementById("desktop-sephrus-gate");
+      const prompt = document.getElementById("desktop-sephrus-prompt");
+      const answer = document.getElementById("desktop-sephrus-answer");
+      const feedback = document.getElementById("desktop-sephrus-feedback");
+      if (!dashboard) return;
+      root.classList.add("desktop-dashboard-active");
+      dashboard.hidden = false;
+
+      const returnButton = document.createElement("button");
+      returnButton.type = "button";
+      returnButton.id = "desktop-dashboard-return";
+      returnButton.className = "settings-open desktop-dashboard-return";
+      returnButton.textContent = "DASHBOARD";
+      returnButton.addEventListener("click", showDashboard);
+      document.querySelector(".header-tools")?.prepend(returnButton);
+
+      function showDashboard() {
+        root.classList.add("desktop-dashboard-active");
+        dashboard.hidden = false;
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+      function showApplication() {
+        root.classList.remove("desktop-dashboard-active");
+        dashboard.hidden = true;
+      }
+      function openAction(action) {
+        showApplication();
+        if (action === "create") document.getElementById("begin-button")?.click();
+        if (action === "archive") document.getElementById("oc-archive-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (action === "lore") document.getElementById("lore-book-open")?.click();
+        if (action === "simulator") document.getElementById("open-simulator-button")?.click();
+        if (action === "multiplayer") document.getElementById("open-multiplayer-button")?.click();
+        if (action === "settings") document.getElementById("settings-open")?.click();
+      }
+      dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
+        button.addEventListener("click", () => openAction(button.dataset.desktopAction));
+      });
+
+      gate?.addEventListener("click", () => {
+        feedback.textContent = "";
+        answer.value = "";
+        prompt.showModal();
+        answer.focus();
+      });
+      document.getElementById("desktop-sephrus-cancel")?.addEventListener("click", () => prompt.close());
+      document.getElementById("desktop-sephrus-form")?.addEventListener("submit", event => {
+        event.preventDefault();
+        if (answer.value === "Sephrus Aztiluth") {
+          document.getElementById("desktop-sephrus-maker").hidden = false;
+          feedback.textContent = "ACCESS GRANTED.";
+          prompt.close();
+        } else {
+          feedback.textContent = "IDENTITY NOT RECOGNIZED.";
+          answer.select();
+        }
+      });
+      document.getElementById("desktop-sephrus-maker")?.addEventListener("click", () => {
+        showApplication();
+        document.getElementById("begin-button")?.click();
+        document.getElementById("mode-laziness")?.click();
+        const name = document.getElementById("character-name");
+        if (name) {
+          name.value = "Sephrus Aztiluth";
+          name.focus();
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>
