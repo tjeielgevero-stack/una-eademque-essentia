@@ -1216,40 +1216,58 @@ $("sim-run-all-button")?.addEventListener("click",simRunAll);
 $("sim-rematch-button")?.addEventListener("click",simRematch);
 $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList.remove("simulator-entered");screen("home");$("begin-button").click();});
 
-// Original ambient archive soundtrack with a dedicated Easter-egg audio transition.
+// Original procedural soundtrack engine, jukebox, and interface sound design.
 (function setupAmbientMusic(){
  const toggle=document.getElementById("ambient-music-toggle");
  const status=document.getElementById("ambient-music-status");
+ const trackSelect=document.getElementById("jukebox-track");
+ const volumeSlider=document.getElementById("jukebox-volume");
+ const volumeValue=document.getElementById("jukebox-volume-value");
+ const sfxToggle=document.getElementById("interface-sounds-toggle");
  if(!toggle)return;
- const storageKey="uee_ambient_music_enabled_v1";
- let context=null,ambientNodes=[],ambientMaster=null,grimNodes=[],grimMaster=null,musicEnabled=false,returnDistorted=false;
- try{musicEnabled=localStorage.getItem(storageKey)==="true";}catch{}
+ const musicKey="uee_ambient_music_enabled_v1",trackKey="uee_jukebox_track_v1",volumeKey="uee_jukebox_volume_v1",sfxKey="uee_interface_sounds_v1";
+ const tracks={
+  archive:{name:"Archive Drift",notes:[55,82.41,110,164.81],arp:[220,261.63,329.63,392],wave:"sine",speed:620,brightness:720},
+  city:{name:"The City Never Sleeps",notes:[65.41,98,130.81,196],arp:[261.63,329.63,392,493.88,392,329.63],wave:"triangle",speed:340,brightness:1050},
+  cathedral:{name:"Glass Cathedral",notes:[49,73.42,98,146.83],arp:[196,246.94,293.66,369.99],wave:"sine",speed:510,brightness:880},
+  backstreets:{name:"Backstreets Afterhours",notes:[58.27,87.31,116.54,174.61],arp:[233.08,277.18,349.23,415.3,349.23],wave:"triangle",speed:390,brightness:940}
+ };
+ let context=null,ambientNodes=[],ambientMaster=null,grimNodes=[],grimMaster=null,arpTimer=null,musicEnabled=false,sfxEnabled=true,returnDistorted=false,grimActive=false,currentVolume=.68,currentTrack="city";
+ try{musicEnabled=localStorage.getItem(musicKey)==="true";currentTrack=localStorage.getItem(trackKey)||"city";currentVolume=Number(localStorage.getItem(volumeKey)??.68);sfxEnabled=localStorage.getItem(sfxKey)!=="false";}catch{}
+ if(!tracks[currentTrack])currentTrack="city";
+ currentVolume=Math.max(0,Math.min(1,Number.isFinite(currentVolume)?currentVolume:.68));
  toggle.checked=false;
+ if(trackSelect)trackSelect.value=currentTrack;
+ if(volumeSlider)volumeSlider.value=String(Math.round(currentVolume*100));
+ if(volumeValue)volumeValue.textContent=Math.round(currentVolume*100)+"%";
+ if(sfxToggle)sfxToggle.checked=sfxEnabled;
  function audioContext(){const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return null;if(!context)context=new AudioCtor();if(context.state==="suspended")context.resume();return context;}
  function clearNodes(list){list.splice(0).forEach(node=>{try{node.stop?.();node.disconnect();}catch{}});}
  function makeDistortionCurve(amount){const samples=44100,curve=new Float32Array(samples),k=amount||18;for(let i=0;i<samples;i++){const x=i*2/samples-1;curve[i]=(3+k)*x*20*(Math.PI/180)/(Math.PI+k*Math.abs(x));}return curve;}
+ function stopAmbient(){if(arpTimer!==null){window.clearInterval(arpTimer);arpTimer=null;}if(ambientMaster){try{ambientMaster.gain.cancelScheduledValues(context.currentTime);ambientMaster.gain.value=0;}catch{}}clearNodes(ambientNodes);ambientMaster=null;}
  function startAmbient(distorted=false){
   const ctx=audioContext();if(!ctx)return false;
-  clearNodes(ambientNodes);
-  const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime(.105,ctx.currentTime,distorted?1.1:2.5);master.connect(ctx.destination);ambientMaster=master;
+  stopAmbient();
+  const preset=tracks[currentTrack]||tracks.city;
+  const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime((distorted?.19:.24)*currentVolume,ctx.currentTime,distorted?1.1:.8);master.connect(ctx.destination);ambientMaster=master;
   let output=master;
-  if(distorted){const shaper=ctx.createWaveShaper();shaper.curve=makeDistortionCurve(24);shaper.oversample="4x";const band=ctx.createBiquadFilter();band.type="bandpass";band.frequency.value=310;band.Q.value=.7;shaper.connect(band);band.connect(master);output=shaper;ambientNodes.push(shaper,band);}
-  const filter=ctx.createBiquadFilter();filter.type=distorted?"lowpass":"lowpass";filter.frequency.value=distorted?430:620;filter.Q.value=.55;filter.connect(output);ambientNodes.push(filter);
-  const notes=[55,82.41,110,164.81];
-  notes.forEach((frequency,index)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=index===1?"triangle":"sine";osc.frequency.value=frequency;osc.detune.value=(index%2?4:-3)+(distorted?(index-1.5)*13:0);gain.gain.value=[.22,.09,.12,.045][index];osc.connect(gain);gain.connect(filter);osc.start();ambientNodes.push(osc,gain);});
-  const slow=ctx.createOscillator(),depth=ctx.createGain();slow.frequency.value=distorted?.11:.035;depth.gain.value=distorted?185:105;slow.connect(depth);depth.connect(filter.frequency);slow.start();ambientNodes.push(slow,depth);
-  if(status)status.textContent=distorted?"AMBIENT MUSIC RETURNED · SIGNAL CORRUPTED":"AMBIENT MUSIC PLAYING · ORIGINAL SOUNDTRACK";
+  if(distorted){const shaper=ctx.createWaveShaper();shaper.curve=makeDistortionCurve(24);shaper.oversample="4x";const band=ctx.createBiquadFilter();band.type="bandpass";band.frequency.value=340;band.Q.value=.72;shaper.connect(band);band.connect(master);output=shaper;ambientNodes.push(shaper,band);}
+  const filter=ctx.createBiquadFilter();filter.type="lowpass";filter.frequency.value=distorted?520:preset.brightness;filter.Q.value=.7;filter.connect(output);ambientNodes.push(filter);
+  preset.notes.forEach((frequency,index)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=index===1?preset.wave:"sine";osc.frequency.value=frequency;osc.detune.value=(index%2?4:-3)+(distorted?(index-1.5)*13:0);gain.gain.value=[.17,.075,.105,.045][index];osc.connect(gain);gain.connect(filter);osc.start();ambientNodes.push(osc,gain);});
+  const slow=ctx.createOscillator(),depth=ctx.createGain();slow.frequency.value=distorted?.14:.055;depth.gain.value=distorted?210:145;slow.connect(depth);depth.connect(filter.frequency);slow.start();ambientNodes.push(slow,depth);
+  let step=0;
+  const playNote=()=>{if(!context||!ambientMaster)return;const note=ctx.createOscillator(),env=ctx.createGain();note.type=distorted?"triangle":preset.wave;note.frequency.value=preset.arp[step++%preset.arp.length];note.detune.value=distorted?((step%3)-1)*17:((step%4)-1.5)*4;env.gain.setValueAtTime(.0001,ctx.currentTime);env.gain.linearRampToValueAtTime(distorted?.018:.035,ctx.currentTime+.035);env.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.34);note.connect(env);env.connect(filter);note.start();note.stop(ctx.currentTime+.36);};
+  playNote();arpTimer=window.setInterval(playNote,preset.speed);
+  if(status)status.textContent=(distorted?"DISTORTED RETURN · ":"PLAYING · ")+preset.name.toUpperCase();
   return true;
  }
  function beginGrim(){
   if(!musicEnabled)return;
   const ctx=audioContext();if(!ctx)return;
-  // The ambient track is cut dead, not faded.
-  if(ambientMaster){try{ambientMaster.gain.cancelScheduledValues(ctx.currentTime);ambientMaster.gain.value=0;}catch{}}
-  clearNodes(ambientNodes);ambientMaster=null;
-  clearNodes(grimNodes);
-  const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime(.13,ctx.currentTime,.12);master.connect(ctx.destination);grimMaster=master;
-  const filter=ctx.createBiquadFilter();filter.type="lowpass";filter.frequency.value=260;filter.Q.value=3.5;filter.connect(master);grimNodes.push(filter);
+  grimActive=true;stopAmbient();
+  if(grimMaster){try{grimMaster.gain.value=0;}catch{}}clearNodes(grimNodes);
+  const master=ctx.createGain();master.gain.value=.00001;master.gain.setTargetAtTime(.18*currentVolume,ctx.currentTime,.12);master.connect(ctx.destination);grimMaster=master;
+  const filter=ctx.createBiquadFilter();filter.type="lowpass";filter.frequency.value=290;filter.Q.value=3.5;filter.connect(master);grimNodes.push(filter);
   [36.71,38.89,55,73.42].forEach((frequency,index)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=index===2?"sawtooth":"sine";osc.frequency.value=frequency;osc.detune.value=[-17,13,4,-9][index];gain.gain.value=[.19,.16,.045,.035][index];osc.connect(gain);gain.connect(filter);osc.start();grimNodes.push(osc,gain);});
   const pulse=ctx.createOscillator(),pulseGain=ctx.createGain();pulse.frequency.value=.17;pulseGain.gain.value=65;pulse.connect(pulseGain);pulseGain.connect(filter.frequency);pulse.start();grimNodes.push(pulse,pulseGain);
   if(status)status.textContent="GRIM · THE ARCHIVE HAS BEEN BREACHED";
@@ -1257,13 +1275,32 @@ $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList
  function endGrim(){
   if(!musicEnabled)return;
   const ctx=audioContext();if(!ctx)return;
-  // The grim layer ends abruptly; the familiar motif returns warped and unstable.
   if(grimMaster){try{grimMaster.gain.cancelScheduledValues(ctx.currentTime);grimMaster.gain.value=0;}catch{}}
-  clearNodes(grimNodes);grimMaster=null;
-  returnDistorted=true;
-  startAmbient(true);
+  clearNodes(grimNodes);grimMaster=null;grimActive=false;returnDistorted=true;startAmbient(true);
  }
- toggle.addEventListener("change",()=>{musicEnabled=toggle.checked;try{localStorage.setItem(storageKey,String(musicEnabled));}catch{}if(musicEnabled){if(!startAmbient(returnDistorted)){musicEnabled=false;toggle.checked=false;try{localStorage.setItem(storageKey,"false");}catch{}}}else{if(ambientMaster)ambientMaster.gain.value=0;if(grimMaster)grimMaster.gain.value=0;clearNodes(ambientNodes);clearNodes(grimNodes);ambientMaster=null;grimMaster=null;if(status)status.textContent="AMBIENT MUSIC PAUSED";}});
+ function playUiSound(kind="click"){
+  if(!sfxEnabled)return;
+  const ctx=audioContext();if(!ctx)return;
+  const osc=ctx.createOscillator(),gain=ctx.createGain(),now=ctx.currentTime;
+  const presets={click:[560,390,.055,.075],select:[720,980,.085,.09],open:[420,680,.11,.12],success:[660,990,.14,.14],back:[390,260,.07,.08]};
+  const [from,to,duration,level]=presets[kind]||presets.click;
+  osc.type=kind==="select"?"triangle":"sine";osc.frequency.setValueAtTime(from,now);osc.frequency.exponentialRampToValueAtTime(to,now+duration);
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(level,now+.012);gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  osc.connect(gain);gain.connect(ctx.destination);osc.start(now);osc.stop(now+duration+.02);
+ }
+ toggle.addEventListener("change",()=>{musicEnabled=toggle.checked;try{localStorage.setItem(musicKey,String(musicEnabled));}catch{}if(musicEnabled){if(grimActive)beginGrim();else if(!startAmbient(returnDistorted)){musicEnabled=false;toggle.checked=false;try{localStorage.setItem(musicKey,"false");}catch{}}}else{stopAmbient();if(grimMaster)grimMaster.gain.value=0;clearNodes(grimNodes);grimMaster=null;if(status)status.textContent="AMBIENT MUSIC PAUSED";}});
+ if(trackSelect)trackSelect.addEventListener("change",()=>{currentTrack=tracks[trackSelect.value]?trackSelect.value:"city";try{localStorage.setItem(trackKey,currentTrack);}catch{}if(musicEnabled&&!grimActive)startAmbient(returnDistorted);playUiSound("select");});
+ if(volumeSlider)volumeSlider.addEventListener("input",()=>{currentVolume=Number(volumeSlider.value)/100;if(volumeValue)volumeValue.textContent=volumeSlider.value+"%";try{localStorage.setItem(volumeKey,String(currentVolume));}catch{}if(ambientMaster&&context)ambientMaster.gain.setTargetAtTime((returnDistorted?.19:.24)*currentVolume,context.currentTime,.08);if(grimMaster&&context)grimMaster.gain.setTargetAtTime(.18*currentVolume,context.currentTime,.08);});
+ if(sfxToggle)sfxToggle.addEventListener("change",()=>{sfxEnabled=sfxToggle.checked;try{localStorage.setItem(sfxKey,String(sfxEnabled));}catch{}if(sfxEnabled)playUiSound("success");});
+ document.addEventListener("click",event=>{
+  const target=event.target instanceof Element?event.target:null;if(!target)return;
+  const button=target.closest("button");
+  if(!button||button.disabled||button.matches("[data-no-sound]"))return;
+  const id=button.id||"";
+  const kind=/continue|confirm|complete|save|submit|start|initialize|copy/.test(id+" "+button.textContent.toLowerCase())?"success":/back|close|exit|cancel|home/.test(id+" "+button.textContent.toLowerCase())?"back":/settings-open|begin-button|mode-|simulator|open/.test(id)?"open":"click";
+  playUiSound(kind);
+ },true);
+ document.addEventListener("change",event=>{const target=event.target;if(target instanceof HTMLInputElement&&target.type==="checkbox"&&!target.matches("#interface-sounds-toggle,#ambient-music-toggle"))playUiSound("select");});
  window.ueeEasterEggAudio={beginGrim,endGrim};
- if(musicEnabled&&status)status.textContent="MUSIC AVAILABLE · ENABLE TO START";
-})();;
+ if(musicEnabled&&status)status.textContent="MUSIC SAVED · ENABLE TO START";
+})();
