@@ -1,0 +1,49 @@
+name: Deploy Multiplayer Worker
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "multiplayer/**"
+      - ".github/workflows/deploy-multiplayer-worker.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-multiplayer-worker
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy uee-multiplayer
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          workingDirectory: multiplayer
+          command: deploy
+
+      - name: Verify Worker health endpoint
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent --show-error https://uee-multiplayer.tjeielgevero.workers.dev/api/health; then
+              echo
+              exit 0
+            fi
+            echo "Health check attempt ${attempt}/5 failed; retrying..."
+            sleep 5
+          done
+          echo "Worker deployed, but its health endpoint did not return a successful response."
+          exit 1
