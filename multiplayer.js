@@ -375,7 +375,7 @@
       overlay.setAttribute("aria-hidden", "true");
       overlay.className = "sim-hit-overlay";
       match.classList.remove("sim-hit-heavy", "sim-hit-fatal");
-    }, kind === "fatal" ? 1100 : 780);
+    }, kind === "fatal" ? 1100 : kind === "ego" ? 900 : 780);
   }
   function qteArrow(direction) {
     return ({ UP: "↑", DOWN: "↓", LEFT: "←", RIGHT: "→" })[direction] || "✦";
