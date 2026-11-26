@@ -510,7 +510,7 @@
     else if (egoTarget) triggerArenaEffect("ego", egoTarget.character?.name || egoTarget.name);
 
     $("mp-host-controls").classList.toggle("mp-hidden", !(room.hostPlayerId === current?.playerId && room.status === "lobby"));
-    $("mp-start").disabled = room.mode === "2v2" && room.players.length !== 4;
+    $("mp-start").disabled = room.players.length < 2 || (room.mode === "2v2" && room.players.length !== 4);
     $("mp-battle-controls").classList.toggle("mp-hidden", room.status !== "active");
     const challengeOpen = !!room.pendingChallenge;
     const isMyTurn = room.status === "active" && room.turnPlayerId === current?.playerId && !challengeOpen;
