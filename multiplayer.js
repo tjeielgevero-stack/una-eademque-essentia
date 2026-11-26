@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const API_KEY = "uee_multiplayer_api_v1";
+  const DEFAULT_API = "https://uee-multiplayer.tjeielgevero.workers.dev";
   const SESSION_KEY = "uee_multiplayer_session_v1";
   const $ = (id) => document.getElementById(id);
   let socket = null;
@@ -81,7 +82,7 @@
       egoEligible: !!ego.eligible
     };
   }
-  function getApi() { return (localStorage.getItem(API_KEY) || "").trim().replace(/\/$/, ""); }
+  function getApi() { return (localStorage.getItem(API_KEY) || DEFAULT_API).trim().replace(/\/$/, ""); }
   function setStatus(message) { const el = $("mp-status"); if (el) el.textContent = message; }
   function sessionSave() { try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(current)); } catch {} }
   function sessionClear() { try { sessionStorage.removeItem(SESSION_KEY); } catch {} }
@@ -98,7 +99,7 @@
       <p class="mp-muted">Create a room, invite other players with its code, and take turns in a shared battle. Each player uses a character saved in their own local archive.</p>
       <div class="mp-grid">
         <label class="mp-field">WORKER ADDRESS
-          <input id="mp-api" type="url" placeholder="https://uee-multiplayer.YOUR-SUBDOMAIN.workers.dev" autocomplete="url">
+          <input id="mp-api" type="url" placeholder="https://uee-multiplayer.tjeielgevero.workers.dev" autocomplete="url">
         </label>
         <label class="mp-field">YOUR PLAYER NAME
           <input id="mp-player-name" maxlength="24" placeholder="Enter a display name" value="Player">
@@ -107,7 +108,7 @@
           <select id="mp-character"></select>
         </label>
       </div>
-      <p class="mp-status" id="mp-status" role="status" aria-live="polite">Enter your Worker address and choose a saved character to begin.</p>
+      <p class="mp-status" id="mp-status" role="status" aria-live="polite">Choose a saved character to begin. The Worker connection is preconfigured.</p>
       <div id="mp-lobby-tools">
         <div class="mp-section-title">CREATE A ROOM</div>
         <div class="mp-grid">
