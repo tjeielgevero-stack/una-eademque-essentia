@@ -2056,5 +2056,5 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 .sim-ability-buttons button:hover:not(:disabled){border-color:#d2b88e;background:#3a3023}
 .sim-ability-buttons button:disabled{opacity:.38;cursor:not-allowed}
 .sim-ability-note{margin:12px 0 0}
-#choice-list .choice[data-custom-answer="true"]{grid-column:2}
-@media(max-width:620px){.sim-ability-selectors,.sim-ability-buttons{grid-template-columns:1fr}#choice-list .choice[data-custom-answer="true"]{grid-column:1}}
+#choice-list .choice[data-custom-answer="true"]{grid-column:1;justify-self:end;width:calc(50% - 4px)}
+@media(max-width:620px){.sim-ability-selectors,.sim-ability-buttons{grid-template-columns:1fr}#choice-list .choice[data-custom-answer="true"]{grid-column:1;width:100%}}
