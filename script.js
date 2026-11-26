@@ -1104,9 +1104,13 @@ function simDifficulty(ids){
 function simUpdateDifficulty(){
  const selected=[...document.querySelectorAll("[data-sim-slot]")].map(select=>select.value).filter(Boolean);
  const required=simMode==="ffa"?3:SIM_MODE_INFO[simMode].count;
+ const uniqueSelection=new Set(selected).size===selected.length;
+ const ready=simMode==="ffa"?selected.length>=required:selected.length===required;
+ const startButton=$("sim-start-button");
+ if(startButton)startButton.disabled=!(ready&&uniqueSelection);
  const rating=$("sim-difficulty-rating"),warning=$("sim-one-sided-warning");
  if(!rating||!warning)return;
- if(selected.length<required){rating.textContent="AWAITING PARTICIPANTS";warning.textContent="";warning.classList.add("hidden");return;}
+ if(selected.length<required||!uniqueSelection){rating.textContent=uniqueSelection?"AWAITING PARTICIPANTS":"CHOOSE A DIFFERENT OC FOR EACH SLOT";warning.textContent="";warning.classList.add("hidden");return;}
  const result=simDifficulty(selected);
  if(!result){rating.textContent="NOT ENOUGH DATA";warning.classList.add("hidden");return;}
  rating.textContent=result.severity+" · SKILL GAP "+result.gap.toFixed(1);
