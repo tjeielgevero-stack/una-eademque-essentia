@@ -47,8 +47,8 @@ jobs:
               echo
               echo "Add these repository Actions secrets, then run this workflow again:"
               echo
-              echo "- `CLOUDFLARE_API_TOKEN`"
-              echo "- `CLOUDFLARE_ACCOUNT_ID`"
+              echo "- CLOUDFLARE_API_TOKEN"
+              echo "- CLOUDFLARE_ACCOUNT_ID"
               echo
               echo "Do not put the API token in a source file or send it in chat."
             } >> "$GITHUB_STEP_SUMMARY"
