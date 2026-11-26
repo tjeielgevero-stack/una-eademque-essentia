@@ -465,30 +465,6 @@ function formatCharacterDossier(name,mode,answersSource){
 function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
-// One resistance profile is chosen per character. Multipliers are balanced to a fixed total of 3.5.
-const DAMAGE_RESISTANCE_OPTIONS = [
- "Slash ×0.5 · Pierce ×0.5 · Blunt ×2.5",
- "Slash ×0.5 · Pierce ×1.0 · Blunt ×2.0",
- "Slash ×0.5 · Pierce ×1.5 · Blunt ×1.5",
- "Slash ×0.5 · Pierce ×2.0 · Blunt ×1.0",
- "Slash ×0.5 · Pierce ×2.5 · Blunt ×0.5",
- "Slash ×1.0 · Pierce ×0.5 · Blunt ×2.0",
- "Slash ×1.0 · Pierce ×1.0 · Blunt ×1.5",
- "Slash ×1.0 · Pierce ×1.5 · Blunt ×1.0",
- "Slash ×1.0 · Pierce ×2.0 · Blunt ×0.5",
- "Slash ×1.5 · Pierce ×0.5 · Blunt ×1.5",
- "Slash ×1.5 · Pierce ×1.0 · Blunt ×1.0",
- "Slash ×1.5 · Pierce ×1.5 · Blunt ×0.5",
- "Slash ×2.0 · Pierce ×0.5 · Blunt ×1.0",
- "Slash ×2.0 · Pierce ×1.0 · Blunt ×0.5",
- "Slash ×2.5 · Pierce ×0.5 · Blunt ×0.5"
-];
-QUESTIONS.push({
- id:"damage_resistances",category:"COMBAT PROFILE",title:"Damage-Type Resistances",
- description:"Choose one balanced resistance profile. Endure = ×0.5, Normal = ×1.0, Effective = ×1.5, and Fatal = ×2.5. The three multipliers always total 3.5, so a stronger resistance requires a weakness elsewhere.",
- options:DAMAGE_RESISTANCE_OPTIONS
-});
-
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
 // and kept separate from Advanced / Complex mode so existing saved answers remain compatible.
 const SIMPLE_OPTION_EXPANSIONS = {
