@@ -341,18 +341,76 @@ function profileFieldsFromAnswers(a){
  };
  return {get,first,combine,detailText,labelled};
 }
+function generatedPick(items){return items[Math.floor(Math.random()*items.length)];}
+function putGenerated(target,id,value){if(!target[id]||!profileAnswerText(target[id].value??target[id].custom).trim())target[id]={choice:"Generated character detail",value,custom:""};}
+function factionOutfit(a){
+ const synd=(a.syndicate||"").toLowerCase(),rank=(a.finger_rank||a.syndicate_hierarchy||"").toLowerCase();
+ if(synd.includes("middle")){
+  if(rank.includes("great")||rank.includes("big"))return "Middle Syndicate formal combat attire, elevated for a senior sibling: a sharply tailored dark suit-coat with the Middle's recognizable red detailing, polished formal layers, reinforced gloves, and insignia. The cut, ornament, and personal accessories are distinctive to this senior member, while the overall silhouette remains unmistakably Middle.";
+  return "Classic Middle Syndicate attire: a formal dark suit with the Finger's recognizable red accents, crisp shirt and tie, tailored trousers, polished footwear, and practical gloves. Personal tailoring and small accessories distinguish the wearer without abandoning the Middle's established design.";
+ }
+ if(synd.includes("thumb"))return "Thumb-affiliated formal uniform: disciplined, sharply structured dark attire with clear rank-conscious tailoring, gloves, and restrained insignia; personal details vary while preserving the group's formal military character.";
+ if(synd.includes("index"))return "Index attire: layered, practical robes and uniform-like garments with a deliberately austere silhouette, suitable for carrying out the Prescripts; individual wear and accessories distinguish the member.";
+ if(synd.includes("ring"))return "Ring attire: expressive, artistically composed clothing with deliberate layering, unusual textures, and a crafted silhouette; the design reflects the Ring's artistic identity while remaining individual.";
+ if(synd.includes("pinky"))return "Pinky attire: understated, carefully tailored clothing with discreet personal and rank details; the design remains deliberately restrained and avoids inventing undisclosed official insignia.";
+ if(a.association)return "Association uniform based on "+a.association+": a professional, role-appropriate uniform with the Association's established practical identity, recognizable insignia, and individualized tailoring.";
+ if(a.occupation==="Wing employee (Feather)")return "Wing employee attire: corporate or facility uniform appropriate to the character's role, with restrained company identifiers, practical layers, and personal modifications.";
+ if(a.occupation==="Workshop artisan or craftsperson")return "Workshop attire: durable workwear adapted to the craft, with reinforced sleeves, practical fastenings, tool loops, and personalized workshop details.";
+ return "An original City-appropriate combat ensemble: formal, practical layers, a distinctive coat or jacket, reinforced gloves and footwear, and details reflecting the character's profession and personal history.";
+}
+function completeGeneratedCharacter(name,source){
+ const a=source||{},v=Object.fromEntries(Object.entries(a).map(([k,x])=>[k,x?.value??x?.custom??""]));
+ const egoTheme=v.ego_theme||v.distortion_theme||"identity and selfhood";
+ const combat=v.combat_approach||"adaptive and opportunistic";
+ const origin=[v.origin_type,v.district,v.upbringing,v.backstreet_environment].filter(Boolean).join(", ")||"the City";
+ const affiliation=[v.association,v.syndicate,v.office,v.workshop,v.wing_role,v.occupation].filter(Boolean).join(" / ")||"Independent";
+ const rank=v.finger_rank||v.syndicate_hierarchy||v.association_position||v.fixer_grade||"Unclassified";
+ const sephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
+ const canonicalAppearance="Tall, approximately 190.5 cm, with a lean peak-human physique and pale complexion. Messy, layered black hair frames sharp, delicate features; flawless skin, slightly pointed canines, and half-lidded eyes complete his distinctive appearance. He wears a white collared shirt beneath an unbuttoned black trench coat, slim black trousers, and maintains an apathetic expression. No alternate appearance or augmentations are introduced.";
+ const canonicalPersonality="Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He values originality and the act of creating things. His fundamental mindset, identity, and personality remain consistent across every variant.";
+ const outfit=factionOutfit(v);
+ putGenerated(a,"generated_title",generatedPick(["The Unwritten Oath","The Quiet Arbiter","The Last Witness","The Gilded Exile","The Hollow Crown","The Unbroken Thread","The Ashen Virtuoso","The Nameless Vow"]));
+ putGenerated(a,"generated_race",v.race||"Human");
+ putGenerated(a,"generated_appearance",sephrus?canonicalAppearance:outfit+" The ensemble's materials, fit, insignia, and accessories are personalized to the character's position and history.");
+ const egoAbsent=String(v.ego_status||"").includes("No known");
+ const egoName=v.ego_name||generatedPick(["Axiom of Ash","The Last Refrain","Crown of Unspoken Names","A Theatre Without Applause","The Shape of What Remains"]);
+ if(!egoAbsent)putGenerated(a,"generated_ego_name",egoName);
+ const motifs=String(egoTheme).split(/\s+/).slice(0,3).join(" ");
+ const abilityNames=["Measured Reprisal","Shifting Measure","Witness Mark","Final Cadence"];
+ const abilityDescriptions=[
+ "An economical opening technique that establishes the user's rhythm and tests the opponent's response. Its visual language draws on "+motifs+".",
+ "A reactive technique that changes its expression after observing an opponent's previous action, complementing a "+combat.toLowerCase()+" approach.",
+ "A signature feint or tactical setup that marks a target's movement and creates a brief opening for the user or an ally. Its effect is temporary and requires accurate timing.",
+ "A high-commitment finishing sequence combining the character's training with the symbolism of "+motifs+". Its force is balanced by a recovery window that can be exploited."
+ ];
+ for(let i=0;i<4;i++)putGenerated(a,"generated_ability_"+(i+1),abilityNames[i]+" — "+abilityDescriptions[i]);
+ putGenerated(a,"generated_ultimate_1","Nocturne of the Unbroken — A rare full manifestation of "+egoTheme+", transforming the immediate battlefield into an expression of a defining conviction. It demands accumulated momentum and leaves the user vulnerable during recovery.");
+ putGenerated(a,"generated_ultimate_2","The Final Unmasking — An alternate culmination that converts accumulated resolve into a decisive multi-stage sequence. It is difficult to prepare, exceptionally uncommon, and cannot be repeated freely.");
+ putGenerated(a,"generated_passive","Composure of the Unfinished — Repeated observation gradually sharpens the user's timing and awareness. The benefit is lost when they abandon patience or act recklessly.");
+ putGenerated(a,"generated_backstory","Raised in "+origin+", this variant learned to survive by reading people and recognizing the consequences behind seemingly small choices. A defining moral decision reshaped their priorities and led them toward "+affiliation+". Their current standing ("+rank+") offers influence and obligations, but does not settle the contradictions they carry.");
+ putGenerated(a,"generated_likes",generatedPick(["Quiet libraries, carefully prepared tea, old orchestral recordings, and people who keep their promises","Rain against windows, intricate craftsmanship, formal attire, and thoughtful conversation","Antique books, orderly rooms, subtle humor, and well-made objects","Late-night city lights, refined cuisine, handwritten notes, and dependable companions"]));
+ putGenerated(a,"generated_dislikes",generatedPick(["Careless promises, needless cruelty, loud self-importance, and being treated as a possession","Wastefulness, public humiliation, broken agreements, and false authority","Intrusive questions, deliberate dishonesty, and avoidable collateral damage","Condescension, performative loyalty, and having choices made for them"]));
+ putGenerated(a,"generated_overall","A "+rank+" "+affiliation+" variant shaped by "+origin+". Their "+(egoAbsent?"lack of a known E.G.O.":"E.G.O., "+egoName)+" and "+combat.toLowerCase()+" approach reflect a complicated individual whose identity is defined by deliberate choices and accepted consequences.");
+ if(sephrus){
+  putGenerated(a,"generated_title","The Same Essence");
+  putGenerated(a,"generated_race",v.race||"Human");
+  putGenerated(a,"generated_appearance",canonicalAppearance);
+  putGenerated(a,"generated_personality",canonicalPersonality);
+  putGenerated(a,"generated_passive_2","Una Eademque Essentia — One and the Same Essence. Across infinite Mirror Worlds, every Sephrus is the same individual living through different circumstances. Their lives, histories, affiliations, and choices may diverge, yet their fundamental identity and essence remain one. Each is distinct in experience, never truly different in who they are; neither inherently good nor evil, each remains morally gray.");
+ }
+}
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
  const notSet="Not specified.";
- const title=labelled("Title")||first("title","epithet","color_title")||notSet;
- const race=labelled("Race")||first("race","species","complex_race")||notSet;
+ const title=labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
+ const race=labelled("Race")||first("race","species","complex_race","generated_race")||notSet;
  const occupation=first("occupation","complex_occupation");
  const affiliation=labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role")||occupation||notSet;
  const grade=labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position")||first("grade","classification")||notSet;
- const appearance=labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
+ const appearance=labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","generated_appearance","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
  const origin=labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
  const egoStatus=first("ego_status","complex_41");
- const egoName=first("ego_name","complex_43");
+ const egoName=first("ego_name","complex_43","generated_ego_name");
  const egoLoadout=get("ego_equipment_customizer");
  const egoAppearance=first("ego_appearance","advanced_ego_appearance","complex_44");
  const egoFunction=first("ego_function","advanced_ego_function","complex_61");
@@ -368,14 +426,14 @@ function formatCharacterDossier(name,mode,answersSource){
  const egoDescription=egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded."
   :[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet;
  const abilitySource=first("advanced_abilities","complex_47","complex_50","complex_51");
- const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||(n===1?abilitySource:"")||notSet;
- const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||notSet;
- const passive=labelled("Passive Ability")||first("passive_ability","complex_passive")||notSet;
- const personality=labelled("Personality")||combine("personality","advanced_personality","complex_03","complex_21","complex_24")||notSet;
+ const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||get("generated_ability_"+n)||(n===1?abilitySource:"")||notSet;
+ const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet;
+ const passive=labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
+ const personality=labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?first("generated_personality"):combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||notSet;
  const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59")||notSet;
  const likes=labelled("Likes")||combine("likes","complex_32","complex_33")||notSet;
  const dislikes=labelled("Dislikes")||combine("dislikes","complex_37","complex_29")||notSet;
- const overall=labelled("Overall")||first("advanced_concept","complex_60","notes")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
+ const overall=labelled("Overall")||first("advanced_concept","complex_60","notes","generated_overall")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
  return [
   "Name: "+(name||"Unnamed Variant"),
   "Title: "+title,
@@ -628,6 +686,7 @@ function render(){
 }
 function finish(){
  pruneHiddenAnswers();
+ completeGeneratedCharacter(characterName,answers);
  saveCurrentOc();
  $("result-character-name").textContent=characterName||"UNNAMED VARIANT";const modeStamp=$("result-creation-mode");if(modeStamp)modeStamp.textContent=(creationMode==="complex"?"COMPLEX":creationMode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION DOSSIER";
  const profile=formatCharacterDossier(characterName,creationMode,answers);
