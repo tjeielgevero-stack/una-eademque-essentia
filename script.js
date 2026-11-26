@@ -465,6 +465,30 @@ function formatCharacterDossier(name,mode,answersSource){
 function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
+// One resistance profile is chosen per character. Multipliers are balanced to a fixed total of 3.5.
+const DAMAGE_RESISTANCE_OPTIONS = [
+ "Slash ×0.5 · Pierce ×0.5 · Blunt ×2.5",
+ "Slash ×0.5 · Pierce ×1.0 · Blunt ×2.0",
+ "Slash ×0.5 · Pierce ×1.5 · Blunt ×1.5",
+ "Slash ×0.5 · Pierce ×2.0 · Blunt ×1.0",
+ "Slash ×0.5 · Pierce ×2.5 · Blunt ×0.5",
+ "Slash ×1.0 · Pierce ×0.5 · Blunt ×2.0",
+ "Slash ×1.0 · Pierce ×1.0 · Blunt ×1.5",
+ "Slash ×1.0 · Pierce ×1.5 · Blunt ×1.0",
+ "Slash ×1.0 · Pierce ×2.0 · Blunt ×0.5",
+ "Slash ×1.5 · Pierce ×0.5 · Blunt ×1.5",
+ "Slash ×1.5 · Pierce ×1.0 · Blunt ×1.0",
+ "Slash ×1.5 · Pierce ×1.5 · Blunt ×0.5",
+ "Slash ×2.0 · Pierce ×0.5 · Blunt ×1.0",
+ "Slash ×2.0 · Pierce ×1.0 · Blunt ×0.5",
+ "Slash ×2.5 · Pierce ×0.5 · Blunt ×0.5"
+];
+QUESTIONS.push({
+ id:"damage_resistances",category:"COMBAT PROFILE",title:"Damage-Type Resistances",
+ description:"Choose one balanced resistance profile. Endure = ×0.5, Normal = ×1.0, Effective = ×1.5, and Fatal = ×2.5. The three multipliers always total 3.5, so a stronger resistance requires a weakness elsewhere.",
+ options:DAMAGE_RESISTANCE_OPTIONS
+});
+
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
 // and kept separate from Advanced / Complex mode so existing saved answers remain compatible.
 const SIMPLE_OPTION_EXPANSIONS = {
@@ -490,7 +514,7 @@ const SIMPLE_OPTION_EXPANSIONS = {
   "Learned through repeated field experience","Mentored by a veteran professional","Private tutor or household instructor","Public or community schooling","Corporate academy","Specialist technical institute","Medical or scientific training","Military-style institutional training","Studied law, contracts, or City regulations","Studied history, literature, or philosophy","Learned through archival research","Learned through observation and imitation","Trained by several unrelated mentors","Education interrupted before completion","Has credentials but little practical experience","Other / custom answer"
  ],
  occupation: [
-  "Licensed Fixer working independently","Unlicensed / unregistered Fixer","Fixer Office owner","Fixer Office manager","Office administrator or clerk","Association trainee","Association Director","Association Branch Manager","Syndicate executive or senior member","Syndicate courier or messenger","Syndicate negotiator","Syndicate accountant or records keeper","Wing researcher","Wing security specialist","Wing field researcher","Wing executive assistant","Workshop engineer","Workshop designer","Workshop repair specialist","Information broker","Private investigator","Bodyguard or personal escort","Courier or transport worker","Medical practitioner","Archivist or librarian","Teacher or instructor","Performer or entertainer","Journalist or documentarian","Merchant or trader","Independent consultant","Retired professional","Other / custom answer"
+  "Licensed Fixer working independently","Unlicensed / unregistered Fixer","Fixer Office owner","Fixer Office manager","Office administrator or clerk","Association trainee","Syndicate executive or senior member","Syndicate courier or messenger","Syndicate negotiator","Syndicate accountant or records keeper","Wing researcher","Wing security specialist","Wing field researcher","Wing executive assistant","Workshop engineer","Workshop designer","Workshop repair specialist","Information broker","Private investigator","Bodyguard or personal escort","Courier or transport worker","Medical practitioner","Archivist or librarian","Teacher or instructor","Performer or entertainer","Journalist or documentarian","Merchant or trader","Independent consultant","Retired professional","Other / custom answer"
  ],
  reputation: [
   "Known for keeping their word","Known for never explaining themselves","Respected by subordinates","Disliked by superiors","Popular among ordinary residents","Trusted with confidential work","Considered difficult to work with","Known as a fair negotiator","Known for unusual methods","A rumor more than a public figure","Famous only within one District","Recognized under an alias","A respected newcomer","A declining former reputation","A deliberately cultivated false reputation","Their reputation is contradictory","Other / custom answer"
