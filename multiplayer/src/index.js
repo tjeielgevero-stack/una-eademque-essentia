@@ -155,7 +155,7 @@ export class RoomHub extends DurableObject {
       turnIndex: 0, round: 1, pendingChallenge: null, log: [{ at: Date.now(), kind: "system", text: "Room created. Waiting for challengers." }]
     };
     await this.ctx.storage.put("room", this.room);
-    return json({ room: this.publicState(), player: { id: this.room.players[0].id, token } });
+    return json({ room: this.publicState(this.room.players[0].id), player: { id: this.room.players[0].id, token } });
   }
 
   async indexAdd(request) {
@@ -183,7 +183,7 @@ export class RoomHub extends DurableObject {
     return json({ rooms });
   }
 
-  publicState() {
+  publicState(viewerId = null) {
     if (!this.room) return null;
     const players = this.room.players.map(player => ({
       id: player.id, name: player.name, character: player.character, team: player.team,
@@ -208,7 +208,7 @@ export class RoomHub extends DurableObject {
         targetId: this.room.pendingChallenge.targetId,
         step: this.room.pendingChallenge.step || 0,
         totalSteps: this.room.pendingChallenge.totalSteps || 1,
-        prompt: this.room.pendingChallenge.prompt,
+        prompt: viewerId === (this.room.pendingChallenge.type === "parry" ? this.room.pendingChallenge.defenderId : this.room.pendingChallenge.qtePlayerId) ? this.room.pendingChallenge.prompt : null,
         expiresAt: this.room.pendingChallenge.expiresAt,
         windowMs: this.room.pendingChallenge.windowMs
       } : null,
@@ -220,10 +220,11 @@ export class RoomHub extends DurableObject {
     await this.ctx.storage.put("room", this.room);
     if (this.room.pendingChallenge) await this.ctx.storage.setAlarm(this.room.pendingChallenge.expiresAt);
     else await this.ctx.storage.deleteAlarm();
-    const state = this.publicState();
-    const payload = JSON.stringify({ type: message, state });
     for (const ws of this.ctx.getWebSockets()) {
-      try { ws.send(payload); } catch { /* stale connection */ }
+      try {
+        const viewerId = ws.deserializeAttachment()?.playerId || null;
+        ws.send(JSON.stringify({ type: message, state: this.publicState(viewerId) }));
+      } catch { /* stale connection */ }
     }
     if (this.room.visibility === "public") {
       const index = this.env.ROOMS.get(this.env.ROOMS.idFromName("__PUBLIC_INDEX__"));
@@ -253,7 +254,7 @@ export class RoomHub extends DurableObject {
     const client = pair[0], server = pair[1];
     this.ctx.acceptWebSocket(server);
     server.serializeAttachment({ playerId: player.id });
-    server.send(JSON.stringify({ type: "state", state: this.publicState() }));
+    server.send(JSON.stringify({ type: "state", state: this.publicState(player.id) }));
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -273,13 +274,13 @@ export class RoomHub extends DurableObject {
     const host = this.room.players.find(item => item.id !== player.id);
     if (host) this.room.log.push({ at: Date.now(), kind: "chat", text: this.interactionLine(host, player, "meet") });
     await this.saveAndBroadcast("player-joined");
-    return json({ room: this.publicState(), player: { id: player.id, token: player.token } }, 201);
+    return json({ room: this.publicState(player.id), player: { id: player.id, token: player.token } }, 201);
   }
 
   async getState(request) {
     if (!this.room) return json({ error: "Room not found." }, 404);
     if (!this.auth(request)) return json({ error: "Invalid room credentials." }, 403);
-    return json({ room: this.publicState() });
+    return json({ room: this.publicState(player.id) });
   }
 
   async start(request) {
@@ -453,7 +454,7 @@ export class RoomHub extends DurableObject {
     }
     const success = String(body.input || "").toUpperCase() === challenge.prompt;
     await this.completeParry(success, false);
-    return json({ room: this.publicState(), parried: success });
+    return json({ room: this.publicState(player.id), parried: success });
   }
 
   async resolveQte(player, body) {
@@ -471,7 +472,7 @@ export class RoomHub extends DurableObject {
     challenge.step += 1;
     if (challenge.step >= challenge.totalSteps) {
       await this.completeUltimate();
-      return json({ room: this.publicState(), ultimate: "success" });
+      return json({ room: this.publicState(player.id), ultimate: "success" });
     }
     const windows = [1120, 820, 590, 420];
     challenge.prompt = challenge.sequence[challenge.step];
@@ -479,7 +480,7 @@ export class RoomHub extends DurableObject {
     challenge.expiresAt = Date.now() + challenge.windowMs;
     this.addLog("system", "Ultimate sequence advanced: " + challenge.step + "/" + challenge.totalSteps + ".");
     await this.saveAndBroadcast("ultimate-step");
-    return json({ room: this.publicState(), ultimate: "step" });
+    return json({ room: this.publicState(player.id), ultimate: "step" });
   }
 
   async act(request) {
@@ -531,7 +532,7 @@ export class RoomHub extends DurableObject {
       player.status = "ULTIMATE CHARGING";
       this.addLog("system", player.name + " begins a multi-stage ultimate activation. Complete all four prompts; the final window is extremely short.");
       await this.saveAndBroadcast("ultimate-start");
-      return json({ room: this.publicState(), ultimate: "started" });
+      return json({ room: this.publicState(player.id), ultimate: "started" });
     }
     if (type === "ego") {
       player.egoUsed = true;
@@ -551,7 +552,7 @@ export class RoomHub extends DurableObject {
     target.status = "PARRY WINDOW";
     this.addLog("action", player.name + (type === "ego" ? " sends " + (player.character.egoName || "an E.G.O. strike") : " attacks") + " " + target.name + ". A parry window opens.");
     await this.saveAndBroadcast("parry-open");
-    return json({ room: this.publicState(), parry: "open" });
+    return json({ room: this.publicState(player.id), parry: "open" });
   }
 
   async leave(request) {
@@ -606,7 +607,7 @@ export class RoomHub extends DurableObject {
     }
 
     await this.saveAndBroadcast("player-left");
-    return json({ ok: true, room: this.publicState() });
+    return json({ ok: true, room: this.publicState(player.id) });
   }
 
   async alarm() {
