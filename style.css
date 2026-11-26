@@ -2001,4 +2001,24 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 }
 
 /* Chains were removed from the Sephrus sequence; retain only the fracture and glass effects. */
-.sephrus-pull-chain,.personality-chain { display:none !important; }
+.sephrus-pull-chain { display:none !important; }
+
+/* Broken personality lettering: scattered fragments, while the canonical option stays clean. */
+.choice.personality-broken .broken-word{display:inline-flex;align-items:center;gap:1px;position:relative;z-index:1;white-space:nowrap;letter-spacing:0;}
+.choice.personality-broken .broken-glyph{display:inline-block;color:#ff7777;transform:translateY(var(--glyph-y,0px)) rotate(var(--glyph-tilt,0deg));text-shadow:0 0 8px rgba(230,50,61,.55);transition:transform .2s ease;}
+.choice.personality-broken:nth-child(3n) .broken-glyph:nth-child(odd){transform:translateY(calc(var(--glyph-y,0px) - 5px)) rotate(calc(var(--glyph-tilt,0deg) + 12deg));}
+.choice.personality-broken:nth-child(4n) .broken-glyph:nth-child(even){transform:translateY(calc(var(--glyph-y,0px) + 4px)) rotate(calc(var(--glyph-tilt,0deg) - 15deg));}
+.choice.personality-broken .personality-chain{display:inline-block!important;position:relative;z-index:2;flex:0 0 auto;color:#b84b50;font-size:17px;line-height:1;text-shadow:0 0 8px rgba(220,61,70,.45);}
+.ambient-music-setting{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 22px;padding:16px 18px;border:1px solid var(--line,rgba(180,160,160,.2));background:rgba(12,10,12,.48);}
+.ambient-music-copy{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.ambient-music-copy strong{font-size:12px;letter-spacing:.13em;color:var(--text,#eee);}
+.ambient-music-copy span,.ambient-music-copy small{font-size:11px;color:var(--muted,#aaa);line-height:1.5;}
+.ambient-music-switch{position:relative;display:inline-flex;flex:0 0 48px;width:48px;height:26px;cursor:pointer;}
+.ambient-music-switch input{position:absolute;opacity:0;width:1px;height:1px;}
+.ambient-music-track{width:48px;height:26px;border:1px solid #74666a;border-radius:20px;background:#211b1e;transition:background .2s,border-color .2s;}
+.ambient-music-track::after{content:"";position:absolute;left:4px;top:4px;width:16px;height:16px;border-radius:50%;background:#b8a9a9;transition:transform .2s,background .2s;}
+.ambient-music-switch input:checked+.ambient-music-track{background:#542b32;border-color:#c16c76;}
+.ambient-music-switch input:checked+.ambient-music-track::after{transform:translateX(22px);background:#fff0ef;}
+.ambient-music-switch input:focus-visible+.ambient-music-track{outline:2px solid #e2a0a5;outline-offset:3px;}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+@media(prefers-reduced-motion:reduce){.choice.personality-broken .broken-glyph{transition:none;}}
