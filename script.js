@@ -473,6 +473,25 @@ function formatWeaponLoadout(value){
  if(!value||typeof value!=="object")return "Not specified.";
  return [value.style,value.weapon,value.ammoType&&"Profile: "+value.ammoType,value.ammo&&"Ammo: "+value.ammo,value.custom].filter(Boolean).join(" · ")||"Not specified.";
 }
+function limitDossierOutput(sections,maxCharacters=4200){
+ const weights=[.25,1,.65,1.15,1,1.35,1.2,1.55,.85,1.05,1.05,1.05,1.05,1.2,1.2,1.05,1.35,1.5,1.5,.95,.95,1.25];
+ const separators=(sections.length-1)*2;
+ const labels=sections.reduce((sum,line)=>sum+line.slice(0,line.indexOf(":")+2).length,0);
+ const available=Math.max(0,maxCharacters-separators-labels);
+ const weightTotal=weights.reduce((sum,value)=>sum+value,0);
+ return sections.map((line,index)=>{
+  const colon=line.indexOf(":");
+  if(colon<0)return line;
+  const heading=line.slice(0,colon+2),body=line.slice(colon+2).trim();
+  const budget=Math.max(24,Math.floor(available*(weights[index]||1)/weightTotal));
+  if(body.length<=budget)return heading+body;
+  let cut=budget-2;
+  const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut),body.lastIndexOf("; ",cut));
+  if(sentenceCut>budget*.52)cut=sentenceCut+1;
+  else{const wordCut=body.lastIndexOf(" ",cut);if(wordCut>budget*.7)cut=wordCut;}
+  return heading+body.slice(0,cut).trimEnd()+"…";
+ }).join("\n\n");
+}
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
  const notSet="Not specified.",isLazy=mode==="laziness";
@@ -524,7 +543,7 @@ function formatCharacterDossier(name,mode,answersSource){
  const dislikes=lazyField("Dislikes")||labelled("Dislikes")||first("complex_37","complex_29")||preference(combine("dislikes","generated_dislikes"),"Dislikes");
  const complexOverview="This dossier presents "+(name||"the character")+" through the history, personal relationships, and inner conflicts recorded across the profile. Its emotional and symbolic direction is "+(first("complex_42")||"developed through the character's recorded memories, principles, and experiences")+". The E.G.O. manifestation and abilities provide another expression of those themes, while the character's choices and consequences define their current place in the story.";
  const overall=lazyField("Overall")||labelled("Overall")||first("complex_60")||(mode==="complex"?complexOverview:first("generated_overall"))||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation?"working as "+occupation:"",egoStatus&&!egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
- return [
+ const dossierSections=[
   "Name: "+(lazyField("Name")||name||"Unnamed Variant"),
   "Title: "+title,
   "Race: "+race,
@@ -547,7 +566,8 @@ function formatCharacterDossier(name,mode,answersSource){
   "Likes: "+likes,
   "Dislikes: "+dislikes,
   "Overall: "+overall
- ].join("\n\n");
+ ];
+ return limitDossierOutput(dossierSections,4200);
 }
 
 function renderOcHistory(){
