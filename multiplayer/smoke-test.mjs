@@ -196,6 +196,28 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
   }
 });
 
+await run("Parry QTE timeout resolves automatically", async () => {
+  const created = await createRoom("1v1", "private", "Timeout Attacker");
+  const code = created.room.code;
+  const host = created.player;
+  const guest = (await joinRoom(code, "Timeout Defender")).player;
+  const started = await startRoom(code, host);
+  check(started.ok, "Timeout test match did not start.");
+
+  const attack = await action(code, host, "attack", guest.id);
+  check(attack.ok && attack.data.room.pendingChallenge?.type === "parry", "Attack did not open the timeout test parry.");
+  await new Promise(resolve => setTimeout(resolve, 1450));
+
+  const state = await getState(code, host);
+  check(state.ok, "Could not read state after the parry timer expired.");
+  check(!state.data.room.pendingChallenge, "Expired parry challenge was not cleared by the Durable Object alarm.");
+  const defender = state.data.room.players.find(player => player.id === guest.id);
+  check(defender.hp < 100 && defender.status === "PARRY MISSED", "Expired parry did not apply the missed-parry result.");
+  check(state.data.room.turnPlayerId === guest.id, "Parry timeout did not advance the turn.");
+  await leaveRoom(code, host);
+  await leaveRoom(code, guest);
+});
+
 await run("Lobby host handoff when the creator leaves", async () => {
   const created = await createRoom("1v1", "private", "Departing Host");
   const code = created.room.code;
