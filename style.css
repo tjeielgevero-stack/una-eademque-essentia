@@ -1554,3 +1554,21 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 .randomize-confirm-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px}
 @media(max-width:560px){.randomize-confirm-actions{align-items:stretch;flex-direction:column}.sim-difficulty-top{align-items:flex-start;flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.sim-hp-fill{animation:none!important;transition:none!important}.sim-fighter-card.sim-damage-pulse .sim-hp-track{animation:none!important}}
+
+
+/* Personal / Volatile E.G.O. dossier details and simulator impact feedback. */
+.result-creation-mode{margin:-6px 0 18px;color:var(--accent-text,#d8b8a4);font:10px 'DM Mono',monospace;letter-spacing:.18em;text-align:center}
+.sim-fighter-mode{margin:6px 0 8px;color:#b9a88f;font:8px 'DM Mono',monospace;letter-spacing:.14em}
+.sim-ego-detail{margin:7px 0 0;padding:8px 9px;border-left:2px solid rgba(198,170,125,.38);background:rgba(255,255,255,.025);color:#c7bba9;font-size:11px;line-height:1.45;overflow-wrap:anywhere;max-height:4.4em;overflow:hidden}
+.simulator-match{position:relative;overflow:hidden}
+.sim-hit-overlay[hidden]{display:none!important}
+.sim-hit-overlay{position:absolute;inset:0;z-index:30;display:grid;place-items:center;padding:28px;pointer-events:none;text-align:center;backdrop-filter:blur(2px);font:clamp(20px,4vw,42px) Georgia,serif;font-weight:700;letter-spacing:.13em;text-shadow:0 3px 18px rgba(0,0,0,.9);border:2px solid rgba(210,185,145,.28)}
+.sim-hit-overlay.sim-hit-heavy{color:#f2dfbb;background:radial-gradient(ellipse at center,rgba(181,126,73,.38),rgba(12,10,9,.82) 72%);animation:sim-heavy-overlay .78s ease-out both}
+.sim-hit-overlay.sim-hit-fatal{color:#f0d6d2;background:radial-gradient(ellipse at center,rgba(112,42,46,.56),rgba(8,7,8,.94) 74%);border-color:rgba(177,91,91,.58);animation:sim-fatal-overlay 1.1s ease-out both}
+.simulator-match.sim-hit-heavy{animation:sim-heavy-shake .48s ease-out}
+.simulator-match.sim-hit-fatal{animation:sim-fatal-shake .72s ease-out}
+@keyframes sim-heavy-overlay{0%{opacity:0;transform:scale(1.08)}14%{opacity:1;transform:scale(1)}65%{opacity:.92}100%{opacity:0;transform:scale(.98)}}
+@keyframes sim-fatal-overlay{0%{opacity:0;transform:scale(1.06)}18%{opacity:1;transform:scale(1)}75%{opacity:.96}100%{opacity:0;transform:scale(.99)}}
+@keyframes sim-heavy-shake{0%,100%{transform:translateX(0)}22%{transform:translateX(-5px)}46%{transform:translateX(4px)}68%{transform:translateX(-2px)}}
+@keyframes sim-fatal-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-6px)}38%{transform:translateX(5px)}58%{transform:translateX(-3px)}}
+@media(prefers-reduced-motion:reduce){.sim-hit-overlay.sim-hit-heavy,.sim-hit-overlay.sim-hit-fatal,.simulator-match.sim-hit-heavy,.simulator-match.sim-hit-fatal{animation:none!important}}
