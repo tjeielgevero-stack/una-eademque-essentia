@@ -19,6 +19,18 @@ function makeToken() {
   crypto.getRandomValues(bytes);
   return Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
 }
+const DEFAULT_RESISTANCES = { slash: 1, pierce: 1, blunt: 1.5 };
+const RESISTANCE_VALUES = [0.5, 1, 1.5, 2, 2.5];
+const STATUS_EFFECTS = new Set(["Burn","Bleed","Rupture","Sinking","Tremor","Poise","Charge","Haste","Bind","Fragile","Protection","Strength","Feeble","Paralyze","Paralysis","Disarm","Smoke","Fairy","Erosion","Offense Level Up","Offense Level Down","Defense Level Up","Defense Level Down","Damage Up","Damage Down","Coin Power Up","Coin Power Down","Ammo","Aggro","Fanatic","Nails","Talisman","Tremor Burst","Stagger Protection","Endurance","Persistence","Blood","Nullify Power","Immobilized"]);
+function safeResistances(input) {
+  const source = input && typeof input === "object" ? input : {};
+  const result = {};
+  for (const type of ["slash", "pierce", "blunt"]) {
+    const value = Number(source[type]);
+    result[type] = RESISTANCE_VALUES.includes(value) ? value : DEFAULT_RESISTANCES[type];
+  }
+  return Math.abs(result.slash + result.pierce + result.blunt - 3.5) < 0.001 ? result : { ...DEFAULT_RESISTANCES };
+}
 function safeCharacter(input) {
   const source = input && typeof input === "object" ? input : {};
   const cleanList = value => Array.isArray(value) ? value.slice(0, 8).map(item => cleanText(item, 160)).filter(Boolean) : [];
@@ -36,6 +48,7 @@ function safeCharacter(input) {
     egoName: cleanText(source.egoName, 100),
     egoType: cleanText(source.egoType, 80),
     egoEligible: source.egoEligible === true,
+    resistances: safeResistances(source.resistances),
     personality: cleanList(source.personality),
     abilities: cleanList(source.abilities),
     ultimateAbilities: cleanList(source.ultimateAbilities),
@@ -151,7 +164,7 @@ export class RoomHub extends DurableObject {
     this.room = {
       code: body.code, mode: body.mode, visibility: body.visibility,
       maxPlayers: body.maxPlayers, status: "lobby", createdAt: Date.now(),
-      players: [{ id: crypto.randomUUID(), token, name: body.playerName, character: body.character, team: teamFor(body.mode, 0), hp: 100, guarding: false, egoUsed: false, egoActive: false, ultimateCharge: 0, ultimateUsed: false, status: "READY" }],
+      players: [{ id: crypto.randomUUID(), token, name: body.playerName, character: body.character, team: teamFor(body.mode, 0), hp: 100, guarding: false, egoUsed: false, egoActive: false, statusEffects: [], ultimateCharge: 0, ultimateUsed: false, status: "READY" }],
       turnIndex: 0, round: 1, pendingChallenge: null, log: [{ at: Date.now(), kind: "system", text: "Room created. Waiting for challengers." }]
     };
     await this.ctx.storage.put("room", this.room);
@@ -188,7 +201,9 @@ export class RoomHub extends DurableObject {
     const players = this.room.players.map(player => ({
       id: player.id, name: player.name, character: player.character, team: player.team,
       hp: player.hp, guarding: player.guarding, egoUsed: player.egoUsed,
-      egoActive: !!player.egoActive, ultimateCharge: player.ultimateCharge || 0,
+      egoActive: !!player.egoActive, resistances: player.character?.resistances || DEFAULT_RESISTANCES,
+      statusEffects: Array.isArray(player.statusEffects) ? player.statusEffects : [],
+      ultimateCharge: player.ultimateCharge || 0,
       ultimateUsed: !!player.ultimateUsed, status: player.status || (player.hp > 0 ? "READY" : "OUT"),
       connected: this.ctx.getWebSockets().some(ws => ws.deserializeAttachment()?.playerId === player.id)
     }));
@@ -266,7 +281,7 @@ export class RoomHub extends DurableObject {
     const player = {
       id: crypto.randomUUID(), token: makeToken(), name: body.playerName,
       character: body.character, team: teamFor(this.room.mode, this.room.players.length),
-      hp: 100, guarding: false, egoUsed: false, egoActive: false,
+      hp: 100, guarding: false, egoUsed: false, egoActive: false, statusEffects: [],
       ultimateCharge: 0, ultimateUsed: false, status: "READY"
     };
     this.room.players.push(player);
@@ -309,6 +324,48 @@ export class RoomHub extends DurableObject {
   addLog(kind, text) {
     this.room.log.push({ at: Date.now(), kind, text });
     if (this.room.log.length > 90) this.room.log.splice(0, this.room.log.length - 90);
+  }
+
+  applyStatusEffect(target, name, potency) {
+    if (!target || !STATUS_EFFECTS.has(name)) return;
+    const value = [5, 15, 20, 30].includes(Number(potency)) ? Number(potency) : 5;
+    if (!Array.isArray(target.statusEffects)) target.statusEffects = [];
+    const existing = target.statusEffects.find(effect => effect.name === name);
+    if (existing) {
+      existing.potency = Math.min(30, (existing.potency || 0) + value);
+      existing.turns = 2;
+    } else {
+      target.statusEffects.push({ name, potency: value, turns: 2 });
+    }
+    this.addLog("action", target.name + " receives " + name + " (" + value + ") for two turns.");
+  }
+
+  damageWithModifiers(attacker, target, baseDamage, damageType = "slash") {
+    const type = ["slash", "pierce", "blunt"].includes(damageType) ? damageType : "slash";
+    const resistance = Number(target.character?.resistances?.[type]);
+    const multiplier = [0.5, 1, 1.5, 2, 2.5].includes(resistance) ? resistance : 1;
+    const potency = (unit, name) => Math.min(30, (unit.statusEffects || []).filter(effect => effect.name === name).reduce((sum, effect) => sum + (Number(effect.potency) || 0), 0));
+    let damage = Math.round(baseDamage * multiplier);
+    damage = Math.round(damage * (1 + potency(attacker, "Strength") / 100));
+    damage = Math.round(damage * (1 - potency(attacker, "Feeble") / 100));
+    damage = Math.round(damage * (1 + potency(target, "Fragile") / 100));
+    damage = Math.round(damage * (1 - potency(target, "Protection") / 100));
+    return Math.max(1, damage);
+  }
+
+  processStatusTurn(player) {
+    if (!player || !Array.isArray(player.statusEffects) || !player.statusEffects.length) return;
+    const damageOverTime = new Set(["Burn", "Bleed", "Rupture", "Sinking", "Tremor", "Fairy", "Erosion"]);
+    for (const effect of player.statusEffects) {
+      if (damageOverTime.has(effect.name) && player.hp > 0) {
+        const tick = Math.max(1, Math.ceil((Number(effect.potency) || 5) / 10));
+        player.hp = Math.max(0, player.hp - tick);
+        this.addLog("action", effect.name + " affects " + player.name + " for " + tick + " damage.");
+      }
+      effect.turns = Math.max(0, (Number(effect.turns) || 1) - 1);
+    }
+    player.statusEffects = player.statusEffects.filter(effect => effect.turns > 0);
+    if (player.hp === 0) this.addLog("system", player.name + " is out of the match.");
   }
 
   interactionLine(first, second, context = "reply") {
@@ -359,13 +416,18 @@ export class RoomHub extends DurableObject {
   }
 
   advanceTurn(actor) {
+    const originalIndex = actor ? this.room.players.findIndex(item => item.id === actor.id) : -1;
+    if (actor) this.processStatusTurn(actor);
     if (actor && actor.hp > 0) actor.ultimateCharge = Math.min(3, (actor.ultimateCharge || 0) + 1);
     if (this.finishMatchIfNeeded()) return;
     const living = this.room.players.filter(item => item.hp > 0);
-    const oldIndex = living.findIndex(item => item.id === actor?.id);
-    this.room.turnIndex = (Math.max(0, oldIndex) + 1) % living.length;
+    let next = null;
+    for (let offset = 1; offset <= this.room.players.length; offset += 1) {
+      const candidate = this.room.players[(Math.max(0, originalIndex) + offset) % this.room.players.length];
+      if (candidate && candidate.hp > 0) { next = candidate; break; }
+    }
+    this.room.turnIndex = Math.max(0, living.findIndex(item => item.id === next?.id));
     if (this.room.turnIndex === 0) this.room.round += 1;
-    const next = living[this.room.turnIndex];
     if (next) this.addLog("system", "Round " + this.room.round + ": " + next.name + " is up next.");
     if (actor && this.room.mode === "2v2") {
       const ally = living.find(item => item.team === actor.team && item.id !== actor.id);
@@ -392,12 +454,13 @@ export class RoomHub extends DurableObject {
       this.addLog("action", defender.name + " perfectly parries " + attacker.name + "’s " + challenge.attackType + ".");
       this.addLog("chat", this.interactionLine(defender, attacker, "parry"));
     } else {
-      damage = challenge.damage;
+      damage = this.damageWithModifiers(attacker, defender, challenge.damage, challenge.damageType);
       if (defender.guarding) { damage = Math.max(2, Math.floor(damage * 0.45)); defender.guarding = false; }
       defender.hp = Math.max(0, defender.hp - damage);
+      this.applyStatusEffect(defender, challenge.statusEffect, challenge.statusPotency);
       defender.status = timedOut ? "PARRY MISSED" : "PARRY FAILED";
       attacker.status = challenge.attackType === "ego" ? "E.G.O. STRIKE" : "ATTACK RESOLVED";
-      this.addLog("action", attacker.name + "’s " + challenge.attackType + " connects for " + damage + " damage.");
+      this.addLog("action", attacker.name + "’s " + challenge.damageType + " " + challenge.attackType + " connects for " + damage + " damage.");
       this.addLog("chat", defender.name + ": “" + (timedOut ? "I was a moment too late." : "I misread that exchange.") + "”");
     }
     if (defender.hp === 0) this.addLog("system", defender.name + " is out of the match.");
@@ -431,14 +494,15 @@ export class RoomHub extends DurableObject {
       await this.saveAndBroadcast("ultimate-ended");
       return;
     }
-    let damage = 34 + Math.floor(Math.random() * 13);
+    let damage = this.damageWithModifiers(actor, target, 34 + Math.floor(Math.random() * 13), challenge.damageType);
     if (target.guarding) { damage = Math.max(8, Math.floor(damage * 0.5)); target.guarding = false; }
     target.hp = Math.max(0, target.hp - damage);
+    this.applyStatusEffect(target, challenge.statusEffect, challenge.statusPotency);
     actor.ultimateCharge = 0;
     actor.ultimateUsed = true;
     actor.status = "ULTIMATE RELEASED";
     target.status = target.hp === 0 ? "OUT" : "RECOVERING";
-    this.addLog("action", actor.name + " completes the ultimate sequence against " + target.name + " for " + damage + " damage.");
+    this.addLog("action", actor.name + " completes the ultimate sequence against " + target.name + " for " + damage + " " + challenge.damageType + " damage.");
     this.addLog("chat", this.interactionLine(actor, target, "ultimate"));
     if (target.hp === 0) this.addLog("system", target.name + " is out of the match.");
     this.advanceTurn(actor);
@@ -454,8 +518,21 @@ export class RoomHub extends DurableObject {
       return json({ error: "The parry timing window has closed." }, 409);
     }
     const success = String(body.input || "").toUpperCase() === challenge.prompt;
-    await this.completeParry(success, false);
-    return json({ room: this.publicState(player.id), parried: success });
+    if (!success) {
+      await this.completeParry(false, false);
+      return json({ room: this.publicState(player.id), parried: false });
+    }
+    challenge.step += 1;
+    if (challenge.step >= challenge.totalSteps) {
+      await this.completeParry(true, false);
+      return json({ room: this.publicState(player.id), parried: true });
+    }
+    challenge.prompt = challenge.sequence[challenge.step];
+    challenge.windowMs = 1500;
+    challenge.expiresAt = Date.now() + challenge.windowMs;
+    this.addLog("system", "Parry chain advanced: " + challenge.step + "/" + challenge.totalSteps + ".");
+    await this.saveAndBroadcast("parry-step");
+    return json({ room: this.publicState(player.id), parried: "step" });
   }
 
   async resolveQte(player, body) {
@@ -467,17 +544,21 @@ export class RoomHub extends DurableObject {
       return json({ error: "The ultimate timing window has closed." }, 409);
     }
     if (String(body.input || "").toUpperCase() !== challenge.prompt) {
-      await this.failUltimate(false);
-      return json({ error: "Incorrect input. The ultimate sequence was interrupted." }, 409);
+      challenge.mistakes = (challenge.mistakes || 0) + 1;
+      if (challenge.mistakes > 1) {
+        await this.failUltimate(false);
+        return json({ error: "The ultimate sequence was interrupted." }, 409);
+      }
+      this.addLog("system", "The ultimate sequence absorbs one missed input and continues.");
     }
     challenge.step += 1;
     if (challenge.step >= challenge.totalSteps) {
       await this.completeUltimate();
       return json({ room: this.publicState(player.id), ultimate: "success" });
     }
-    const windows = [1120, 820, 590, 420];
+    const windows = [2400, 2200, 2000];
     challenge.prompt = challenge.sequence[challenge.step];
-    challenge.windowMs = windows[challenge.step] || 420;
+    challenge.windowMs = windows[challenge.step] || 2000;
     challenge.expiresAt = Date.now() + challenge.windowMs;
     this.addLog("system", "Ultimate sequence advanced: " + challenge.step + "/" + challenge.totalSteps + ".");
     await this.saveAndBroadcast("ultimate-step");
@@ -522,16 +603,19 @@ export class RoomHub extends DurableObject {
     if (!target) return json({ error: "Choose an active opponent. Friendly fire is not allowed in 2v2." }, 400);
     if (type === "ego" && (!player.character.egoEligible || player.egoUsed)) return json({ error: "This character cannot use E.G.O. right now." }, 400);
     if (type === "ultimate") {
-      const sequence = Array.from({ length: 4 }, () => ["UP", "DOWN", "LEFT", "RIGHT"][Math.floor(Math.random() * 4)]);
-      const firstWindow = 1120;
+      const sequence = Array.from({ length: 3 }, () => ["UP", "DOWN", "LEFT", "RIGHT"][Math.floor(Math.random() * 4)]);
+      const firstWindow = 2400;
       this.room.pendingChallenge = {
         id: crypto.randomUUID(), type: "ultimate", attackerId: player.id,
         qtePlayerId: player.id, targetId: target.id, sequence,
-        step: 0, totalSteps: sequence.length, prompt: sequence[0],
-        windowMs: firstWindow, expiresAt: Date.now() + firstWindow
+        step: 0, totalSteps: sequence.length, mistakes: 0,
+        damageType: ["slash", "pierce", "blunt"].includes(body.damageType) ? body.damageType : "slash",
+        statusEffect: STATUS_EFFECTS.has(body.statusEffect) ? body.statusEffect : "",
+        statusPotency: [5, 15, 20, 30].includes(Number(body.statusPotency)) ? Number(body.statusPotency) : 5,
+        prompt: sequence[0], windowMs: firstWindow, expiresAt: Date.now() + firstWindow
       };
       player.status = "ULTIMATE CHARGING";
-      this.addLog("system", player.name + " begins a multi-stage ultimate activation. Complete all four prompts; the final window is extremely short.");
+      this.addLog("system", player.name + " begins a three-step ultimate sequence. One missed input is allowed.");
       await this.saveAndBroadcast("ultimate-start");
       return json({ room: this.publicState(player.id), ultimate: "started" });
     }
@@ -541,17 +625,20 @@ export class RoomHub extends DurableObject {
       this.addLog("system", player.name + " manifests " + (player.character.egoName || "their E.G.O.") + ".");
     }
     const damage = type === "ego" ? 21 + Math.floor(Math.random() * 8) : 12 + Math.floor(Math.random() * 7);
-    const windowMs = 1050;
+    const windowMs = 1500;
+    const sequence = Array.from({ length: 3 }, () => ["UP", "DOWN", "LEFT", "RIGHT"][Math.floor(Math.random() * 4)]);
     this.room.pendingChallenge = {
       id: crypto.randomUUID(), type: "parry", attackerId: player.id,
       defenderId: target.id, targetId: target.id, attackType: type, damage,
-      step: 0, totalSteps: 1,
-      prompt: ["UP", "DOWN", "LEFT", "RIGHT"][Math.floor(Math.random() * 4)],
-      windowMs, expiresAt: Date.now() + windowMs
+      damageType: ["slash", "pierce", "blunt"].includes(body.damageType) ? body.damageType : "slash",
+      statusEffect: STATUS_EFFECTS.has(body.statusEffect) ? body.statusEffect : "",
+      statusPotency: [5, 15, 20, 30].includes(Number(body.statusPotency)) ? Number(body.statusPotency) : 5,
+      sequence, step: 0, totalSteps: sequence.length,
+      prompt: sequence[0], windowMs, expiresAt: Date.now() + windowMs
     };
     player.status = type === "ego" ? "E.G.O. STRIKE" : "ATTACKING";
     target.status = "PARRY WINDOW";
-    this.addLog("action", player.name + (type === "ego" ? " sends " + (player.character.egoName || "an E.G.O. strike") : " attacks") + " " + target.name + ". A parry window opens.");
+    this.addLog("action", player.name + (type === "ego" ? " sends " + (player.character.egoName || "an E.G.O. strike") : " attacks") + " " + target.name + ". A three-step parry window opens.");
     await this.saveAndBroadcast("parry-open");
     return json({ room: this.publicState(player.id), parry: "open" });
   }
