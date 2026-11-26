@@ -66,8 +66,8 @@
     .mp-qte-progress{max-width:360px;height:5px;margin:15px auto 7px;background:#393129;overflow:hidden}
     .mp-qte-progress span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#a68a62,#eee0c6);transform-origin:left;transition:transform .04s linear}
     .mp-qte-step{color:#b6a58c;font:9px 'DM Mono',monospace;letter-spacing:.13em}
-    .mp-qte-buttons{display:grid;grid-template-columns:repeat(4,minmax(52px,72px));justify-content:center;gap:8px;margin-top:15px}
-    .mp-qte-buttons button{min-height:52px;border:1px solid #806b4e;background:#211c16;color:#f1e4d0;font:24px Georgia,serif;cursor:pointer;transition:transform .1s,background .1s,border-color .1s}
+    .mp-qte-buttons{display:grid;grid-template-columns:repeat(3,minmax(58px,72px));grid-template-rows:repeat(2,52px);justify-content:center;gap:8px;margin-top:15px}.mp-qte-buttons button:nth-child(1){grid-column:2;grid-row:1}.mp-qte-buttons button:nth-child(2){grid-column:1;grid-row:2}.mp-qte-buttons button:nth-child(3){grid-column:2;grid-row:2}.mp-qte-buttons button:nth-child(4){grid-column:3;grid-row:2}
+    .mp-qte-buttons button{min-height:52px;border:1px solid #806b4e;background:#211c16;color:#f1e4d0;font:700 20px "DM Mono",monospace;cursor:pointer;touch-action:manipulation;transition:transform .1s,background .1s,border-color .1s}
     .mp-qte-buttons button:hover:not(:disabled){transform:translateY(-2px);background:#403323;border-color:#d0b48a}
     .mp-qte-buttons button:disabled{opacity:.35;cursor:not-allowed}
     .mp-ultimate-meter{height:5px;background:#36302a;overflow:hidden;margin-top:8px}
@@ -262,14 +262,14 @@
           <p id="mp-qte-kicker" class="mp-qte-kicker">MIRROR ARENA / TIMING EVENT</p>
           <h3 id="mp-qte-title" class="mp-qte-title">PARRY WINDOW</h3>
           <p id="mp-qte-copy" class="mp-qte-copy">Respond to the prompt before the timing window closes.</p>
-          <div id="mp-qte-prompt" class="mp-qte-prompt">↑</div>
+          <div id="mp-qte-prompt" class="mp-qte-prompt">W</div>
           <div class="mp-qte-progress"><span id="mp-qte-timebar"></span></div>
           <p id="mp-qte-step" class="mp-qte-step"></p>
           <div id="mp-qte-buttons" class="mp-qte-buttons">
-            <button type="button" data-qte-input="UP" aria-label="Up">↑</button>
-            <button type="button" data-qte-input="LEFT" aria-label="Left">←</button>
-            <button type="button" data-qte-input="DOWN" aria-label="Down">↓</button>
-            <button type="button" data-qte-input="RIGHT" aria-label="Right">→</button>
+            <button type="button" data-qte-input="UP" aria-label="W key">W</button>
+            <button type="button" data-qte-input="LEFT" aria-label="A key">A</button>
+            <button type="button" data-qte-input="DOWN" aria-label="S key">S</button>
+            <button type="button" data-qte-input="RIGHT" aria-label="D key">D</button>
           </div>
         </section>
         <div id="mp-host-controls" class="mp-actions mp-hidden"><button id="mp-start" class="primary-button" type="button">START MATCH ↗</button></div>
@@ -403,7 +403,7 @@
     }, kind === "fatal" ? 1100 : kind === "ego" ? 900 : 780);
   }
   function qteArrow(direction) {
-    return ({ UP: "↑", DOWN: "↓", LEFT: "←", RIGHT: "→" })[direction] || "✦";
+    return ({ UP: "W", DOWN: "S", LEFT: "A", RIGHT: "D" })[direction] || "✦";
   }
   function stopQteTimer() {
     if (qteTimer) { clearInterval(qteTimer); qteTimer = null; }
@@ -446,8 +446,8 @@
     $("mp-qte-kicker").textContent = challenge.type === "parry" ? "MIRROR ARENA / DEFENSIVE REACTION" : "MIRROR ARENA / ULTIMATE ACTIVATION";
     $("mp-qte-title").textContent = challenge.type === "parry" ? (isOwner ? "PARRY NOW" : "PARRY WINDOW") : (isOwner ? "COMPLETE THE ULTIMATE" : "ULTIMATE SEQUENCE");
     $("mp-qte-copy").textContent = challenge.type === "parry"
-      ? (isOwner ? "Match all three directions in sequence. Each successful input advances the chain; one miss lets the attack connect." : (owner?.name || "The defender") + " has a three-step chance to parry " + (attacker?.name || "the attack") + ".")
-      : (isOwner ? "Complete three directions. You have generous timing windows and may miss one input without losing the sequence." : (attacker?.name || "A player") + " is attempting an ultimate against " + (target?.name || "their target") + ".");
+      ? (isOwner ? "Match the W, A, S, or D prompt three times in sequence. You can also tap the matching on-screen key. One miss lets the attack connect." : (owner?.name || "The defender") + " has a three-step chance to parry " + (attacker?.name || "the attack") + ".")
+      : (isOwner ? "Complete three W, A, S, or D prompts. You have generous timing windows and may miss one input without losing the sequence. Tap the on-screen key on mobile." : (attacker?.name || "A player") + " is attempting an ultimate against " + (target?.name || "their target") + ".");
     $("mp-qte-prompt").textContent = qteArrow(challenge.prompt);
     $("mp-qte-step").textContent = (challenge.type === "parry" ? "PARRY " : "ULTIMATE ") + (challenge.step + 1) + " / " + challenge.totalSteps + " · " + (challenge.windowMs / 1000).toFixed(2) + "s" + (challenge.type === "ultimate" ? " · " + Math.max(0, 1 - (challenge.mistakes || 0)) + " MISSES LEFT" : "");
     const challengeStateId = challenge.id + ":" + challenge.step;
@@ -674,7 +674,7 @@
   document.querySelectorAll("[data-qte-input]").forEach(button => button.addEventListener("click", () => submitQte(button.dataset.qteInput)));
   document.addEventListener("keydown", event => {
     if (!latestRoom?.pendingChallenge || !current) return;
-    const keyMap = { ArrowUp:"UP", w:"UP", W:"UP", ArrowDown:"DOWN", s:"DOWN", S:"DOWN", ArrowLeft:"LEFT", a:"LEFT", A:"LEFT", ArrowRight:"RIGHT", d:"RIGHT", D:"RIGHT" };
+    const keyMap = { w:"UP", W:"UP", s:"DOWN", S:"DOWN", a:"LEFT", A:"LEFT", d:"RIGHT", D:"RIGHT" };
     const input = keyMap[event.key];
     if (!input) return;
     const challenge = latestRoom.pendingChallenge;
