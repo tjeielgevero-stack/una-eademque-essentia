@@ -482,11 +482,12 @@ function formatCharacterDossier(name,mode,answersSource){
  const raceRaw=lazyField("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||"Human";
  const race=raceRaw==="Human"?"Human — A human individual whose identity and capabilities are shaped by personal history, training, choices, and any recorded E.G.O. manifestation.":raceRaw;
  const occupation=first("occupation","complex_occupation");
- const affiliation=lazyField("Affiliation")||labelled("Affiliation")||first("generated_affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet;
- const grade=lazyField("Grade")||labelled("Grade")||first("generated_grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","head_role","complex_head_role")||first("grade","classification")||notSet;
+ const affiliation=lazyField("Affiliation")||labelled("Affiliation")||(mode==="complex"?"Not specified — this Complex profile does not assign a formal Association, organization, or Office.":first("generated_affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet);
+ const grade=lazyField("Grade")||labelled("Grade")||(mode==="complex"?"Not specified — this Complex profile does not assign a formal Fixer Grade or organizational rank.":first("generated_grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","head_role","complex_head_role")||first("grade","classification")||notSet);
  const appearance=lazyField("Appearance")||labelled("Appearance")||first("advanced_appearance","appearance","complex_09","generated_appearance","augmentation")||notSet;
- const origin=lazyField("Origin")||labelled("Origin")||first("generated_origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
+ const origin=lazyField("Origin")||labelled("Origin")||(mode==="complex"?(first("complex_14")||"Not specified — the Complex profile does not record a specific place of origin."):first("generated_origin")||combine("origin_type","district","upbringing","backstreet_environment")||notSet);
  const egoStatus=first("ego_status","complex_41");
+ const statusText=profileAnswerText(first("status_infliction","complex_status_infliction"));
  const egoName=first("ego_name","complex_43","generated_ego_name");
  const egoLoadout=get("ego_equipment_customizer");
  const egoAppearance=first("ego_appearance","advanced_ego_appearance","complex_44");
@@ -502,7 +503,7 @@ function formatCharacterDossier(name,mode,answersSource){
  else if(egoStatus)fallbackEgoType=egoStatus;
  const egoType=lazyField("E.G.O Type")||labelled("E.G.O Type")||first("generated_ego_type")||fallbackEgoType;
  const egoDescription=lazyField("E.G.O")||labelled("E.G.O")||first("generated_ego_description")||(egoStatus.includes("No known")?"No personal E.G.O. or Distortion is recorded.": [egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | "))||notSet;
- const ability=n=>lazyField("Ability "+n)||labelled("Ability "+n)||(mode==="complex"?(get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(first("generated_ability_"+n)||notSet));
+ const ability=n=>{const value=lazyField("Ability "+n)||labelled("Ability "+n)||(mode==="complex"?(get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(first("generated_ability_"+n)||notSet));return mode==="complex"&&n===3&&statusText&&value!==notSet?value+" The status effects recorded for this character include "+statusText+".":value;};
  const ultimate=n=>lazyField("Ultimate Ability "+n)||labelled("Ultimate Ability "+n)||(mode==="complex"?(get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(first("generated_ultimate_"+n)||notSet));
  const passive=lazyField("Passive Ability")||labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
  const passiveActivation=first("passive_activation","complex_passive_activation");
