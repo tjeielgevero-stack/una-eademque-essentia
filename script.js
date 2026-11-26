@@ -349,9 +349,18 @@ function profileFieldsFromAnswers(a){
  const detailText=first("dossier_details","profile_details","advanced_abilities","complex_abilities");
  const labelled=(label,source=detailText)=>{
   if(!source)return "";
-  const escaped=label;
-  const match=source.match(new RegExp("(?:^|\\n)\\s*"+escaped+"\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:Title|Race|Appearance|Ability \\d+|Ultimate Ability \\d+|Passive Ability|Personality|Backstory|Likes|Dislikes|Origin|Affiliation|Grade|Overall)\\s*:|$)","i"));
-  return match?.[1]?.trim()||"";
+  const labels=["Name","Title","Race","Affiliation","Grade","Appearance","Origin","E.G.O Type","E.G.O","Ability 1","Ability 2","Ability 3","Ability 4","Ultimate Ability 1","Ultimate Ability 2","Passive Ability 2","Passive Ability","Personality","Backstory","Likes","Dislikes","Overall"];
+  const lines=String(source).split(/\r?\n/);
+  const index=lines.findIndex(line=>line.trim().toLowerCase().startsWith(label.toLowerCase()+":"));
+  if(index<0)return "";
+  const firstLine=lines[index].trim().slice(label.length+1).trim();
+  const body=[firstLine];
+  for(let i=index+1;i<lines.length;i++){
+   const current=lines[i].trim();
+   if(labels.some(name=>current.toLowerCase().startsWith(name.toLowerCase()+":")))break;
+   body.push(lines[i]);
+  }
+  return body.join("\n").trim();
  };
  return {get,first,combine,detailText,labelled};
 }
@@ -391,7 +400,8 @@ function completeGeneratedCharacter(name,source){
  const egoName=v.ego_name||generatedPick(["Axiom of Ash","The Last Refrain","Crown of Unspoken Names","A Theatre Without Applause","The Shape of What Remains"]);
  if(!egoAbsent)putGenerated(a,"generated_ego_name",egoName);
  const motifs=String(egoTheme).split(/\s+/).slice(0,3).join(" ");
-const abilityNames=["Measured Reprisal","Shifting Measure","Witness Mark","Final Cadence"];
+putGenerated(a,"generated_passive_2",generatedPick(["Quiet Continuance — Maintains composure through difficult circumstances, allowing the character to remain deliberate under pressure.","Residual Instinct — Retains awareness of shifting circumstances and adjusts their approach when the situation changes.","Measured Resolve — Remains focused when plans falter, preserving clarity and coordination."]));
+ const abilityNames=["Measured Reprisal","Shifting Measure","Witness Mark","Final Cadence"];
  abilityNames.forEach((abilityName,index)=>{
   a["generated_ability_"+(index+1)]={choice:"Generated character detail",value:abilityName,custom:""};
  });
