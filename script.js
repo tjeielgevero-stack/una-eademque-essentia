@@ -72,7 +72,8 @@ const QUESTIONS = [
 {id:"family_status",category:"HISTORY & SOCIAL POSITION",title:"Family Standing",description:"How was this variant's family regarded? This is social standing, not automatically their personal rank.",options:["Prominent and influential family","Established Fixer family","Known Workshop family","Family connected to a Wing","Family connected to a Syndicate","Ordinary working family","Impoverished household","Disgraced or notorious family","No known family / raised independently","Other / custom answer"]},
 {id:"augmentation",category:"HISTORY & SOCIAL POSITION",title:"Augmentations",description:"What is this variant's relationship with the City's commonplace body-modification technology? Keep this at a narrative level.",options:["No known technological augmentations","Minor quality-of-life modifications","Medical or prosthetic replacements","Specialized professional augmentations","Extensive bodily augmentation","Experimental or unusual modifications","Unknown / undisclosed","Other / custom answer"]},
 {id:"education",category:"HISTORY & SOCIAL POSITION",title:"Training & Education",description:"Where did this variant acquire their knowledge and professional training?",options:["Family instruction","Fixer Office apprenticeship","Association training","Syndicate training","Wing education or corporate training","Workshop apprenticeship","Self-taught","Formal private education","Several sources","Other / custom answer"]},
-{id:"occupation",category:"PROFESSION & AFFILIATION",title:"Primary Occupation",description:"What does this variant principally do for a living? Choose the main affiliation first; an explicit dual-role option is available for Syndicate members who also work as Fixers.",options:["Fixer","Fixer Office employee","Syndicate member","Wing employee (Feather)","Workshop artisan or craftsperson","Association employee","Independent contractor","Researcher / specialist","Other / custom answer"]},
+{id:"occupation",category:"PROFESSION & AFFILIATION",title:"Primary Occupation",description:"What does this variant principally do for a living? Choose the main affiliation first; an explicit dual-role option is available for Syndicate members who also work as Fixers.",options:["Fixer","Fixer Office employee","Syndicate member","Wing employee (Feather)","Workshop artisan or craftsperson","Association employee","The Head’s direct subordinate","Independent contractor","Researcher / specialist","Other / custom answer"]},
+{id:"head_role",category:"PROFESSION & AFFILIATION",title:"Position within the Head’s organization",description:"Choose the character’s recognized role. These are distinct positions within the Head’s hierarchy, not ordinary occupations.",showIf:a=>a.occupation==="The Head’s direct subordinate",options:["Pawn","Arbiter","Claw","Beholder"]},
 {id:"syndicate_fixer_status",category:"PROFESSION & AFFILIATION",title:"Additional Fixer Standing",description:"Syndicate membership does not automatically make someone a Fixer. Choose whether this character is only a Syndicate member, also works as a Fixer (an intentional OC dual role), or previously worked as one. This controls whether Fixer record questions appear.",showIf:a=>a.occupation==="Syndicate member",options:["Syndicate member only","Also works as a Fixer (dual role)","Former Fixer (previous career)"]},
 {id:"syndicate_type",category:"PROFESSION & AFFILIATION",title:"Syndicate Category",description:"Choose the kind of Syndicate. The Five Fingers are the five major Syndicates; subsidiaries and independent groups are listed separately.",showIf:a=>a.occupation==="Syndicate member",options:["One of the Five Fingers","A Finger subsidiary / affiliate","An independent Syndicate","A custom / lesser-known Syndicate","Unknown / undisclosed"]},
 {id:"syndicate",category:"PROFESSION & AFFILIATION",title:"Syndicate / Finger Affiliation",description:a=>a.syndicate_type==="One of the Five Fingers"?"Choose one of the Five Fingers. The next question will show that Finger's known hierarchy.":a.syndicate_type==="A Finger subsidiary / affiliate"?"Choose a known group affiliated with a Finger. The listed affiliations are examples, not an exhaustive roster.":a.syndicate_type==="An independent Syndicate"?"Choose a known independent Syndicate. This list is not exhaustive; custom entries are available.":"Choose or enter the Syndicate this character belongs to.",showIf:a=>!!a.syndicate_type,options:a=>syndicateOptions(a)},
@@ -354,6 +355,7 @@ function factionOutfit(a){
  if(synd.includes("index"))return "Index attire: layered, practical robes and uniform-like garments with a deliberately austere silhouette, suitable for carrying out the Prescripts; individual wear and accessories distinguish the member.";
  if(synd.includes("ring"))return "Ring attire: expressive, artistically composed clothing with deliberate layering, unusual textures, and a crafted silhouette; the design reflects the Ring's artistic identity while remaining individual.";
  if(synd.includes("pinky"))return "Pinky attire: understated, carefully tailored clothing with discreet personal and rank details; the design remains deliberately restrained and avoids inventing undisclosed official insignia.";
+ if(a.occupation==="The Head’s direct subordinate")return "A severe, immaculate uniform reflecting service to the Head, with restrained institutional insignia and a silhouette appropriate to the character’s selected office: "+(a.head_role||"an undisclosed role")+".";
  if(a.association)return "Association uniform based on "+a.association+": a professional, role-appropriate uniform with the Association's established practical identity, recognizable insignia, and individualized tailoring.";
  if(a.occupation==="Wing employee (Feather)")return "Wing employee attire: corporate or facility uniform appropriate to the character's role, with restrained company identifiers, practical layers, and personal modifications.";
  if(a.occupation==="Workshop artisan or craftsperson")return "Workshop attire: durable workwear adapted to the craft, with reinforced sleeves, practical fastenings, tool loops, and personalized workshop details.";
@@ -364,8 +366,8 @@ function completeGeneratedCharacter(name,source){
  const egoTheme=v.ego_theme||v.distortion_theme||"identity and selfhood";
  const combat=v.combat_approach||"adaptive and opportunistic";
  const origin=[v.origin_type,v.district,v.upbringing,v.backstreet_environment].filter(Boolean).join(", ")||"the City";
- const affiliation=[v.association,v.syndicate,v.office,v.workshop,v.wing_role,v.occupation].filter(Boolean).join(" / ")||"Independent";
- const rank=v.finger_rank||v.syndicate_hierarchy||v.association_position||v.fixer_grade||"Unclassified";
+ const affiliation=[v.association,v.syndicate,v.office,v.workshop,v.wing_role,v.head_role,v.occupation].filter(Boolean).join(" / ")||"Independent";
+ const rank=v.head_role||v.finger_rank||v.syndicate_hierarchy||v.association_position||v.fixer_grade||"Unclassified";
  const sephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
  const canonicalAppearance="Tall, approximately 190.5 cm, with a lean peak-human physique and pale complexion. Messy, layered black hair frames sharp, delicate features; flawless skin, slightly pointed canines, and half-lidded eyes complete his distinctive appearance. He wears a white collared shirt beneath an unbuttoned black trench coat, slim black trousers, and maintains an apathetic expression. No alternate appearance or augmentations are introduced.";
  const canonicalPersonality="Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He values originality and the act of creating things. His fundamental mindset, identity, and personality remain consistent across every variant.";
@@ -550,6 +552,19 @@ QUESTIONS.forEach(question=>{
  }
 });
 
+// Remove choices whose information is already captured by a dedicated affiliation or role question.
+const REDUNDANT_CREATOR_OPTIONS={
+ nest_status:new Set(["Wing employee (Feather)","Wing executive or privileged employee"]),
+ occupation:new Set(["Association trainee","Syndicate executive or senior member","Wing researcher","Wing security specialist","Wing field researcher","Wing executive assistant","Licensed Fixer working independently","Fixer Office owner","Fixer Office manager","Office administrator or clerk"]),
+ workshop:new Set(["Independent craftsperson","Workshop engineer","Workshop designer","Workshop repair specialist"])
+};
+QUESTIONS.forEach(question=>{
+ const remove=REDUNDANT_CREATOR_OPTIONS[question.id];
+ if(!remove)return;
+ const original=question.options;
+ question.options=typeof original==="function"?answers=>original(answers).filter(option=>!remove.has(option)):original.filter(option=>!remove.has(option));
+});
+
 const DOSSIER_QUESTIONS = [
  {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPassive Ability 2: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
 ];
@@ -558,7 +573,7 @@ function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v
 function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
  origin_type:["district","nest_status","backstreet_environment"],
- occupation:["syndicate_fixer_status","syndicate_type","syndicate","finger_rank","syndicate_hierarchy","fixer_grade","color_title","association","association_branch","association_section","association_position","office","wing_role","workshop"],
+ occupation:["head_role","syndicate_fixer_status","syndicate_type","syndicate","finger_rank","syndicate_hierarchy","fixer_grade","color_title","association","association_branch","association_section","association_position","office","wing_role","workshop"],
  fixer_grade:["color_title"],
  association:["association_branch","association_section","association_position"],
  association_branch:["association_section","association_position"],
@@ -576,6 +591,7 @@ const GENERATED_DOWNSTREAM={
  origin_type:["generated_backstory","generated_overall"],district:["generated_backstory","generated_overall"],
  upbringing:["generated_backstory","generated_overall"],backstreet_environment:["generated_backstory","generated_overall"],
  occupation:["generated_appearance","generated_backstory","generated_overall"],
+ head_role:["generated_appearance","generated_backstory","generated_overall"],
  syndicate_type:["generated_appearance","generated_backstory","generated_overall"],
  syndicate:["generated_appearance","generated_backstory","generated_overall"],
  finger_rank:["generated_appearance","generated_backstory","generated_overall"],
