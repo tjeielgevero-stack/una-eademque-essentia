@@ -407,7 +407,8 @@ function formatCharacterDossier(name,mode,answersSource){
  const occupation=first("occupation","complex_occupation");
  const affiliation=labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role")||occupation||notSet;
  const grade=labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position")||first("grade","classification")||notSet;
- const appearance=labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","generated_appearance","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
+  const isSephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
+  const appearance=isSephrus?first("generated_appearance"):labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","generated_appearance","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
  const origin=labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
  const egoStatus=first("ego_status","complex_41");
  const egoName=first("ego_name","complex_43","generated_ego_name");
@@ -430,9 +431,9 @@ function formatCharacterDossier(name,mode,answersSource){
  const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet;
  const passive=labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
  const personality=labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?first("generated_personality"):combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||notSet;
- const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59")||notSet;
- const likes=labelled("Likes")||combine("likes","complex_32","complex_33")||notSet;
- const dislikes=labelled("Dislikes")||combine("dislikes","complex_37","complex_29")||notSet;
+ const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59","generated_backstory")||notSet;
+ const likes=labelled("Likes")||combine("likes","complex_32","complex_33","generated_likes")||notSet;
+ const dislikes=labelled("Dislikes")||combine("dislikes","complex_37","complex_29","generated_dislikes")||notSet;
  const overall=labelled("Overall")||first("advanced_concept","complex_60","notes","generated_overall")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
  return [
   "Name: "+(name||"Unnamed Variant"),
@@ -451,18 +452,19 @@ function formatCharacterDossier(name,mode,answersSource){
   "Ultimate Ability 1: "+ultimate(1),
   "Ultimate Ability 2: "+ultimate(2),
   "Passive Ability: "+passive,
+   ...(first("generated_passive_2")?["Passive Ability 2: "+first("generated_passive_2")]:[]),
   "Personality: "+personality,
   "Backstory: "+backstory,
   "Likes: "+likes,
   "Dislikes: "+dislikes,
   "Overall: "+overall
- ].join("\\n\\n");
+ ].join("\n\n");
 }
 function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
 const DOSSIER_QUESTIONS = [
- {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
+ {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPassive Ability 2: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
 ];
 function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;return [...base,...DOSSIER_QUESTIONS];}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
