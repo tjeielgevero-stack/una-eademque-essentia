@@ -75,6 +75,23 @@
     .mp-interaction-note{color:#b8a58b;font:9px 'DM Mono',monospace;letter-spacing:.12em;margin:8px 0}
     .mp-match-feed{max-height:380px}
     .mp-attack-note{display:block;margin-top:6px;color:#968a78;font:8px 'DM Mono',monospace;letter-spacing:.06em}
+    .mp-combat-loadout{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
+    .mp-combat-loadout label{display:flex;flex-direction:column;gap:6px;color:#bdb09e;font:9px 'DM Mono',monospace;letter-spacing:.1em}
+    .mp-combat-loadout select{min-height:40px;padding:9px;background:#111;color:#eee;border:1px solid #5a5148;font:13px Georgia,serif}
+    .mp-resistance-note{color:#b7a78e;font:9px/1.5 'DM Mono',monospace;margin:7px 0}
+    .mp-status-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+    .mp-status-tag{padding:4px 6px;border:1px solid #66513c;background:#211b15;color:#e0c9a8;font:8px 'DM Mono',monospace}
+    .mp-book-button{margin-top:10px}
+    .mp-status-book{width:min(900px,calc(100% - 28px));max-height:min(82vh,850px);padding:0;border:1px solid #78664f;background:#111;color:#e7ddcf;box-shadow:0 24px 100px #000c}
+    .mp-status-book::backdrop{background:#050505dd;backdrop-filter:blur(5px)}
+    .mp-status-book-inner{padding:clamp(16px,3vw,28px)}
+    .mp-status-book h2{font:clamp(27px,4vw,38px) Georgia,serif;letter-spacing:.06em;margin:6px 0 10px}
+    .mp-status-book-search{width:100%;padding:12px;background:#090909;border:1px solid #625340;color:#eee;margin:12px 0}
+    .mp-status-book-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:9px;max-height:52vh;overflow:auto;padding-right:5px}
+    .mp-status-book-entry{padding:11px;border:1px solid #40382f;background:#181614}
+    .mp-status-book-entry strong{display:block;color:#e8d5b7;font:12px 'DM Mono',monospace;letter-spacing:.08em}
+    .mp-status-book-entry small{display:block;color:#b7aa98;font:11px/1.5 Georgia,serif;margin-top:5px}
+    .mp-status-book-entry em{display:block;color:#8f806d;font:8px 'DM Mono',monospace;font-style:normal;margin-top:6px}
     @media(max-width:600px){.mp-actions button{width:100%}.mp-room-code{font-size:23px}}
   `;
   document.head.append(css);
@@ -172,6 +189,16 @@
       egoName: ego.name || answer(record, ["ego_name", "complex_43"]),
       egoType: answer(record, ["ego_status", "complex_41"]),
       egoEligible: !!ego.eligible,
+      resistances: (() => {
+        const text = answer(record, ["damage_resistances"]);
+        const read = type => {
+          const match = text.match(new RegExp(type + "\\s*[×x]\\s*(0\\.5|1\\.0|1\\.5|2\\.0|2\\.5|1|2)", "i"));
+          return match ? Number(match[1]) : null;
+        };
+        const values = { slash: read("Slash"), pierce: read("Pierce"), blunt: read("Blunt") };
+        return values.slash !== null && values.pierce !== null && values.blunt !== null && Math.abs(values.slash + values.pierce + values.blunt - 3.5) < 0.001
+          ? values : { slash: 1, pierce: 1, blunt: 1.5 };
+      })(),
       personality: personality.map(String).slice(0, 8),
       abilities: abilityFields.length ? abilityFields.slice(0,4) : splitAbilities(abilityText),
       ultimateAbilities: ultimateAbilities.slice(0,2),
@@ -264,6 +291,18 @@
               <select id="mp-target"></select>
             </label>
           </div>
+          <div class="mp-combat-loadout">
+            <label>ATTACK TYPE
+              <select id="mp-damage-type"><option value="slash">Slash</option><option value="pierce">Pierce</option><option value="blunt">Blunt</option></select>
+            </label>
+            <label>STATUS EFFECT
+              <select id="mp-status-effect"><option value="">None</option><option>Burn</option><option>Bleed</option><option>Rupture</option><option>Sinking</option><option>Tremor</option><option>Fragile</option><option>Bind</option><option>Paralyze</option><option>Poise</option><option>Charge</option><option>Haste</option><option>Protection</option><option>Strength</option><option>Feeble</option><option>Smoke</option><option>Fairy</option><option>Erosion</option></select>
+            </label>
+            <label>STATUS INTENSITY
+              <select id="mp-status-tier"><option value="5">Low · 5</option><option value="15">Medium · 15</option><option value="20">Large · 20</option><option value="30">Massive · 30</option></select>
+            </label>
+          </div>
+          <p class="mp-status-note">Choose a damage category and, optionally, one status effect to apply when the attack connects. Effects last two turns.</p>
           <div class="mp-action-grid">
             <button id="mp-attack" class="secondary-button" type="button">ATTACK</button>
             <button id="mp-defend" class="secondary-button" type="button">DEFEND</button>
@@ -421,10 +460,10 @@
     $("mp-qte-kicker").textContent = challenge.type === "parry" ? "MIRROR ARENA / DEFENSIVE REACTION" : "MIRROR ARENA / ULTIMATE ACTIVATION";
     $("mp-qte-title").textContent = challenge.type === "parry" ? (isOwner ? "PARRY NOW" : "PARRY WINDOW") : (isOwner ? "COMPLETE THE ULTIMATE" : "ULTIMATE SEQUENCE");
     $("mp-qte-copy").textContent = challenge.type === "parry"
-      ? (isOwner ? "Match the direction before the narrow timing window closes. Keyboard arrows or the on-screen buttons both work." : (owner?.name || "The defender") + " has a brief chance to parry " + (attacker?.name || "the attack") + ".")
-      : (isOwner ? "Complete all four directions in sequence. The final prompt is deliberately unforgiving." : (attacker?.name || "A player") + " is attempting an ultimate against " + (target?.name || "their target") + ".");
+      ? (isOwner ? "Match all three directions in sequence. Each successful input advances the chain; one miss lets the attack connect." : (owner?.name || "The defender") + " has a three-step chance to parry " + (attacker?.name || "the attack") + ".")
+      : (isOwner ? "Complete three directions. You have generous timing windows and may miss one input without losing the sequence." : (attacker?.name || "A player") + " is attempting an ultimate against " + (target?.name || "their target") + ".");
     $("mp-qte-prompt").textContent = qteArrow(challenge.prompt);
-    $("mp-qte-step").textContent = challenge.type === "parry" ? "ONE RESPONSE · " + (challenge.windowMs / 1000).toFixed(2) + "s" : "ACTIVATION " + (challenge.step + 1) + " / " + challenge.totalSteps + " · " + (challenge.windowMs / 1000).toFixed(2) + "s";
+    $("mp-qte-step").textContent = (challenge.type === "parry" ? "PARRY " : "ULTIMATE ") + (challenge.step + 1) + " / " + challenge.totalSteps + " · " + (challenge.windowMs / 1000).toFixed(2) + "s" + (challenge.type === "ultimate" ? " · " + Math.max(0, 1 - (challenge.mistakes || 0)) + " MISSES LEFT" : "");
     const challengeStateId = challenge.id + ":" + challenge.step;
     if (activeChallengeId !== challengeStateId) {
       activeChallengeId = challengeStateId;
@@ -491,12 +530,22 @@
       fill.style.width = Math.max(0, hit ? old.hp : player.hp) + "%";
       hp.append(fill);
       const hpText = make("div", { className: "sim-hp-text" }, "HEALTH " + player.hp + " / 100");
+      const resistanceName = value => value === 0.5 ? "ENDURE" : value === 1 ? "NORMAL" : value === 1.5 ? "EFFECTIVE" : value === 2.5 ? "FATAL" : "VULNERABLE";
+      const resist = player.resistances || player.character?.resistances || { slash: 1, pierce: 1, blunt: 1.5 };
+      const resistanceNote = make("p", { className: "mp-resistance-note" }, ["SLASH", "PIERCE", "BLUNT"].map(type => {
+        const value = Number(resist[type.toLowerCase()] ?? 1);
+        return type + " " + resistanceName(value) + " ×" + value.toFixed(1);
+      }).join("  ·  "));
       const status = make("p", { className: "sim-fighter-status" }, (player.guarding ? "GUARDING · " : "") + (player.egoUsed ? "E.G.O. USED · " : "") + (player.ultimateCharge || 0) + "/3 ULTIMATE CHARGE" + (player.ultimateUsed ? " · ULTIMATE SPENT" : ""));
+      const statusTags = make("div", { className: "mp-status-tags" });
+      (player.statusEffects || []).forEach(effect => statusTags.append(make("span", { className: "mp-status-tag" }, effect.name + " " + effect.potency + " · " + effect.turns + "T")));
       const ultimateMeter = make("div", { className: "mp-ultimate-meter" });
       const ultimateFill = make("span");
       ultimateFill.style.width = Math.min(3, player.ultimateCharge || 0) / 3 * 100 + "%";
       ultimateMeter.append(ultimateFill);
-      card.append(top, name, traits, affiliation, hp, hpText, status, ultimateMeter);
+      card.append(top, name, traits, affiliation, hp, hpText, status, resistanceNote);
+      if (statusTags.childNodes.length) card.append(statusTags);
+      card.append(ultimateMeter);
       if (player.character?.egoEligible) {
         card.append(make("p", { className: "sim-ego-label" }, player.egoActive ? "✦ " + (player.character.egoName || "E.G.O.") + " · MANIFESTED" : "E.G.O. AVAILABLE"));
       }
@@ -575,7 +624,12 @@
   }
   async function sendAction(type) {
     if (!current) return;
-    const body = Object.assign({}, credentials(), { type, targetId: $("mp-target").value });
+    const body = Object.assign({}, credentials(), {
+      type, targetId: $("mp-target").value,
+      damageType: $("mp-damage-type").value,
+      statusEffect: $("mp-status-effect").value,
+      statusPotency: Number($("mp-status-tier").value)
+    });
     const data = await api("/api/rooms/" + current.code + "/action", { method: "POST", body: JSON.stringify(body) });
     renderRoom(data.room);
   }
@@ -653,6 +707,35 @@
   $("mp-leave").addEventListener("click", leaveRoom);
   $("mp-resume").addEventListener("click", () => resume().catch(err => setStatus(err.message)));
 
+  const STATUS_BOOK_ENTRIES = [["Burn","At turn end, the unit takes damage based on its potency; remaining count decreases.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Bleed","When the unit performs an offensive action, it suffers damage based on potency; count is consumed.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Paralysis","Weakens selected dice or skill power for a limited number of actions.","LIBRARY OF RUINA"],["Fairy","Deals recurring damage when the affected unit rolls or acts; it gradually fades.","LIBRARY OF RUINA"],["Strength","Increases the power of offensive actions.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Endurance","Improves defensive dice or defensive action power.","LIBRARY OF RUINA"],["Feeble","Reduces offensive power for a limited duration.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Disarm","Reduces defensive power for a limited duration.","LIBRARY OF RUINA"],["Haste","Raises speed for the current turn or scene.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Bind","Lowers speed for the current turn or scene.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Protection","Reduces damage received.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Stagger Protection","Reduces stagger damage received.","LIBRARY OF RUINA"],["Fragile","Increases damage received for a limited duration.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Stagger Resistance Down","Makes stagger damage more effective against the affected unit.","LIBRARY OF RUINA"],["Charge","A resource used by specific skills and passives; its count is spent by related effects.","LIBRARY OF RUINA · LIMBUS COMPANY"],["Smoke","Increases damage taken per stack; high stacks can also improve dice power in Ruina.","LIBRARY OF RUINA"],["Persistence","A special survival effect that can allow a unit to endure otherwise fatal damage.","LIBRARY OF RUINA"],["Erosion","Deals recurring damage and can add extra damage when the unit is hit.","LIBRARY OF RUINA"],["Blood","A special resource with effects that depend on its current amount.","LIBRARY OF RUINA"],["Nullify Power","Prevents power-related effects from changing dice for the scene.","LIBRARY OF RUINA"],["Immobilized","Prevents the unit from acting for the scene.","LIBRARY OF RUINA"],["Enhance","Raises the maximum range of selected dice.","LIBRARY OF RUINA"],["Weaken","Lowers the maximum range of selected dice.","LIBRARY OF RUINA"],["Singleton","A deck condition used by certain combat pages and passives.","LIBRARY OF RUINA"],["Rupture","The next hit or a limited number of hits deal additional fixed damage based on potency.","LIMBUS COMPANY"],["Sinking","When hit, the unit loses SP; units without SP instead receive Gloom damage.","LIMBUS COMPANY"],["Tremor","A buildup effect that can raise stagger thresholds when paired with Tremor Burst skills.","LIMBUS COMPANY"],["Poise","Builds critical-hit chance and can be consumed by critical hits.","LIMBUS COMPANY"],["Paralyze","Fixes the power of a number of skill coins at zero for a turn.","LIMBUS COMPANY"],["Offense Level Up","Raises the unit's offense level for a turn.","LIMBUS COMPANY"],["Offense Level Down","Lowers the unit's offense level for a turn.","LIMBUS COMPANY"],["Defense Level Up","Raises the unit's defense level for a turn.","LIMBUS COMPANY"],["Defense Level Down","Lowers the unit's defense level for a turn.","LIMBUS COMPANY"],["Damage Up","Increases damage dealt for a limited duration.","LIMBUS COMPANY"],["Damage Down","Reduces damage dealt for a limited duration.","LIMBUS COMPANY"],["Coin Power Up","Raises skill coin power for a limited duration.","LIMBUS COMPANY"],["Coin Power Down","Lowers skill coin power for a limited duration.","LIMBUS COMPANY"],["Attack Power Up","Improves attack skill power.","LIMBUS COMPANY"],["Attack Power Down","Reduces attack skill power.","LIMBUS COMPANY"],["Defense Power Up","Improves defensive skill power.","LIMBUS COMPANY"],["Defense Power Down","Reduces defensive skill power.","LIMBUS COMPANY"],["Ammo","A limited resource spent by certain skills; some skills require available ammo.","LIMBUS COMPANY"],["Aggro","A targeting marker that influences which unit is selected by certain enemy actions.","LIMBUS COMPANY"],["Discard","A special effect that removes selected skills or cards from the current hand.","LIMBUS COMPANY"],["Fanatic","A special combat state that interacts with particular skills and passives.","LIMBUS COMPANY"],["Nails","A special buildup effect associated with particular identities and skills.","LIMBUS COMPANY"],["Talisman","A special stack-based effect with interactions tied to specific skills and passives.","LIMBUS COMPANY"],["Tremor Burst","Interacts with Tremor to raise stagger thresholds; behavior depends on Tremor type.","LIMBUS COMPANY"],["Tremor - Scorch","A Tremor variant that adds a Burn interaction when Tremor Burst triggers.","LIMBUS COMPANY"],["Dark Flame","A special status used by particular E.G.O. and encounter mechanics.","LIMBUS COMPANY"],["Butterfly","A unique Sinking-related effect with special interactions.","LIMBUS COMPANY"],["Echoes of the Manor","A special effect associated with specific identities and E.G.O.","LIMBUS COMPANY"],["Bloodfeast","A shared resource used by certain Bloodfiend-related mechanics.","LIMBUS COMPANY"],["Charge Barrier","A defensive resource that converts its stacks into shield under specific rules.","LIMBUS COMPANY"],["Plus Coin Boost / Drop","Changes the power of positive or negative skill coins.","LIMBUS COMPANY"],["Slash / Pierce / Blunt Fragility","Specialized fragility effects that increase damage from a matching damage category.","LIMBUS COMPANY"]];
+  const statusBookButton = make("button", { id: "open-status-book", className: "secondary-button mp-book-button", type: "button" }, "STATUS EFFECT BOOK  ↗");
+  if (heroActions) heroActions.append(statusBookButton);
+  const statusBook = make("dialog", { id: "mp-status-book", className: "mp-status-book" });
+  const bookInner = make("div", { className: "mp-status-book-inner" });
+  bookInner.append(make("p", { className: "mp-kicker" }, "ARCHIVE REFERENCE / COMBAT EFFECTS"));
+  bookInner.append(make("h2", {}, "STATUS EFFECT BOOK"));
+  bookInner.append(make("p", { className: "mp-muted" }, "A combined reference to core and named special effects from Library of Ruina and Limbus Company. Exact behavior can vary by identity, E.G.O., passive, or encounter."));
+  const bookSearch = make("input", { className: "mp-status-book-search", type: "search", placeholder: "Search status effects…", "aria-label": "Search status effects" });
+  const bookList = make("div", { className: "mp-status-book-list" });
+  const drawBook = () => {
+    const query = bookSearch.value.trim().toLowerCase();
+    bookList.innerHTML = "";
+    const matches = STATUS_BOOK_ENTRIES.filter(entry => entry[0].toLowerCase().includes(query) || entry[1].toLowerCase().includes(query) || entry[2].toLowerCase().includes(query));
+    matches.forEach(entry => {
+      const card = make("article", { className: "mp-status-book-entry" });
+      card.append(make("strong", {}, entry[0]), make("small", {}, entry[1]), make("em", {}, entry[2]));
+      bookList.append(card);
+    });
+    if (!matches.length) bookList.append(make("p", { className: "mp-muted" }, "No matching entries."));
+  };
+  drawBook();
+  bookSearch.addEventListener("input", drawBook);
+  const bookFooter = make("div", { className: "mp-actions" });
+  bookFooter.append(make("button", { className: "secondary-button", type: "button", onClick: () => statusBook.close() }, "CLOSE BOOK"));
+  bookInner.append(bookSearch, bookList, bookFooter);
+  statusBook.append(bookInner);
+  document.body.append(statusBook);
+  statusBookButton.addEventListener("click", () => statusBook.showModal());
   loadSession();
   if (current) $("mp-resume-wrap").classList.remove("mp-hidden");
   fillCharacters();
