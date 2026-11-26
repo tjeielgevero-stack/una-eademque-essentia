@@ -1,6 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 
-const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" };
+const JSON_HEADERS = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "access-control-allow-origin": "*", "access-control-allow-methods": "GET, POST, OPTIONS", "access-control-allow-headers": "Content-Type, X-Player-Id, X-Player-Token" };
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 function json(data, status = 200) {
@@ -63,7 +63,7 @@ export default {
         const index = env.ROOMS.get(env.ROOMS.idFromName("__PUBLIC_INDEX__"));
         await index.fetch("https://index.internal/add", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ code, mode, players: 1, maxPlayers, createdAt: Date.now() })
+          body: JSON.stringify({ code, mode, players: 1, maxPlayers, status: "lobby", createdAt: Date.now() })
         });
       }
       return json(payload, 201);
@@ -95,7 +95,7 @@ export default {
     if (action === "start" && request.method === "POST") return stub.fetch(await forwardRequest(request, "https://room.internal/start"));
     if (action === "action" && request.method === "POST") return stub.fetch(await forwardRequest(request, "https://room.internal/action"));
     if (action === "leave" && request.method === "POST") return stub.fetch(await forwardRequest(request, "https://room.internal/leave"));
-    if (!action && request.method === "GET") return stub.fetch(new Request("https://room.internal/state" + url.search, request));
+    if (!action && request.method === "GET") return stub.fetch(new Request("https://room.internal/state" + url.search, { method: "GET", headers: request.headers }));
     return json({ error: "Method not allowed." }, 405);
   }
 };
@@ -143,7 +143,7 @@ export class RoomHub extends DurableObject {
   async indexAdd(request) {
     const item = await request.json();
     const list = await this.ctx.storage.get("publicRooms") || [];
-    const next = [item, ...list.filter(room => room.code !== item.code)].slice(0, 40);
+    const next = [item, ...list.filter(room => room.code !== item.code && Date.now() - room.createdAt < 12 * 60 * 60 * 1000)].slice(0, 40);
     await this.ctx.storage.put("publicRooms", next);
     return json({ ok: true });
   }
@@ -181,7 +181,7 @@ export class RoomHub extends DurableObject {
       const index = this.env.ROOMS.get(this.env.ROOMS.idFromName("__PUBLIC_INDEX__"));
       await index.fetch("https://index.internal/add", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code: this.room.code, mode: this.room.mode, players: this.room.players.length, maxPlayers: this.room.maxPlayers, createdAt: this.room.createdAt })
+        body: JSON.stringify({ code: this.room.code, mode: this.room.mode, players: this.room.players.length, maxPlayers: this.room.maxPlayers, status: this.room.status, createdAt: this.room.createdAt })
       });
     }
   }
