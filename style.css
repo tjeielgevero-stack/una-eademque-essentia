@@ -1275,10 +1275,10 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
   box-shadow:0 0 0 5px rgba(var(--accent-rgb),.13),0 18px 42px rgba(0,0,0,.52),0 0 30px rgba(var(--accent-rgb),.4)!important;
 }
 @keyframes super-necessary-bobble {
-  0%,100% { transform:translateY(-4px) scale(1.42) rotate(-2deg); }
-  25% { transform:translateY(-13px) scale(1.58) rotate(2deg); }
-  50% { transform:translateY(2px) scale(1.34) rotate(-1deg); }
-  75% { transform:translateY(-8px) scale(1.52) rotate(2deg); }
+  0%,100% { transform:scale(1.16); }
+  25% { transform:scale(1.22); }
+  50% { transform:scale(1.12); }
+  75% { transform:scale(1.19); }
 }
 .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) main,
 .effect-screenquake.screenquake-hovering:not(.effects-pointer-paused) .site-header,
@@ -1390,7 +1390,6 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
 .effect-onepiecepacing.effect-buttonbounce .primary-button:hover,
 .effect-onepiecepacing.effect-buttonbounce .secondary-button:hover { animation-duration:3.5s!important; }
 .effect-onepiecepacing.effect-hoverwiggle .feature-card:hover,
-.effect-onepiecepacing.effect-hoverwiggle .choice:hover,
 .effect-onepiecepacing.effect-hoverwiggle .creation-mode-card:hover { animation-duration:3.2s!important; }
 .effect-onepiecepacing.effect-sparkle .settings-gear { animation-duration:18s!important; }
 .effect-onepiecepacing.effect-superbobble:not(.effects-pointer-paused) button:hover { animation-duration:4.8s!important; }
@@ -1604,10 +1603,4 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @media(prefers-reduced-motion:reduce){.sim-hit-overlay.sim-hit-ego{animation:none!important}}
 
 
-/* Keep the dramatic bobble inside the hovered button's hit area. */
-@keyframes super-necessary-bobble {
-  0%,100% { transform:scale(1.16); }
-  25% { transform:scale(1.22); }
-  50% { transform:scale(1.12); }
-  75% { transform:scale(1.19); }
-}
+
