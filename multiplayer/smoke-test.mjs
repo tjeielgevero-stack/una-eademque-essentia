@@ -129,9 +129,12 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     check(firstAttack.ok, "Host attack was rejected.");
     const firstParry = firstAttack.data.room.pendingChallenge;
     check(firstParry?.type === "parry" && firstParry.defenderId === guest.id, "Attack did not open a parry QTE.");
+    check(firstParry.prompt === null, "Attacking player was incorrectly shown the defender's parry direction.");
     check(firstAttack.data.room.players.find(player => player.id === guest.id).hp === 100, "HP changed before the parry QTE was resolved.");
+    const defenderView = await getState(code, guest);
+    check(defenderView.data.room.pendingChallenge?.prompt, "Defender did not receive the private parry prompt.");
 
-    const parry = await action(code, guest, "parry", undefined, { challengeId: firstParry.id, input: firstParry.prompt });
+    const parry = await action(code, guest, "parry", undefined, { challengeId: firstParry.id, input: defenderView.data.room.pendingChallenge.prompt });
     check(parry.ok && parry.data.parried === true, "Correct parry input was not accepted.");
     check(parry.data.room.players.find(player => player.id === guest.id).hp === 100, "Successful parry did not prevent the incoming damage.");
     check(parry.data.room.turnPlayerId === guest.id, "Parry resolution did not advance the turn.");
@@ -175,7 +178,10 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     const ultimate = await action(code, host, "ultimate", guest.id);
     check(ultimate.ok && ultimate.data.room.pendingChallenge?.type === "ultimate", "Charged player could not begin the ultimate QTE.");
     let challenge = ultimate.data.room.pendingChallenge;
-    check(challenge.totalSteps === 4, "Ultimate did not require four activation prompts.");
+    check(challenge.totalSteps === 4 && challenge.prompt, "Ultimate did not require four activation prompts or reveal the first prompt to its owner.");
+    const spectatorView = await getState(code, guest);
+    check(spectatorView.data.room.pendingChallenge?.prompt === null, "Ultimate direction was exposed to the opponent.");
+
     for (let step = 0; step < 4; step += 1) {
       const result = await action(code, host, "qte", undefined, { challengeId: challenge.id, input: challenge.prompt });
       check(result.ok, "Ultimate QTE step " + (step + 1) + " failed.");
