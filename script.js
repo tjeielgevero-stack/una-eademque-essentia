@@ -606,15 +606,21 @@ $("name-continue").onclick=()=>{
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>{ $("character-name").value=characterName;screen("name"); };
+function launchSelectedMode(){answers={};editingOcId=null;index=0;render();screen("picker");}
 function beginSelectedMode(mode){
- creationMode=mode;answers={};editingOcId=null;index=0;render();screen("picker");
+ creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":"simple";
+ answers={};editingOcId=null;index=0;
+ const dlg=$("randomize-confirm-dialog");
+ $("randomize-confirm-title").textContent="RANDOMIZE "+creationMode.toUpperCase()+" MODE?";
+ $("randomize-confirm-description").textContent="Would you like to randomize this "+creationMode.toUpperCase()+" creation mode? Choose randomize for a generated name and answers, or continue manually.";
+ if(dlg&&typeof dlg.showModal==="function")dlg.showModal();else launchSelectedMode();
 }
 $("mode-simple").onclick=()=>beginSelectedMode("simple");
 $("mode-advanced").onclick=()=>beginSelectedMode("advanced");
 $("mode-complex").onclick=()=>beginSelectedMode("complex");
-$("randomize-mode-button")?.addEventListener("click",()=>{const dlg=$("randomize-confirm-dialog");$("randomize-confirm-description").textContent="Randomize a complete "+creationMode.toUpperCase()+" profile? This creates a new character name, fills the selected mode, and creates a theme-matched Personal E.G.O. name where applicable.";dlg?.showModal();});
-$("randomize-cancel")?.addEventListener("click",()=>$("randomize-confirm-dialog")?.close());
+$("randomize-cancel")?.addEventListener("click",()=>{$("randomize-confirm-dialog")?.close();launchSelectedMode();});
 $("randomize-confirm")?.addEventListener("click",()=>{$("randomize-confirm-dialog")?.close();randomizeAll(creationMode);});
+$("randomize-confirm-dialog")?.addEventListener("cancel",()=>{launchSelectedMode();});
 renderOcHistory();
 $("home-button").onclick=()=>screen("home");
 $("back-button").onclick=()=>{if(index>0){index--;render();}else{screen("mode");}};
@@ -677,8 +683,10 @@ function simEgoProfile(record){
  if(status==="Has become a Distortion")type="DISTORTION SHIFT";
  else if(status==="Volatile E.G.O. (unstable manifestation)")type="VOLATILE E.G.O.";
  else if(status==="Personally manifested E.G.O. (Effloresced E.G.O.)")type="PERSONAL E.G.O.";
- const answer=a.ego_name;
- const name=(answer?.value&&typeof answer.value==="string")?answer.value:(answer?.custom||"");
+ else if(["Uses Abnormality-derived E.G.O.","Uses Abnormality E.G.O. (Sinner-issued)","Uses refined Lobotomy E.G.O. equipment"].includes(status))type="E.G.O. EQUIPMENT MANIFEST";
+ const answer=a.ego_name,loadout=a.ego_equipment_customizer?.value||{};
+ const loadoutName=loadout.sinner_ego||loadout.category4||loadout.suit||loadout.synergy||"";
+ const name=(answer?.value&&typeof answer.value==="string")?answer.value:(answer?.custom||loadoutName||"");
  return {eligible:!!type,type,name:name||type,theme:a.ego_theme?.value||a.distortion_theme?.value||""};
 }
 
