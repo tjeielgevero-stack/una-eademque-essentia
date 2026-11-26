@@ -613,21 +613,6 @@ function showSephrusAfterimage(messageText){
  fractureWeb.append(fracturePath);
  frame.insertBefore(fractureWeb,frame.children[2]||null);
 
- // Each chain is made from interlocking metal links, not a text symbol.
- const chainPositions=["top-left","top-right","bottom-left","bottom-right","left-upper","left-lower","right-upper","right-lower"];
- chainPositions.forEach(position=>{
-  const chain=document.createElement("span");
-  chain.className="sephrus-pull-chain";
-  chain.dataset.chain=position;
-  chain.setAttribute("aria-hidden","true");
-  for(let linkIndex=0;linkIndex<16;linkIndex++){
-   const link=document.createElement("i");
-   link.className="sephrus-chain-link";
-   link.dataset.link=String(linkIndex+1);
-   chain.append(link);
-  }
-  frame.append(chain);
- });
  notice.append(frame);
  document.body.append(notice);
  requestAnimationFrame(()=>notice.classList.add("visible"));
@@ -857,10 +842,8 @@ function render(){
     const m=document.createElement("span");m.className="choice-mark";
     const t=document.createElement("span");t.textContent=opt;
     if(isBroken){
-     const chainLeft=document.createElement("span");chainLeft.className="personality-chain";chainLeft.textContent="⛓";chainLeft.setAttribute("aria-hidden","true");
      const cracks=document.createElement("span");cracks.className="personality-cracks";cracks.setAttribute("aria-hidden","true");
-     const chainRight=document.createElement("span");chainRight.className="personality-chain";chainRight.textContent="⛓";chainRight.setAttribute("aria-hidden","true");
-     b.append(chainLeft,m,t,cracks,chainRight);
+     b.append(m,t,cracks);
      b.setAttribute("aria-label","BROKEN — damaged personality record");
      b.style.setProperty("--fracture-delay",(i%7)*.11+"s");
      b.onclick=()=>{
@@ -871,7 +854,7 @@ function render(){
       if(fractureStatus){
        fractureStatus.hidden=false;
        if(sephrusBrokenClickCount===1)fractureStatus.textContent="A HAIRLINE FRACTURE APPEARS IN THE RECORD.";
-       else if(sephrusBrokenClickCount===7)fractureStatus.textContent="THE CHAINS BEGIN TO STRAIN.";
+       else if(sephrusBrokenClickCount===7)fractureStatus.textContent="THE RECORD BEGINS TO STRAIN.";
        else if(sephrusBrokenClickCount===15)fractureStatus.textContent="THE ARCHIVE CAN NO LONGER HOLD ITS SHAPE.";
        else if(sephrusBrokenClickCount===22)fractureStatus.textContent="ONE MORE FAULT. THE RECORD IS ALMOST GONE.";
        else if(sephrusBrokenClickCount>=23)fractureStatus.textContent="THE RECORD FALLS SILENT.";
@@ -883,7 +866,7 @@ function render(){
      if(isCanonical){
       b.setAttribute("aria-label","Canonical personality — the only valid entry");
       b.setAttribute("aria-pressed","true");
-      b.onclick=()=>{b.classList.remove("personality-canonical-touched");void b.offsetWidth;b.classList.add("personality-canonical-touched");window.setTimeout(()=>b.classList.remove("personality-canonical-touched"),420);};
+      b.onclick=()=>{if(sephrusEscapeRunning)return;setAnswer(q,"Selected traits",[canonical],"");advance();};
      }else{
       b.onclick=()=>{
        let next=selected.slice();
