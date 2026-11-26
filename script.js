@@ -419,7 +419,7 @@ function completeGeneratedCharacter(name,source){
  const egoType=egoAbsent?"Absent":egoStatus.includes("Personally manifested")?"Personal E.G.O.":egoStatus.includes("Volatile")?"Volatile E.G.O.":egoStatus.includes("Distortion")?"Distortion":egoStatus.includes("Abnormality-derived")?"Abnormality-derived":egoStatus.includes("Sinner-issued")?"Abnormality-based (Sinner-issued)":egoStatus.includes("Lobotomy")?"Artificial / refined Lobotomy E.G.O.":egoStatus||"Not specified.";
  const egoTypeDescription=egoType==="Personal E.G.O."?"Personal E.G.O. — A manifestation shaped by the individual's own psyche, identity, and defining experiences; its form and properties are personal rather than borrowed from an external source.":egoType==="Volatile E.G.O."?"Volatile E.G.O. — A personal manifestation whose appearance or effects remain unstable, reflecting an unresolved or fluctuating relationship with the feelings that produced it.":egoType==="Distortion"?"Distortion — A transformation associated with a collapse or radical alteration of the individual's self-understanding, expressed through a form that embodies their inner contradiction.":egoType==="Absent"?"Absent — No manifested personal E.G.O. or known Distortion is recorded for this variant.":egoType+" — This classification identifies the source and nature of the character's recorded E.G.O. state.";
  putGenerated(a,"generated_ego_type",egoTypeDescription);
- const egoDescription=egoAbsent?"No personal E.G.O. or Distortion is currently recorded for this variant. The absence is part of the character's present profile and does not, by itself, determine their potential, resolve, or place in the wider story.": "The E.G.O. known as "+egoName+" manifests as "+egoAppearance+". Its defining property is that it "+egoFunction.toLowerCase()+". The manifestation is rooted in "+egoTheme.toLowerCase()+", giving its appearance and effects a consistent symbolic meaning rather than making them a collection of unrelated powers. It emerged through "+egoTrigger.toLowerCase()+", connecting its present form to a defining emotional or personal turning point.";
+ const egoDescription=egoAbsent?"No personal E.G.O. or Distortion is currently recorded for this variant. The absence is part of the character's present profile and does not, by itself, determine their potential, resolve, or place in the wider story.": "The E.G.O. known as "+egoName+" manifests as "+String(egoAppearance).charAt(0).toLowerCase()+String(egoAppearance).slice(1)+". Its defining property is that it "+egoFunction.toLowerCase()+". The manifestation is rooted in "+egoTheme.toLowerCase()+", giving its appearance and effects a consistent symbolic meaning rather than making them a collection of unrelated powers. It emerged through "+egoTrigger.toLowerCase()+", connecting its present form to a defining emotional or personal turning point.";
  putGenerated(a,"generated_ego_description",egoDescription);
  const motifs=String(egoTheme).toLowerCase();
  const approach=String(combat).toLowerCase();
@@ -436,7 +436,7 @@ function completeGeneratedCharacter(name,source){
   "The Final Unmasking — The scattered echoes converge and reveal the E.G.O.'s complete symbolic form. The manifestation brings its accumulated marks, reflections, and lingering images into one coherent image, exposing the meaning that connected them from the beginning. Rather than representing a new identity, the ultimate expresses the character's acceptance of the identity already present beneath every borrowed image."
  ];
  ["Nocturne of the Unbroken","The Final Unmasking"].forEach((abilityName,index)=>{a["generated_ultimate_"+(index+1)]={choice:"Generated character detail",value:ultimateDescriptions[index],custom:""};});
- a.generated_passive={choice:"Generated character detail",value:"Composure of the Unfinished — The character's composure becomes most apparent when circumstances turn against them. Rather than allowing pressure to dictate their next decision, they narrow their attention to what remains within their control and continue with deliberate focus. The passive is recorded as activating "+(v.passive_activation||"when its stated condition is met")+".",custom:""};
+ a.generated_passive={choice:"Generated character detail",value:"Composure of the Unfinished — The character's composure becomes most apparent when circumstances turn against them. Rather than allowing pressure to dictate their next decision, they narrow their attention to what remains within their control and continue with deliberate focus. Its activation condition is determined by the selected passive trigger.",custom:""};
  putGenerated(a,"generated_passive_2","Quiet Continuance — Even after a plan is interrupted or an encounter becomes uncertain, the character retains a steady sense of purpose. This secondary trait represents the habits and convictions that remain when immediate confidence has been tested, allowing them to return to their chosen course without pretending that setbacks have not occurred.");
  const traits=Array.isArray(v.personality)?v.personality.filter(x=>x&&x!=="Other / custom answer"):String(v.personality||"").trim();
  const traitText=Array.isArray(traits)?traits.join(", "):traits;
@@ -466,7 +466,7 @@ function formatCharacterDossier(name,mode,answersSource){
  const notSet="Not specified.",isLazy=mode==="laziness";
  const lazyField=label=>isLazy?labelled(label):"";
  const isSephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
- const title=lazyField("Title")||labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
+ const title=lazyField("Title")||labelled("Title")||first("generated_title_description","title","epithet","color_title","generated_title")||notSet;
  const raceRaw=lazyField("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||"Human";
  const race=raceRaw==="Human"?"Human — A human individual whose identity and capabilities are shaped by personal history, training, choices, and any recorded E.G.O. manifestation.":raceRaw;
  const occupation=first("occupation","complex_occupation");
@@ -502,8 +502,10 @@ function formatCharacterDossier(name,mode,answersSource){
  const preference=(value,type)=>{
   if(!value||value===notSet)return notSet;
   if(value.length>180&&/[.!?]/.test(value))return value;
-  if(type==="Likes")return "The character enjoys "+value+". These interests offer moments of comfort, curiosity, or personal expression amid the demands of their circumstances, and reveal the small details they choose to value beyond their professional identity.";
-  return "The character dislikes "+value+". These are more than passing irritations: they mark the behavior, attitudes, and situations they are least willing to accept, even when resisting them creates additional complications.";
+  const items=value.split(/,\s*/).map(item=>item.trim()).filter(Boolean).map(item=>item.charAt(0).toLowerCase()+item.slice(1));
+  const natural=items.length>1?(items.length===2?items.join(" and "):items.slice(0,-1).join(", ")+", and "+items[items.length-1]):(items[0]||value);
+  if(type==="Likes")return "The character enjoys "+natural+". These interests offer moments of comfort, curiosity, or personal expression amid the demands of their circumstances, and reveal the small details they choose to value beyond their professional identity.";
+  return "The character dislikes "+natural+". These are more than passing irritations: they mark the behavior, attitudes, and situations they are least willing to accept, even when resisting them creates additional complications.";
  };
  const likes=lazyField("Likes")||labelled("Likes")||first("complex_32","complex_33")||preference(combine("likes","generated_likes"),"Likes");
  const dislikes=lazyField("Dislikes")||labelled("Dislikes")||first("complex_37","complex_29")||preference(combine("dislikes","generated_dislikes"),"Dislikes");
