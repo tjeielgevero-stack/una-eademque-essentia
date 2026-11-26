@@ -500,6 +500,40 @@ function setAnswer(q,choice,value,custom=""){
 }
 function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
 function resetSephrusSecretState(){sephrusBrokenClickCount=0;sephrusEscapeRunning=false;}
+
+function showSephrusAfterimage(){
+ const previous=document.querySelector(".sephrus-afterimage");
+ if(previous)previous.remove();
+ const notice=document.createElement("aside");
+ notice.className="sephrus-afterimage";
+ notice.setAttribute("role","status");
+ notice.setAttribute("aria-live","polite");
+ notice.setAttribute("aria-label","A message from the archive");
+ const frame=document.createElement("div");
+ frame.className="sephrus-afterimage-frame";
+ const label=document.createElement("span");
+ label.className="sephrus-afterimage-label";
+ label.textContent="UNREGISTERED MIRROR RECORD";
+ const message=document.createElement("p");
+ message.className="sephrus-afterimage-text";
+ message.textContent="We are one and the same. you choose yours. but choose mine, and i decide what happens.";
+ frame.append(label,message);
+ for(let i=0;i<6;i++){
+  const shard=document.createElement("span");
+  shard.className="sephrus-glass-shard";
+  shard.setAttribute("aria-hidden","true");
+  shard.dataset.shard=String(i+1);
+  frame.append(shard);
+ }
+ notice.append(frame);
+ document.body.append(notice);
+ requestAnimationFrame(()=>notice.classList.add("visible"));
+ window.setTimeout(()=>{
+  if(!notice.isConnected)return;
+  notice.classList.add("shattering");
+  window.setTimeout(()=>notice.remove(),1450);
+ },5000);
+}
 function returnHomeFromSephrusSecret(){
  if(sephrusEscapeRunning)return;
  sephrusEscapeRunning=true;
@@ -515,7 +549,7 @@ function returnHomeFromSephrusSecret(){
   renderOcHistory();
   screen("home");
   requestAnimationFrame(()=>overlay.classList.remove("active"));
-  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();},2250);
+  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage();},2250);
  },2100);
 }
 function renderSinnerEgo(saved){
