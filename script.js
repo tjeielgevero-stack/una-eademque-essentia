@@ -61,6 +61,14 @@ function syndicateOptions(a){
  return ["Unknown / undisclosed"];
 }
 
+
+function customLastUnique(options){
+ const seen=new Set(),clean=[];
+ (Array.isArray(options)?options:[]).forEach(option=>{const key=String(option).trim().toLowerCase();if(!key||seen.has(key))return;seen.add(key);clean.push(option);});
+ const custom=clean.filter(option=>String(option).toLowerCase()==="other / custom answer");
+ return [...clean.filter(option=>String(option).toLowerCase()!=="other / custom answer"),...custom];
+}
+
 const QUESTIONS = [
 {id:"personality",category:"PERSONALITY & TEMPERAMENT",title:"Personality",description:"Select every trait that fits this character. Choose Custom to enter your own personality description instead; Custom cannot be combined with preset traits.",multiple:true,options:["Aloof","Reserved","Stoic","Calm and composed","Analytical","Pragmatic","Cynical","Sarcastic","Witty","Cheerful","Outgoing","Charismatic","Gentle","Compassionate","Patient","Idealistic","Ambitious","Proud","Arrogant","Eccentric","Mischievous","Impulsive","Hot-headed","Anxious","Paranoid","Melancholic","Detached","Secretive","Protective","Loyal","Manipulative","Ruthless","Soft-spoken","Other / custom answer"]},
 {id:"era",category:"SETTING & TIMELINE",title:"Story Era",description:"At what point in the Project Moon timeline does this variant's story take place?",options:["Before the events of Lobotomy Corporation","During the Lobotomy Corporation era","After the White Nights and Dark Days","During the Library of Ruina era","During the Limbus Company era","An alternate Mirror World / original timeline","Other / custom answer"]},
@@ -102,7 +110,7 @@ const QUESTIONS = [
 {id:"ego_theme",category:"E.G.O. & DISTORTION",title:"E.G.O. Theme",description:"What core idea, memory, desire, fear, or conviction does the E.G.O. express?",showIf:a=>a.ego_status==="Personally manifested E.G.O. (Effloresced E.G.O.)"||a.ego_status==="Volatile E.G.O. (unstable manifestation)",options:["Identity and selfhood","Freedom and confinement","Memory and regret","Ambition and recognition","Love and attachment","Isolation and alienation","Order and control","Change and acceptance","Other / custom answer"]},
 {id:"ego_name",category:"E.G.O. & DISTORTION",title:"Personal E.G.O. Name & Description",description:"Name and describe this variant's own manifested E.G.O. This page is only relevant to personal or volatile E.G.O.; equipment extracted from Abnormalities is recorded in its loadout instead.",showIf:a=>a.ego_status==="Personally manifested E.G.O. (Effloresced E.G.O.)"||a.ego_status==="Volatile E.G.O. (unstable manifestation)",options:["Other / custom answer","Leave blank for now"]},
 
-{id:"ego_appearance",category:"E.G.O. & DISTORTION",title:"What Does Your E.G.O. Look Like?",description:"Choose the visual direction of the character's Personal or Volatile E.G.O. Select Other / custom answer to describe a completely original appearance.",showIf:a=>creationMode==="simple"&&["Personally manifested E.G.O. (Effloresced E.G.O.)","Volatile E.G.O. (unstable manifestation)"].includes(a.ego_status),options:["A tailored ceremonial coat with symbolic embroidery","Layered armor resembling porcelain or fine ceramic","A weathered uniform altered by personal keepsakes","A long mantle or cloak made of drifting, paper-like layers","A refined suit with impossible seams and shifting patterns","A mask or face-covering that reflects the character's inner self","A crown, halo, or ring of floating fragments","A veil of threads, ribbons, or loose fabric","A silhouette formed from shadow and pale light","A set of asymmetrical gauntlets and arm guards","A full-body shell with smooth, sculpted plates","A collection of floating ornaments surrounding the body","A dress or robe with theatrical, stage-like details","A practical outfit transformed by one impossible feature","A form built from glass-like panels and reflections","A form covered in delicate cracks filled with light","A stitched or patchwork exterior with carefully arranged seams","A mechanical-looking frame with symbolic moving parts","A feathered or petal-like mantle","A flowing form resembling smoke, ink, or liquid","A sharp, geometric silhouette with clean lines","A soft, oversized shape that hides most of the original outline","A pair of wings or wing-like structures","A halo of suspended tools, charms, or personal objects","A second silhouette layered over the character's own","A partial manifestation that covers only selected areas","A complete transformation into a symbolic, non-human shape","Other / custom answer"]},
+{id:"ego_appearance",category:"E.G.O. & DISTORTION",title:"What Does Your E.G.O. Look Like?",description:"Choose the visual direction of the character's Personal or Volatile E.G.O. Select Other / custom answer to describe a completely original appearance.",showIf:a=>creationMode!=="complex"&&["Personally manifested E.G.O. (Effloresced E.G.O.)","Volatile E.G.O. (unstable manifestation)"].includes(a.ego_status),options:["A tailored ceremonial coat with symbolic embroidery","Layered armor resembling porcelain or fine ceramic","A weathered uniform altered by personal keepsakes","A long mantle or cloak made of drifting, paper-like layers","A refined suit with impossible seams and shifting patterns","A mask or face-covering that reflects the character's inner self","A crown, halo, or ring of floating fragments","A veil of threads, ribbons, or loose fabric","A silhouette formed from shadow and pale light","A set of asymmetrical gauntlets and arm guards","A full-body shell with smooth, sculpted plates","A collection of floating ornaments surrounding the body","A dress or robe with theatrical, stage-like details","A practical outfit transformed by one impossible feature","A form built from glass-like panels and reflections","A form covered in delicate cracks filled with light","A stitched or patchwork exterior with carefully arranged seams","A mechanical-looking frame with symbolic moving parts","A feathered or petal-like mantle","A flowing form resembling smoke, ink, or liquid","A sharp, geometric silhouette with clean lines","A soft, oversized shape that hides most of the original outline","A pair of wings or wing-like structures","A halo of suspended tools, charms, or personal objects","A second silhouette layered over the character's own","A partial manifestation that covers only selected areas","A complete transformation into a symbolic, non-human shape","A translucent outer shell like layered stained glass","A mantle of suspended handwritten pages and ink strokes","A sculpted silhouette of dark stone with luminous seams","A ceremonial uniform with floating insignia and orbiting seals","A mirrored double-layered outfit with delayed reflections","A flowing shroud of pale ash and drifting embers","A crystalline frame with rearranging facets","A star-map cloak with shifting constellations","A woven body of fine chains and interlocking rings","A porcelain mask and segmented ceremonial robes","A living garden of leaves, thorns, and pale blossoms","A veil of black feathers and silver filaments","A polished, statue-like body with hairline fractures","A liquid-metal mantle that ripples without falling","A shadowed silhouette edged by a thin corona of light","A layered stage costume with a shifting theatrical backdrop","A translucent veil with floating glass ornaments","A form assembled from geometric panels that orbit the body","Other / custom answer"]},
 {id:"ego_function",category:"E.G.O. & DISTORTION",title:"What Does Your E.G.O. Do?",description:"Choose the broad fictional effect of this Personal or Volatile E.G.O. Select Other / custom answer to describe its unique abilities and limits.",showIf:a=>creationMode==="simple"&&["Personally manifested E.G.O. (Effloresced E.G.O.)","Volatile E.G.O. (unstable manifestation)"].includes(a.ego_status),options:["Creates protective barriers or momentary shelter","Strengthens the user's resolve and defensive presence","Creates temporary copies, echoes, or afterimages","Distorts the user's sense of distance and position","Reveals hidden traces, patterns, or concealed details","Turns memories into visible symbols or projections","Shapes threads, ribbons, or bindings as symbolic constructs","Creates a personal field that changes the surrounding atmosphere","Briefly slows or quickens the user's perception of events","Redirects incoming momentum in a purely fictional way","Creates decoys that draw attention away from allies","Connects nearby allies through a shared protective effect","Transforms light and shadow into symbolic shapes","Stores and releases a limited burst of accumulated momentum","Changes the form or properties of its own manifested tools","Creates temporary platforms, steps, or paths","Disrupts an opponent's concentration or rhythm","Amplifies a chosen emotion into a visible environmental effect","Reinforces the user's stance and resistance to being moved","Creates a short-lived zone that limits movement","Allows the user to shift between several symbolic forms","Projects a memory, promise, or personal ideal into the arena","Separates the user from surrounding distractions","Restores composure and steadies nearby allies","Adapts its effect to a clearly defined personal condition","Its function is deliberately subtle or primarily symbolic","Other / custom answer"]},
 {id:"distortion_theme",category:"E.G.O. & DISTORTION",title:"Distortion Theme",description:"If distorted, what craving, fixation, or emotional contradiction does the transformation embody?",showIf:a=>a.ego_status==="Has become a Distortion",options:["A consuming desire","An unresolved regret","A need for recognition","Fear of abandonment","Obsession with control","A fractured sense of identity","Other / custom answer"]},
 
@@ -111,6 +119,19 @@ const QUESTIONS = [
 {id:"backstory",category:"FINAL CHARACTER DETAILS",title:"Defining Backstory Event",description:"Choose a broad starting point for the event that most changed this variant's life.",options:["A family legacy or inheritance","A failed Fixer assignment","A Wing-related incident","A Syndicate conflict","A Workshop or technology incident","An Abnormality-related incident","A personal betrayal","A major moral choice","A career-defining achievement","Other / custom answer"]},
 {id:"notes",category:"FINAL CHARACTER DETAILS",title:"Additional Lore Notes",description:"Add any important detail that the structured questions did not cover.",options:["Other / custom answer","Leave blank for now"]}
 ];
+
+QUESTIONS.push(
+ {id:"ability_1",category:"COMBAT PROFILE / ABILITIES",title:"Ability 1",description:"Describe the first regular fictional ability. It inflicts Low status potency (5).",freeText:true,inputLabel:"ABILITY 1"},
+ {id:"ability_2",category:"COMBAT PROFILE / ABILITIES",title:"Ability 2",description:"Describe the second regular fictional ability. It inflicts Medium status potency (15).",freeText:true,inputLabel:"ABILITY 2"},
+ {id:"ability_3",category:"COMBAT PROFILE / ABILITIES",title:"Ability 3",description:"Describe the third regular fictional ability. It inflicts Medium status potency (15).",freeText:true,inputLabel:"ABILITY 3"},
+ {id:"ability_4",category:"COMBAT PROFILE / ABILITIES",title:"Ability 4",description:"Describe the fourth regular fictional ability. It inflicts Large status potency (20).",freeText:true,inputLabel:"ABILITY 4"},
+ {id:"ultimate_ability_1",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 1",description:"Describe the first ultimate. It inflicts Massive status potency (30).",freeText:true,inputLabel:"ULTIMATE ABILITY 1"},
+ {id:"ultimate_ability_2",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 2",description:"Describe the second ultimate. It inflicts Massive status potency (30).",freeText:true,inputLabel:"ULTIMATE ABILITY 2"},
+ {id:"status_infliction",category:"COMBAT PROFILE / STATUS INFLICTION",title:"Which Status Effects Does This OC Inflict?",description:"Choose up to three status effects. Potency is divided evenly between your selections.",multiple:true,maxSelections:3,noneOption:"No status effect",options:["No status effect","Burn","Bleed","Rupture","Sinking","Tremor","Fragile","Bind","Paralyze","Poise","Charge","Haste","Protection","Strength","Feeble","Smoke","Fairy","Erosion"]},
+ {id:"passive_ability",category:"COMBAT PROFILE / PASSIVES",title:"Passive Ability",description:"Describe the character's passive ability.",freeText:true,inputLabel:"PASSIVE ABILITY"},
+ {id:"passive_activation",category:"COMBAT PROFILE / PASSIVES",title:"When Does This Passive Activate?",description:"Choose whether the passive is permanently active or activates after a specific battle event.",options:["Always active","At the start of battle","At the start of this character's turn","After taking damage","When below 50% HP","When an ally is knocked out","When E.G.O. manifests","Other / custom answer"]}
+);
+
 
 const $=id=>document.getElementById(id);
 
@@ -303,7 +324,6 @@ const ADVANCED_QUESTIONS = [
  {id:"advanced_abilities",category:"ADVANCED PROFILE / CAPABILITIES",title:"Signature Capabilities & Techniques",description:"Describe their distinctive fictional capabilities, signature techniques, limitations, and the visual or thematic identity behind them. Keep the description at a story-design level.",freeText:true,inputLabel:"SIGNATURE CAPABILITIES"},
  {id:"advanced_arc",category:"ADVANCED PROFILE / STORY DIRECTION",title:"Character Arc & Narrative Direction",description:"Where does the character begin, what could challenge or change them, and what kind of future—or unresolved ending—do you envision for them?",freeText:true,inputLabel:"CHARACTER ARC"},
  {id:"advanced_extra_lore",category:"ADVANCED PROFILE / ARCHIVE NOTES",title:"Additional Advanced Lore",description:"Add any other details that deserve a place in the full archive: symbols, recurring motifs, secrets, personal rituals, or connections to other records.",freeText:true,inputLabel:"ADDITIONAL LORE"},
- {id:"advanced_ego_appearance",category:"ADVANCED PROFILE / E.G.O. MANIFESTATION",title:"What Does Your E.G.O. Look Like?",description:"Describe the complete visual appearance of this character's Personal or Volatile E.G.O. Include its silhouette, clothing or structure, materials, colors, textures, symbols, movement, and how it changes the character's outline. Explain which details reflect the character's psyche.",showIf:a=>["Personally manifested E.G.O. (Effloresced E.G.O.)","Volatile E.G.O. (unstable manifestation)"].includes(a.ego_status),freeText:true,maxLength:6000,inputLabel:"PERSONAL / VOLATILE E.G.O. APPEARANCE"},
  {id:"advanced_ego_function",category:"ADVANCED PROFILE / E.G.O. FUNCTION",title:"What Does Your E.G.O. Do?",description:"Describe the fictional abilities and practical narrative role of this Personal or Volatile E.G.O. Explain what it can do, how its effects appear, what conditions govern it, and what limitations or trade-offs keep it balanced.",showIf:a=>["Personally manifested E.G.O. (Effloresced E.G.O.)","Volatile E.G.O. (unstable manifestation)"].includes(a.ego_status),freeText:true,maxLength:6000,inputLabel:"PERSONAL / VOLATILE E.G.O. ABILITIES"}
 ];
 
@@ -434,6 +454,9 @@ function formatCharacterDossier(name,mode,answersSource){
  const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||(n===1?abilitySource:"")||get("generated_ability_"+n)||notSet;
  const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet;
  const passive=labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
+ const passiveActivation=first("passive_activation","complex_passive_activation");
+ const selectedStatuses=first("status_infliction","complex_status_infliction");
+ const statusInfliction=Array.isArray(selectedStatuses)?selectedStatuses.join(" · "):(selectedStatuses||"None");
  const personality=labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?first("generated_personality"):combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||notSet;
  const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59","generated_backstory")||notSet;
  const likes=labelled("Likes")||combine("likes","complex_32","complex_33","generated_likes")||notSet;
@@ -455,7 +478,8 @@ function formatCharacterDossier(name,mode,answersSource){
   "Ability 4: "+ability(4),
   "Ultimate Ability 1: "+ultimate(1),
   "Ultimate Ability 2: "+ultimate(2),
-  "Passive Ability: "+passive,
+  "Passive Ability: "+passive+(passiveActivation?" · "+passiveActivation:""),
+  "Status Infliction: "+statusInfliction,
    ...(first("generated_passive_2")?["Passive Ability 2: "+first("generated_passive_2")]:[]),
   "Personality: "+personality,
   "Backstory: "+backstory,
@@ -564,6 +588,19 @@ QUESTIONS.forEach(question=>{
  const original=question.options;
  question.options=typeof original==="function"?answers=>original(answers).filter(option=>!remove.has(option)||(question.id==="workshop"&&option==="Independent craftsperson"&&answers.occupation!=="Workshop artisan or craftsperson")):original.filter(option=>!remove.has(option));
 });
+
+
+COMPLEX_QUESTIONS.push(
+ {id:"complex_ability_1",category:"COMBAT PROFILE / ABILITIES",title:"Ability 1",description:"First regular ability. Low potency (5).",freeText:true,maxLength:6000,inputLabel:"ABILITY 1"},
+ {id:"complex_ability_2",category:"COMBAT PROFILE / ABILITIES",title:"Ability 2",description:"Second regular ability. Medium potency (15).",freeText:true,maxLength:6000,inputLabel:"ABILITY 2"},
+ {id:"complex_ability_3",category:"COMBAT PROFILE / ABILITIES",title:"Ability 3",description:"Third regular ability. Medium potency (15).",freeText:true,maxLength:6000,inputLabel:"ABILITY 3"},
+ {id:"complex_ability_4",category:"COMBAT PROFILE / ABILITIES",title:"Ability 4",description:"Fourth regular ability. Large potency (20).",freeText:true,maxLength:6000,inputLabel:"ABILITY 4"},
+ {id:"complex_ultimate_1",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 1",description:"First ultimate. Massive potency (30).",freeText:true,maxLength:6000,inputLabel:"ULTIMATE ABILITY 1"},
+ {id:"complex_ultimate_2",category:"COMBAT PROFILE / ULTIMATES",title:"Ultimate Ability 2",description:"Second ultimate. Massive potency (30).",freeText:true,maxLength:6000,inputLabel:"ULTIMATE ABILITY 2"},
+ {id:"complex_status_infliction",category:"COMBAT PROFILE / STATUS INFLICTION",title:"Which Status Effects Does This OC Inflict?",description:"Choose up to three status effects. Potency is divided evenly between them.",multiple:true,maxSelections:3,noneOption:"No status effect",options:["No status effect","Burn","Bleed","Rupture","Sinking","Tremor","Fragile","Bind","Paralyze","Poise","Charge","Haste","Protection","Strength","Feeble","Smoke","Fairy","Erosion"]},
+ {id:"complex_passive",category:"COMBAT PROFILE / PASSIVES",title:"Passive Ability",description:"Describe the character's passive ability.",freeText:true,maxLength:6000,inputLabel:"PASSIVE ABILITY"},
+ {id:"complex_passive_activation",category:"COMBAT PROFILE / PASSIVES",title:"When Does This Passive Activate?",description:"Choose whether the passive is permanently active or activates after a specific battle event.",options:["Always active","At the start of battle","At the start of this character's turn","After taking damage","When below 50% HP","When an ally is knocked out","When E.G.O. manifests","Other / custom answer"]}
+);
 
 const DOSSIER_QUESTIONS = [
  {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPassive Ability 2: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
@@ -961,7 +998,7 @@ function render(){
    return;
  }
  if(q.multiple){
-   const originalOptions=typeof q.options==="function"?q.options(values()):q.options;
+   const originalOptions=customLastUnique(typeof q.options==="function"?q.options(values()):q.options);
    const isSephrusPersonality=q.id==="personality"&&sephrusSecretKey(characterName)!==null;
    const canonical="Aloof, composed, observant, analytical, pragmatic, and calculating. Reserved and solitary, he is morally gray rather than inherently good or evil. He values originality and the act of creating things. His fundamental mindset, identity, and personality remain consistent across every variant.";
    let selected=Array.isArray(saved.value)?saved.value:[];
@@ -979,7 +1016,7 @@ function render(){
     const isCanonical=isSephrusPersonality&&opt===canonical;
     const b=document.createElement("button");b.type="button";
     b.style.setProperty("--choice-delay",Math.min(i,12)*12+"ms");
-    b.className="choice"+(selected.includes(opt)?" selected":"")+(isBroken?" personality-broken":"")+(isCanonical?" personality-canonical":"");
+    b.className="choice"+(selected.includes(opt)?" selected":"")+(isBroken?" personality-broken":"")+(isCanonical?" personality-canonical":"");if(opt==="Other / custom answer")b.dataset.customAnswer="true";
     const m=document.createElement("span");m.className="choice-mark";
     const t=document.createElement("span");t.textContent=opt;
     if(isBroken){
@@ -1017,7 +1054,8 @@ function render(){
       b.onclick=()=>{
        let next=selected.slice();
        if(opt==="Other / custom answer")next=next.includes(opt)?[]:[opt];
-       else{next=next.filter(x=>x!=="Other / custom answer");next=next.includes(opt)?next.filter(x=>x!==opt):next.concat(opt);}
+       else if(q.noneOption&&opt===q.noneOption)next=next.includes(opt)?[]:[opt];
+       else{next=next.filter(x=>x!=="Other / custom answer"&&x!==q.noneOption);if(next.includes(opt))next=next.filter(x=>x!==opt);else{if(q.maxSelections&&next.length>=q.maxSelections){$("validation-message").textContent="CHOOSE UP TO "+q.maxSelections+" OPTIONS.";return;}next=next.concat(opt);}}
        setAnswer(q,next.includes("Other / custom answer")?"Other / custom answer":"Selected traits",next,saved.custom||"");
        render();
        if(next.includes("Other / custom answer"))$("custom-answer").focus();
@@ -1035,8 +1073,8 @@ function render(){
    $("next-button").textContent=index===qs.length-1?"CONFIRM & COMPLETE":"SAVE PERSONALITY & CONTINUE";
    return;
   }
-  const options=typeof q.options==="function"?q.options(values()):q.options;
- options.forEach((opt,optIndex)=>{const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",`${Math.min(optIndex,12)*22}ms`);b.className="choice"+(saved.choice===opt?" selected":"");const mark=document.createElement("span");mark.className="choice-mark";const label=document.createElement("span");label.textContent=opt;b.append(mark,label);if(saved.choice===opt)b.dataset.selected="true";b.onclick=()=>{
+  const options=customLastUnique(typeof q.options==="function"?q.options(values()):q.options);
+ options.forEach((opt,optIndex)=>{const b=document.createElement("button");b.type="button";b.style.setProperty("--choice-delay",`${Math.min(optIndex,12)*22}ms`);b.className="choice"+(saved.choice===opt?" selected":"");if(opt==="Other / custom answer")b.dataset.customAnswer="true";const mark=document.createElement("span");mark.className="choice-mark";const label=document.createElement("span");label.textContent=opt;b.append(mark,label);if(saved.choice===opt)b.dataset.selected="true";b.onclick=()=>{
    if(opt==="Other / custom answer"){
     [...$("choice-list").children].forEach(x=>{x.classList.remove("selected");delete x.dataset.selected;});
     b.classList.add("selected");b.dataset.selected="true";$("custom-wrap").classList.remove("hidden");$("next-button").classList.remove("hidden");$("custom-answer").focus();
