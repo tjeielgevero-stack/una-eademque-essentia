@@ -710,7 +710,7 @@ const GENERATED_DOWNSTREAM={
  personality:["generated_personality"],advanced_personality:["generated_personality"],
  complex_47:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  complex_50:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
- complex_51:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
+ complex_51:["generated_backstory","generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
  ability_1:["generated_ability_1"],ability_2:["generated_ability_2"],ability_3:["generated_ability_3"],ability_4:["generated_ability_4"],
  ego_status:["generated_ego_name","generated_ego_description","generated_ego_type","generated_overall"],
  ego_name:["generated_ego_description","generated_overall"],
