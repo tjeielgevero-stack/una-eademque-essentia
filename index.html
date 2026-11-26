@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Project Moon Variant Builder — a community character creation tool.">
   <title>Project Moon Variant Builder</title>
-  <link rel="stylesheet" href="style.css?v=20261126-complex-arena-final1">
+  <link rel="stylesheet" href="style.css?v=20261126-complex-independent1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -247,29 +247,12 @@
       <p class="sponsor-joke">Sponsored by The Head. Your data is probably being monitored.</p>
     </section>
 
-    <section id="name-screen" class="name-screen screen hidden" aria-labelledby="name-title">
-      <div class="name-panel">
-        <div class="name-ornament" aria-hidden="true">✦ ───────── ✦</div>
-        <p class="eyebrow">IDENTITY REGISTRATION / 00</p>
-        <h2 id="name-title">Create Your Name.</h2>
-        <p class="name-description">Every record begins with an identity. What shall this character be called?</p>
-        <label class="name-field-label" for="character-name">CHARACTER NAME</label>
-        <input id="character-name" class="name-input" type="text" maxlength="80" autocomplete="off" placeholder="Enter a name..." aria-describedby="name-validation">
-        <p id="name-validation" class="validation" role="alert"></p>
-        <div class="name-actions">
-          <button id="name-back" class="secondary-button" type="button">← BACK</button>
-          <button id="name-continue" class="primary-button" type="button">CONTINUE <span>→</span></button>
-        </div>
-        <p class="name-footnote">YOU CAN CHANGE THIS NAME BEFORE COMPLETING YOUR RECORD.</p>
-      </div>
-    </section>
-
     <section id="mode-screen" class="mode-screen screen hidden" aria-labelledby="mode-title">
       <div class="mode-panel">
         <div class="name-ornament" aria-hidden="true">✦ ───────── ✦</div>
         <p class="eyebrow">CREATION CONFIGURATION / 01</p>
         <h2 id="mode-title">Choose Your Creation Mode.</h2>
-        <p class="mode-description">Choose how deeply you want to develop this character. Every mode begins with the same core archive.</p>
+        <p class="mode-description">Choose your creation path first. After selecting a mode, choose whether to generate the whole character or enter a name and build it yourself.</p>
         <div class="creation-mode-grid">
           <button id="mode-simple" class="creation-mode-card" type="button">
             <span class="mode-card-number">01 / ORIGINAL PATH</span>
@@ -283,9 +266,27 @@
             <span class="mode-card-description">Everything in Simple Creation, followed by detailed written prompts for concept, appearance, personality, motives, relationships, abilities, and story direction.</span>
             <span class="mode-card-action">USE ADVANCED CREATION <b>→</b></span>
           </button>
-        <button id="mode-complex" class="creation-mode-card complex-mode-card" type="button"><span class="mode-card-number">03 / UNRESTRICTED PROFILE</span><strong>COMPLEX CREATION</strong><span class="mode-card-description">Everything in Advanced Creation, plus seven deeper prompts with expanded writing space. Up to 60 questions.</span><span class="mode-card-action">USE COMPLEX CREATION <b>→</b></span></button></div>
+        <button id="mode-complex" class="creation-mode-card complex-mode-card" type="button"><span class="mode-card-number">03 / UNRESTRICTED PROFILE</span><strong>COMPLEX CREATION</strong><span class="mode-card-description">A completely separate 60-question character dossier. It does not reuse the Simple or Advanced question sets.</span><span class="mode-card-action">USE COMPLEX CREATION <b>→</b></span></button></div>
         
-        <button id="mode-back" class="text-button mode-back" type="button">← BACK TO NAME</button>
+        <button id="mode-back" class="text-button mode-back" type="button">← BACK TO MAIN MENU</button>
+      </div>
+    </section>
+
+    
+<section id="name-screen" class="name-screen screen hidden" aria-labelledby="name-title">
+      <div class="name-panel">
+        <div class="name-ornament" aria-hidden="true">✦ ───────── ✦</div>
+        <p class="eyebrow">IDENTITY REGISTRATION / 00</p>
+        <h2 id="name-title">Create Your Name.</h2>
+        <p class="name-description">Every record begins with an identity. What shall this character be called?</p>
+        <label class="name-field-label" for="character-name">CHARACTER NAME</label>
+        <input id="character-name" class="name-input" type="text" maxlength="80" autocomplete="off" placeholder="Enter a name..." aria-describedby="name-validation">
+        <p id="name-validation" class="validation" role="alert"></p>
+        <div class="name-actions">
+          <button id="name-back" class="secondary-button" type="button">← BACK TO MODE</button>
+          <button id="name-continue" class="primary-button" type="button">CONTINUE <span>→</span></button>
+        </div>
+        <p class="name-footnote">YOU CAN CHANGE THIS NAME BEFORE COMPLETING YOUR RECORD.</p>
       </div>
     </section>
 
@@ -378,6 +379,6 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-complex-arena-final1"></script>
+  <script src="script.js?v=20261126-complex-independent1"></script>
 </body>
 </html>
