@@ -344,13 +344,13 @@ function profileFieldsFromAnswers(a){
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
  const notSet="Not specified.";
- const title=first("title","epithet","color_title")||labelled("Title")||notSet;
- const race=first("race","species","complex_race")||labelled("Race")||notSet;
+ const title=labelled("Title")||first("title","epithet","color_title")||notSet;
+ const race=labelled("Race")||first("race","species","complex_race")||notSet;
  const occupation=first("occupation","complex_occupation");
- const affiliation=combine("affiliation","association","office","syndicate","workshop","wing_role")||occupation||labelled("Affiliation")||notSet;
- const grade=combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","color_title")||first("grade","classification")||labelled("Grade")||notSet;
- const appearance=combine("advanced_appearance","appearance","complex_09","augmentation","ego_appearance","advanced_ego_appearance","complex_44")||labelled("Appearance")||notSet;
- const origin=combine("origin_type","district","upbringing","backstreet_environment","complex_14")||labelled("Origin")||notSet;
+ const affiliation=labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role")||occupation||notSet;
+ const grade=labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","color_title")||first("grade","classification")||notSet;
+ const appearance=labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
+ const origin=labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
  const egoStatus=first("ego_status","complex_41");
  const egoName=first("ego_name","complex_43");
  const egoLoadout=get("ego_equipment_customizer");
@@ -371,11 +371,11 @@ function formatCharacterDossier(name,mode,answersSource){
  const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||(n===1?abilitySource:"")||notSet;
  const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||notSet;
  const passive=labelled("Passive Ability")||first("passive_ability","complex_passive")||notSet;
- const personality=combine("personality","advanced_personality","complex_03","complex_21","complex_24")||labelled("Personality")||notSet;
- const backstory=combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59")||notSet;
- const likes=combine("likes","complex_32","complex_33")||labelled("Likes")||notSet;
- const dislikes=combine("dislikes","complex_37","complex_29")||labelled("Dislikes")||notSet;
- const overall=first("advanced_concept","complex_60","notes")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
+ const personality=labelled("Personality")||combine("personality","advanced_personality","complex_03","complex_21","complex_24")||notSet;
+ const backstory=labelled("Backstory")||combine("advanced_concept","advanced_motivation","advanced_conflict","backstory","upbringing","complex_14","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59")||notSet;
+ const likes=labelled("Likes")||combine("likes","complex_32","complex_33")||notSet;
+ const dislikes=labelled("Dislikes")||combine("dislikes","complex_37","complex_29")||notSet;
+ const overall=labelled("Overall")||first("advanced_concept","complex_60","notes")||[name||"Unnamed Variant",origin!==notSet?"originating from "+origin:"",occupation? "working as "+occupation:"",egoStatus&& !egoStatus.includes("No known")?"with "+egoStatus:""].filter(Boolean).join(" — ")||notSet;
  return [
   "Name: "+(name||"Unnamed Variant"),
   "Title: "+title,
@@ -403,7 +403,10 @@ function formatCharacterDossier(name,mode,answersSource){
 function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
-function activeQuestions(){return creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;}
+const DOSSIER_QUESTIONS = [
+ {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
+];
+function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;return [...base,...DOSSIER_QUESTIONS];}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
 function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
@@ -637,6 +640,7 @@ function submit(){
  const q=visible()[index];
  if(q.freeText){
   const detail=$("advanced-answer").value.trim();
+  if(!detail&&q.optional){setAnswer(q,"Optional profile details","","");advance();return;}
   if(!detail){$("validation-message").textContent="PLEASE ADD A DETAIL BEFORE CONTINUING.";return;}
   setAnswer(q,"Detailed response",detail,detail);advance();return;
  }
@@ -672,7 +676,7 @@ function randomizeAll(mode=creationMode){
  characterName=randomCharacterName();$("character-name").value=characterName;
  for(const q of activeQuestions()){
   if(q.showIf&&!q.showIf(values()))continue;
-  if(q.freeText){const text=randomizedWriting(q);answers[q.id]={choice:"Detailed response",value:text,custom:text};continue;}
+  if(q.freeText){if(q.optional){answers[q.id]={choice:"Optional profile details",value:"",custom:""};continue;}const text=randomizedWriting(q);answers[q.id]={choice:"Detailed response",value:text,custom:text};continue;}
   if(q.multiple){const pool=q.options.filter(x=>x!=="Other / custom answer"),shuffled=pool.slice().sort(()=>Math.random()-.5),chosen=shuffled.slice(0,2+Math.floor(Math.random()*2));answers[q.id]={choice:"Selected traits",value:chosen,custom:""};continue;}
   if(q.id==="ego_name"){const name=randomEgoName(values().ego_theme);answers[q.id]={choice:"Other / custom answer",value:name,custom:name};continue;}
   if(q.customizer){
