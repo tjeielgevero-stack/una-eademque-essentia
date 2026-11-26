@@ -7,6 +7,10 @@ on:
       - main
     paths:
       - "multiplayer/**"
+      - "multiplayer.js"
+      - "script.js"
+      - "style.css"
+      - "index.html"
       - ".github/workflows/deploy-multiplayer-worker.yml"
   workflow_dispatch:
 
@@ -35,6 +39,8 @@ jobs:
         run: |
           node --input-type=module --check < multiplayer/src/index.js
           node --check multiplayer.js
+          node --check script.js
+          node --check multiplayer/smoke-test.mjs
 
       - name: Check Cloudflare deployment credentials
         id: cloudflare_credentials
