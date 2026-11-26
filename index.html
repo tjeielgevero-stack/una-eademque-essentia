@@ -45,12 +45,35 @@
     <div class="header-tools">
       <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
       <button id="app-install-button" class="settings-open app-install-button" type="button">INSTALL APP</button>
+      <button id="info-open" class="settings-open info-open" type="button" aria-haspopup="dialog" aria-controls="info-overlay" aria-expanded="false">INFO</button>
       <button id="settings-open" class="settings-open" type="button" aria-haspopup="dialog" aria-controls="settings-overlay" aria-expanded="false">
         <span class="settings-gear" aria-hidden="true">⚙</span> SETTINGS
       </button>
     </div>
   </header>
 
+
+  <dialog id="info-overlay" class="info-overlay" aria-labelledby="info-title">
+    <section class="info-panel" role="dialog" aria-modal="true" aria-labelledby="info-title">
+      <div class="info-panel-header">
+        <div>
+          <p class="info-kicker">A NOTE FROM THE CREATOR</p>
+          <h2 id="info-title">ABOUT THIS GAME</h2>
+        </div>
+        <button id="info-close" class="settings-close" type="button" aria-label="Close information">×</button>
+      </div>
+      <div class="info-copy">
+        <p>This game is <strong>vibe-coded and made for fun</strong> because, honestly, <strong>I was bored</strong> and wanted to make something entertaining.</p>
+        <p>It's a passion project, not a professional or perfectly polished game. There may be bugs, unfinished ideas, or things that could be improved. Please enjoy it for what it is!</p>
+        <p>Have a suggestion, spotted something that needs fixing, or just want to share an idea? Feel free to add me on Discord:</p>
+        <div class="info-discord">
+          <span>DISCORD USERNAME</span>
+          <strong>reliable_guy12</strong>
+        </div>
+      </div>
+      <button id="info-done" class="primary-button info-done" type="button">GOT IT <span>✓</span></button>
+    </section>
+  </dialog>
 
   <dialog id="settings-overlay" class="settings-overlay" aria-labelledby="settings-title">
     <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
@@ -421,6 +444,29 @@
   <script src="data.js"></script>
   <script src="script.js?v=20261126-status-passives6"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
+  <script>
+    (() => {
+      const infoDialog = document.getElementById("info-overlay");
+      const infoOpen = document.getElementById("info-open");
+      const infoClose = document.getElementById("info-close");
+      const infoDone = document.getElementById("info-done");
+      if (!infoDialog || !infoOpen) return;
+      const closeInfo = () => {
+        infoDialog.close();
+        infoOpen.setAttribute("aria-expanded", "false");
+      };
+      infoOpen.addEventListener("click", () => {
+        infoDialog.showModal();
+        infoOpen.setAttribute("aria-expanded", "true");
+      });
+      infoClose?.addEventListener("click", closeInfo);
+      infoDone?.addEventListener("click", closeInfo);
+      infoDialog.addEventListener("click", event => {
+        if (event.target === infoDialog) closeInfo();
+      });
+      infoDialog.addEventListener("close", () => infoOpen.setAttribute("aria-expanded", "false"));
+    })();
+  </script>
   <script>
     (() => {
       const installButton = document.getElementById("app-install-button");
