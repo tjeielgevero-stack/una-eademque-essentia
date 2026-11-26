@@ -422,6 +422,10 @@ function completeGeneratedCharacter(name,source){
   putGenerated(a,"generated_passive_2","Una Eademque Essentia — One and the Same Essence. Across infinite Mirror Worlds, every Sephrus is the same individual living through different circumstances. Their lives, histories, affiliations, and choices may diverge, yet their fundamental identity and essence remain one. Each is distinct in experience, never truly different in who they are; neither inherently good nor evil, each remains morally gray.");
  }
 }
+function formatWeaponLoadout(value){
+ if(!value||typeof value!=="object")return "Not specified.";
+ return [value.style,value.weapon,value.ammo&&"Ammo: "+value.ammo,value.custom].filter(Boolean).join(" · ")||"Not specified.";
+}
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
  const notSet="Not specified.";
@@ -472,6 +476,7 @@ function formatCharacterDossier(name,mode,answersSource){
   "Origin: "+origin,
   "E.G.O: "+egoDescription,
   "E.G.O Type: "+egoType,
+  "Weapon Loadout: "+formatWeaponLoadout(get("weapon_loadout")),
   "Ability 1: "+ability(1),
   "Ability 2: "+ability(2),
   "Ability 3: "+ability(3),
@@ -488,7 +493,17 @@ function formatCharacterDossier(name,mode,answersSource){
   "Overall: "+overall
  ].join("\n\n");
 }
-function renderOcHistory(){const list=$("oc-history-list");if(!list)return;const rows=readOcArchive();$("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";if(!rows.length){const p=document.createElement("p");p.className="oc-empty";p.textContent="NO CHARACTER RECORDS YET.";list.append(p);return;}rows.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");name.textContent=r.name||"Unnamed Variant";const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);list.append(card);});}
+function renderOcHistory(){
+ const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
+ const rows=readOcArchive(),isSephrus=r=>String(r.name||"").trim().toLowerCase()==="sephrus aztiluth";
+ const general=rows.filter(r=>!isSephrus(r)),sephrus=rows.filter(isSephrus);
+ $("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";sephrusList.innerHTML="";
+ if(sephrusSection)sephrusSection.hidden=sephrus.length===0;
+ function draw(target,items,isSpecial){
+  if(!items.length){const p=document.createElement("p");p.className="oc-empty";p.textContent=isSpecial?"NO SEPHRUS VARIANTS RECORDED YET.":"NO CHARACTER RECORDS YET.";target.append(p);return;}
+  items.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");const recordTitle=r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";name.textContent=isSpecial?(r.name||"Sephrus Aztiluth")+" ("+recordTitle+")":(r.name||"Unnamed Variant");const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);target.append(card);});}
+ draw(list,general,false);draw(sephrusList,sephrus,true);
+}
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
@@ -605,7 +620,8 @@ COMPLEX_QUESTIONS.push(
 const DOSSIER_QUESTIONS = [
  {id:"profile_details",category:"FINAL DOSSIER / OPTIONAL DETAILS",title:"Additional Profile Details",description:"Optional: add any details that the earlier questions did not cover. Use the exact labels below if you want them placed directly into the final structured dossier. Leave blank to skip.\\n\\nTitle: \\nRace: \\nAppearance: \\nAbility 1: \\nAbility 2: \\nAbility 3: \\nAbility 4: \\nUltimate Ability 1: \\nUltimate Ability 2: \\nPassive Ability: \\nPassive Ability 2: \\nPersonality: \\nBackstory: \\nLikes: \\nDislikes: \\nOrigin: \\nAffiliation: \\nGrade: \\nOverall:",freeText:true,optional:true,maxLength:6000,inputLabel:"OPTIONAL DOSSIER DETAILS"}
 ];
-function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;return [...base,...DOSSIER_QUESTIONS];}
+const WEAPON_QUESTION={id:"weapon_loadout",category:"COMBAT IDENTITY",title:"Weapon & Fighting Style",description:"Choose the character's non-E.G.O. fighting equipment and preferred style. This is a fictional character-design loadout; ranged ammunition uses invented archive types, not real-world specifications.",customizer:true,weaponCustomizer:true};
+function activeQuestions(){const base=creationMode==="complex"?COMPLEX_QUESTIONS:creationMode==="advanced"?[...QUESTIONS,...ADVANCED_QUESTIONS]:QUESTIONS;return [...base,WEAPON_QUESTION,...DOSSIER_QUESTIONS];}
 function values(){const v={};for(const q of activeQuestions())if(answers[q.id])v[q.id]=answers[q.id].value;return v;}
 function visible(){return activeQuestions().filter(q=>!q.showIf||q.showIf(values()));}
 const DOWNSTREAM={
@@ -694,6 +710,11 @@ function unlockEssentiaMainTitle(){
  applyEssentiaMainTitle();
 }
 applyEssentiaMainTitle();
+function normalizeSephrusCharacterName(name){
+ const key=String(name||"").trim().toLowerCase().replace(/\\s+/g," ");
+ const aliases=["sephrus","zephyrus","aztiluth","sephrus zephyrus","sephrus aztiluth","zephyrus aztiluth","sephrus zephyrus aztiluth"];
+ return aliases.includes(key)?"Sephrus Aztiluth":String(name||"").trim();
+}
 function sephrusSecretKey(name){
  const normalized=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
  const messages={
@@ -822,6 +843,80 @@ function returnHomeFromSephrusSecret(){
   window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage(afterimageMessage);},2250);
  },2100);
 }
+const WEAPON_STYLE_OPTIONS=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit"];
+const WEAPON_CATALOGUE={
+ "Melee":["Fists","Knuckle Guards","Cestus","Gauntlets","Tonfa","Baton","Short Sword","Longsword","Greatsword","Rapier","Saber","Katana","Paired Blades","Dagger","Ceremonial Knife","Spear","Lance","Halberd","Glaive","Polearm","Quarterstaff","Warhammer","Mace","Flail","Battle Axe","Great Axe","Scythe","Shield","Umbrella","Cane","Combat Fan","Chain-Blade (fantasy)","Whip (fantasy)","Flexible Ribbon-Blade (fantasy)","Twin Staffs","Trident","Hooked Staff","Folding Blade (fantasy)"],
+ "Ranged":["Longbow","Shortbow","Recurve Bow","Composite Bow (fictional setting)","Crossbow","Hand Crossbow","Sidearm","Revolver-style Sidearm","Longarm","Scatter-type Firearm","Rapid-fire Firearm","Precision Firearm","Energy Firearm","Arcane Firearm","Handheld Energy Projector","Fictional Payload Launcher"],
+ "Unarmed":["Fists","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style"],
+ "Hybrid / Transforming":["Transforming Blade","Modular Staff","Split-form Polearm","Blade-and-Focus Pair","Twin-form Weapon","Collapsible Fantasy Weapon","Weapon-and-Shield Pair"],
+ "Focus / Conduit":["Arcane Focus","Catalyst","Talisman Set","Grimoire","Resonance Bell","Ritual Instrument","Mechanical Conduit","E.G.O.-independent Device"]
+};
+const BOW_AMMO=["Plain Arrow (fictional profile)","Ember Arrow","Frost Arrow","Thunder Arrow","Gale Arrow","Binding Arrow","Resonance Arrow","Light Arrow","Echo Arrow","Dream Arrow","Signal Arrow","Status-inflicting Arrow","Custom Fictional Arrow"];
+const GUN_AMMO={
+ "compact":["Compact Impact Charge","Compact Ember Charge","Compact Frost Charge","Compact Shock Charge","Compact Resonance Charge","Compact Binding Charge","Compact Status Charge","Compact Signal Charge","Custom Fictional Charge"],
+ "revolver":["Cylinder-form Impact Charge","Cylinder-form Ember Charge","Cylinder-form Shock Charge","Cylinder-form Resonance Charge","Cylinder-form Status Charge","Custom Fictional Charge"],
+ "long":["Long-form Impact Charge","Long-form Piercing-effect Charge (fictional)","Long-form Frost Charge","Long-form Ember Charge","Long-form Marking Charge","Long-form Resonance Charge","Custom Fictional Charge"],
+ "scatter":["Scatter Capsule","Frost Scatter Capsule","Ember Scatter Capsule","Binding Scatter Capsule","Resonance Scatter Capsule","Custom Fictional Capsule"],
+ "rapid":["Rapid Impact Charge","Rapid Shock Charge","Rapid Marking Charge","Rapid Status Charge","Custom Fictional Charge"],
+ "energy":["Energy Cell","Ember Cell","Frost Cell","Thunder Cell","Light Cell","Resonance Cell","Custom Fictional Cell"],
+ "payload":["Sealed Utility Payload","Signal Payload","Binding Payload","Smoke-like Fictional Veil Payload","Resonance Payload","Custom Fictional Payload"]
+};
+function readWeaponDraft(){
+ const val=id=>document.getElementById("weapon-"+id)?.value||"";
+ return {style:val("style"),weapon:val("type"),ammoType:val("ammo-type"),ammo:val("ammo"),custom:val("custom")};
+}
+function renderWeaponCustomizer(saved){
+ const initial=saved.value&&typeof saved.value==="object"?saved.value:{};
+ const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal weapon-customizer";
+ const note=document.createElement("p");note.className="loadout-note";note.textContent="NON-E.G.O. EQUIPMENT · CHOOSE A STYLE, THEN BUILD A PERSONAL LOADOUT. RANGED AMMUNITION IS PURELY FICTIONAL.";
+ panel.append(note);
+ const fields=document.createElement("div");fields.className="loadout-fields weapon-fields";
+ function addSelect(id,label,options,value){
+  const wrap=document.createElement("div");wrap.className="loadout-field";
+  const lab=document.createElement("label");lab.htmlFor="weapon-"+id;lab.textContent=label;
+  const select=document.createElement("select");select.id="weapon-"+id;
+  options.forEach(item=>{const opt=document.createElement("option");opt.value=item;opt.textContent=item;select.append(opt);});
+  if(value&&options.includes(value))select.value=value;
+  wrap.append(lab,select);fields.append(wrap);return select;
+ }
+ const style=addSelect("style","FIGHTING STYLE",WEAPON_STYLE_OPTIONS,initial.style||"Melee");
+ const typeWrap=document.createElement("div");typeWrap.className="loadout-field";
+ const typeLabel=document.createElement("label");typeLabel.htmlFor="weapon-type";typeLabel.textContent="WEAPON / IMPLEMENT";
+ const type=document.createElement("select");type.id="weapon-type";typeWrap.append(typeLabel,type);fields.append(typeWrap);
+ const ammoWrap=document.createElement("div");ammoWrap.className="loadout-field";ammoWrap.hidden=true;
+ const ammoTypeLabel=document.createElement("label");ammoTypeLabel.htmlFor="weapon-ammo-type";ammoTypeLabel.textContent="AMMUNITION PROFILE";
+ const ammoType=document.createElement("select");ammoType.id="weapon-ammo-type";ammoWrap.append(ammoTypeLabel,ammoType);fields.append(ammoWrap);
+ const ammoChoiceWrap=document.createElement("div");ammoChoiceWrap.className="loadout-field";ammoChoiceWrap.hidden=true;
+ const ammoLabel=document.createElement("label");ammoLabel.htmlFor="weapon-ammo";ammoLabel.textContent="AMMO TYPE";
+ const ammo=document.createElement("select");ammo.id="weapon-ammo";ammoChoiceWrap.append(ammoLabel,ammo);fields.append(ammoChoiceWrap);
+ const customWrap=document.createElement("div");customWrap.className="loadout-field";
+ const customLabel=document.createElement("label");customLabel.htmlFor="weapon-custom";customLabel.textContent="CUSTOM DETAILS (OPTIONAL)";
+ const custom=document.createElement("input");custom.id="weapon-custom";custom.type="text";custom.maxLength=240;custom.placeholder="Name, appearance, or fictional special property";
+ custom.value=initial.custom||"";customWrap.append(customLabel,custom);fields.append(customWrap);
+ function fill(select,items,value){select.innerHTML="";items.forEach(item=>{const opt=document.createElement("option");opt.value=item;opt.textContent=item;select.append(opt);});if(value&&items.includes(value))select.value=value;}
+ function updateType(){
+  const styleValue=style.value;const items=WEAPON_CATALOGUE[styleValue]||[];
+  fill(type,items,initial.weapon);updateAmmo();
+ }
+ function updateAmmo(){
+  const styleValue=style.value,weaponValue=type.value;
+  const isBow=styleValue==="Ranged"&&/bow|crossbow/i.test(weaponValue);
+  const isGun=styleValue==="Ranged"&&/sidearm|revolver|longarm|scatter|rapid-fire|precision firearm|energy firearm|arcane firearm/i.test(weaponValue);
+  ammoWrap.hidden=!(isBow||isGun);ammoChoiceWrap.hidden=!(isBow||isGun);
+  if(!isBow&&!isGun)return;
+  ammoTypeLabel.textContent=isBow?"ARROW PROFILE":"AMMUNITION PROFILE";
+  const families=isBow?["Arrow","Specialized fictional arrow"]:weaponValue.includes("Revolver")?["Cylinder-form fictional charge"]:weaponValue.includes("Scatter")?["Scatter-type fictional capsule"]:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?["Energy-cell profile"]:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?["Long-form fictional charge"]:weaponValue.includes("Rapid")?["Rapid-form fictional charge"]:["Compact fictional charge"];
+  fill(ammoType,families,initial.ammoType);
+  const options=isBow?BOW_AMMO:weaponValue.includes("Revolver")?GUN_AMMO.revolver:weaponValue.includes("Scatter")?GUN_AMMO.scatter:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?GUN_AMMO.energy:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?GUN_AMMO.long:weaponValue.includes("Rapid")?GUN_AMMO.rapid:GUN_AMMO.compact;
+  fill(ammo,options,initial.ammo);
+ }
+ style.addEventListener("change",()=>{initial.weapon="";initial.ammo="";initial.ammoType="";updateType();});
+ type.addEventListener("change",()=>{initial.ammo="";initial.ammoType="";updateAmmo();});
+ updateType();panel.append(fields);
+ const hint=document.createElement("p");hint.className="weapon-loadout-hint";hint.textContent="Melee includes close-range weapon families and fists. Ranged includes bows and fictional firearm archetypes; ammunition choices are invented for this setting and only describe the character's loadout.";
+ panel.append(hint);$("choice-list").append(panel);
+ $("next-button").classList.remove("hidden");$("next-button").innerHTML="SAVE WEAPON LOADOUT <span>→</span>";$("custom-wrap").classList.add("hidden");
+}
 function renderSinnerEgo(saved){
   const savedValue=(saved.value&&saved.value.sinner_ego)||"";
   const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal";panel.dataset.egoPath="sinner";
@@ -897,6 +992,7 @@ function render(){
    return;
  }
  if(q.customizer){
+   if(q.weaponCustomizer){renderWeaponCustomizer(saved);return;}
    if(egoPathOf(values().ego_status)==="sinner"){renderSinnerEgo(saved);return;}
    const savedLoadout=saved.value||{};
    const egoPath=egoPathOf(values().ego_status);const isLcorp=egoPath==="lobotomy";
@@ -1105,6 +1201,7 @@ function submit(){
   setAnswer(q,"Detailed response",detail,detail);advance();return;
  }
  if(q.customizer){
+  if(q.weaponCustomizer){const loadout=readWeaponDraft();if(!loadout.style||!loadout.weapon){$("validation-message").textContent="CHOOSE A FIGHTING STYLE AND A WEAPON OR FOCUS.";return;}setAnswer(q,"Selected weapon loadout",loadout,"");advance();return;}
   if(egoPathOf(values().ego_status)==="sinner"){
    const ego=$("loadout-sinner_ego").value.trim();
    if(!ego){$("validation-message").textContent="SEARCH OR ENTER AN E.G.O. BEFORE CONTINUING.";return;}
@@ -1158,7 +1255,7 @@ $("name-back").onclick=()=>screen("mode");
 $("name-continue").onclick=()=>{
  const entered=$("character-name").value.trim();
  if(!entered){$("name-validation").textContent="PLEASE ENTER A NAME TO BEGIN YOUR RECORD."; $("character-name").focus(); return;}
- resetSephrusSecretState();characterName=entered;index=0;render();screen("picker");
+ resetSephrusSecretState();characterName=normalizeSephrusCharacterName(entered);$("character-name").value=characterName;index=0;render();screen("picker");
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>screen("home");
