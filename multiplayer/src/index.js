@@ -302,7 +302,7 @@ export class RoomHub extends DurableObject {
     this.room.round = 1;
     this.room.log.push({ at: Date.now(), text: "The match has begun. " + this.room.players[0].name + " takes the first turn." });
     await this.saveAndBroadcast("match-started");
-    return json({ room: this.publicState() });
+    return json({ room: this.publicState(player.id) });
   }
 
   addLog(kind, text) {
