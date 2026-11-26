@@ -1244,8 +1244,9 @@ function simMirrorAssist(actor){
  actor.mirrorSummons=(actor.mirrorSummons||0)+1;
  const summonName="Sephrus Variant "+actor.mirrorSummons;
  simAddLog("system",actor.name,summonName+" materializes from another Mirror World and joins the exchange.");
+ simAddLog("chat",actor.name,'"I hear you across the mirror. Continue."');
  simAddLog("chat",summonName,'"The same essence. A different circumstance. We will assist."');
- return 8;
+ return 18;
 }
 
 function simRecordScore(record){
