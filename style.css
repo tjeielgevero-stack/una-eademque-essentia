@@ -1264,3 +1264,87 @@ footer { border-top-color:rgba(var(--accent-rgb),.24); }
     animation:none!important;
   }
 }
+
+
+/* OVER-THE-TOP EFFECTS — choose how ridiculous the archive should become. */
+.effect-superbobble button:hover {
+  position:relative;
+  z-index:30;
+  transform-origin:center;
+  animation:super-necessary-bobble .72s cubic-bezier(.3,1.6,.55,1) infinite!important;
+  box-shadow:0 0 0 5px rgba(var(--accent-rgb),.13),0 18px 42px rgba(0,0,0,.52),0 0 30px rgba(var(--accent-rgb),.4)!important;
+}
+@keyframes super-necessary-bobble {
+  0%,100% { transform:translateY(-4px) scale(1.42) rotate(-2deg); }
+  25% { transform:translateY(-13px) scale(1.58) rotate(2deg); }
+  50% { transform:translateY(2px) scale(1.34) rotate(-1deg); }
+  75% { transform:translateY(-8px) scale(1.52) rotate(2deg); }
+}
+.effect-screenquake body:has(button:hover) main,
+.effect-screenquake body:has(button:hover) .site-header,
+.effect-screenquake body:has(button:hover) footer,
+.effect-screenquake body:has(button:hover) .settings-panel {
+  animation:overdrive-screen-quake .42s steps(2,end) infinite;
+}
+@keyframes overdrive-screen-quake {
+  0% { translate:0 0; }
+  25% { translate:2px -1px; }
+  50% { translate:-2px 1px; }
+  75% { translate:1px 2px; }
+  100% { translate:-1px -2px; }
+}
+.effect-rainbowapocalypse main,
+.effect-rainbowapocalypse .site-header,
+.effect-rainbowapocalypse footer,
+.effect-rainbowapocalypse .settings-panel {
+  animation:overdrive-rainbow-apocalypse 8s linear infinite;
+}
+@keyframes overdrive-rainbow-apocalypse {
+  from { filter:hue-rotate(0deg) saturate(1.15); }
+  to { filter:hue-rotate(360deg) saturate(1.85); }
+}
+.effect-bossintro .screen-enter {
+  animation:overdrive-boss-entrance .92s cubic-bezier(.12,.9,.2,1.18) both!important;
+  transform-origin:50% 45%;
+}
+.effect-bossintro .question-enter {
+  animation:overdrive-question-entrance .72s cubic-bezier(.12,.9,.2,1.18) both!important;
+  transform-origin:50% 35%;
+}
+@keyframes overdrive-boss-entrance {
+  0% { opacity:0; transform:perspective(1000px) translateY(70px) rotateX(24deg) scale(.72); filter:blur(12px) brightness(1.8); }
+  58% { opacity:1; transform:perspective(1000px) translateY(-9px) rotateX(-3deg) scale(1.035); filter:blur(0) brightness(1.25); }
+  78% { transform:perspective(1000px) translateY(3px) rotateX(1deg) scale(.99); }
+  100% { opacity:1; transform:perspective(1000px) translateY(0) rotateX(0) scale(1); filter:none; }
+}
+@keyframes overdrive-question-entrance {
+  0% { opacity:0; transform:translateY(34px) scale(.88) rotate(-1.2deg); filter:blur(7px); }
+  65% { opacity:1; transform:translateY(-4px) scale(1.015) rotate(.2deg); filter:blur(0); }
+  100% { opacity:1; transform:translateY(0) scale(1) rotate(0); }
+}
+.overdrive-effects .effect-card {
+  border-color:rgba(var(--accent-rgb),.42);
+  background:linear-gradient(135deg,rgba(var(--accent-rgb),.075),rgba(0,0,0,.22));
+}
+.overdrive-effects .effect-card:hover {
+  border-color:var(--accent);
+  box-shadow:0 0 24px rgba(var(--accent-rgb),.13);
+}
+@media(prefers-reduced-motion:reduce) {
+  .effect-superbobble button:hover,
+  .effect-screenquake body:has(button:hover) main,
+  .effect-screenquake body:has(button:hover) .site-header,
+  .effect-screenquake body:has(button:hover) footer,
+  .effect-screenquake body:has(button:hover) .settings-panel,
+  .effect-rainbowapocalypse main,
+  .effect-rainbowapocalypse .site-header,
+  .effect-rainbowapocalypse footer,
+  .effect-rainbowapocalypse .settings-panel,
+  .effect-bossintro .screen-enter,
+  .effect-bossintro .question-enter {
+    animation:none!important;
+    filter:none!important;
+    translate:none!important;
+    transform:none!important;
+  }
+}
