@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-vibe106">
+  <link rel="stylesheet" href="style.css?v=20261127-lore1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -44,6 +44,7 @@
     <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
     <div class="header-tools">
       <span class="header-tag">CITY RECORDS · MIRROR WORLD BUILDER</span>
+      <button id="lore-book-open" class="settings-open lore-book-open" type="button" aria-haspopup="dialog" aria-controls="lore-book-overlay" aria-expanded="false">LORE BOOK</button>
       <button id="app-install-button" class="settings-open app-install-button" type="button">INSTALL APP</button>
       <button id="info-open" class="settings-open info-open" type="button" aria-haspopup="dialog" aria-controls="info-overlay" aria-expanded="false">INFO</button>
       <button id="settings-open" class="settings-open" type="button" aria-haspopup="dialog" aria-controls="settings-overlay" aria-expanded="false">
@@ -72,6 +73,40 @@
         </div>
       </div>
       <button id="info-done" class="primary-button info-done" type="button">GOT IT <span>✓</span></button>
+    </section>
+  </dialog>
+
+
+  <dialog id="lore-book-overlay" class="lore-book-overlay" aria-labelledby="lore-book-title">
+    <section class="lore-book-panel" role="dialog" aria-modal="true" aria-labelledby="lore-book-title">
+      <div class="lore-book-header">
+        <div>
+          <p class="lore-book-kicker">PROJECT MOON REFERENCE ARCHIVE</p>
+          <h2 id="lore-book-title">THE LORE BOOK</h2>
+          <p class="lore-book-intro">A general-purpose encyclopedia of the worlds, organizations, phenomena, and story concepts across Project Moon's three main games.</p>
+        </div>
+        <button id="lore-book-close" class="settings-close" type="button" aria-label="Close lore book">×</button>
+      </div>
+      <p class="lore-book-spoiler"><strong>SPOILER NOTICE:</strong> Entries may discuss major setting reveals and story concepts from all three games. Read at your own pace.</p>
+      <div class="lore-book-controls">
+        <label class="lore-book-search-label" for="lore-book-search">SEARCH THE ENCYCLOPEDIA</label>
+        <input id="lore-book-search" name="lore-book-search" type="search" maxlength="100" placeholder="Search locations, factions, people, or concepts…">
+      </div>
+      <nav class="lore-book-tabs" aria-label="Lore book volumes">
+        <button type="button" class="lore-book-tab is-active" data-lore-volume="city">CITY PRIMER</button>
+        <button type="button" class="lore-book-tab" data-lore-volume="lobotomy">LOBOTOMY CORPORATION</button>
+        <button type="button" class="lore-book-tab" data-lore-volume="ruina">LIBRARY OF RUINA</button>
+        <button type="button" class="lore-book-tab" data-lore-volume="limbus">LIMBUS COMPANY</button>
+      </nav>
+      <div id="lore-book-content" class="lore-book-content" aria-live="polite"></div>
+      <footer class="lore-book-sources">
+        <span>REFERENCE LINKS</span>
+        <a href="https://limbuscompany.com/" target="_blank" rel="noopener noreferrer">Official Limbus Company website</a>
+        <a href="https://lobotomycorp.fandom.com/wiki/Lobotomy_Corporation_Wiki" target="_blank" rel="noopener noreferrer">Lobotomy Corporation Wiki</a>
+        <a href="https://libraryofruina.wiki.gg/" target="_blank" rel="noopener noreferrer">Library of Ruina Wiki</a>
+        <a href="https://limbuscompany.wiki.gg/" target="_blank" rel="noopener noreferrer">Limbus Company Wiki</a>
+        <small>Unofficial fan reference. Summaries are written for this archive; Project Moon owns its original settings and characters. Entries may simplify details and can be expanded as the games develop.</small>
+      </footer>
     </section>
   </dialog>
 
@@ -472,8 +507,9 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261127-vibe106"></script>
+  <script src="script.js?v=20261127-lore1"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
+  <script src="lore-book.js?v=20261127-lore1"></script>
   <script>
     (() => {
       const infoDialog = document.getElementById("info-overlay");
