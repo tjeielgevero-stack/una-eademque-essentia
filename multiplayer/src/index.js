@@ -32,7 +32,11 @@ function safeCharacter(input) {
     egoEligible: source.egoEligible === true
   };
 }
-async function forwardRequest(request, url) {\n  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.text();\n  return new Request(url, { method: request.method, headers: request.headers, body });\n}\nfunction teamFor(mode, index) {
+async function forwardRequest(request, url) {
+  const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.text();
+  return new Request(url, { method: request.method, headers: request.headers, body });
+}
+function teamFor(mode, index) {
   if (mode === "2v2") return index % 2 === 0 ? "A" : "B";
   return mode === "ffa" ? String(index + 1) : (index === 0 ? "A" : "B");
 }
@@ -40,6 +44,7 @@ async function forwardRequest(request, url) {\n  const body = request.method ===
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: JSON_HEADERS });
     if (url.pathname === "/api/health") return json({ ok: true, service: "Una Eademque Essentia Multiplayer", version: 1 });
     if (url.pathname === "/api/rooms" && request.method === "POST") {
       let body;
