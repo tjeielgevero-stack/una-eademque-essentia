@@ -1999,3 +1999,6 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
   .sephrus-afterimage.shattering .sephrus-afterimage-frame { opacity:0; }
   .sephrus-afterimage.shattering .sephrus-glass-shard,.sephrus-afterimage.shattering .sephrus-pull-chain,.sephrus-afterimage.shattering .sephrus-fracture-web { animation:none!important; }
 }
+
+/* Chains were removed from the Sephrus sequence; retain only the fracture and glass effects. */
+.sephrus-pull-chain,.personality-chain { display:none !important; }
