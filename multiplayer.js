@@ -255,7 +255,7 @@
       card.append(make("small", {}, player.hp + " HP" + (player.guarding ? " · DEFENDING" : "") + (player.egoUsed ? " · E.G.O. USED" : "")));
       players.append(card);
     });
-    $("mp-host-controls").classList.toggle("mp-hidden", !(current?.host && room.status === "lobby"));
+    $("mp-host-controls").classList.toggle("mp-hidden", !(room.hostPlayerId === current?.playerId && room.status === "lobby"));
     $("mp-battle-controls").classList.toggle("mp-hidden", room.status !== "active");
     const isMyTurn = room.status === "active" && room.turnPlayerId === current?.playerId;
     ["mp-attack", "mp-defend", "mp-ego", "mp-pass"].forEach(id => $(id).disabled = !isMyTurn);
