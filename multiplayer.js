@@ -45,6 +45,12 @@
     .mp-back{margin-bottom:18px}
     .mp-arena{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0 22px}
     .mp-fighter-card{position:relative;min-height:210px}
+    @keyframes mp-attacker-lunge{0%,100%{transform:translateX(0) scale(1)}38%{transform:translateX(7px) scale(1.015)}68%{transform:translateX(-2px) scale(1)}}
+    @keyframes mp-parry-pulse{0%,100%{box-shadow:0 0 0 rgba(206,184,142,0)}50%{box-shadow:0 0 24px rgba(206,184,142,.28)}}
+    .mp-fighter-card.mp-attacking{animation:mp-attacker-lunge .48s cubic-bezier(.2,.8,.2,1)}
+    .mp-fighter-card.mp-parry-ready{border-color:#c9b58f;animation:mp-parry-pulse .72s ease-in-out infinite}
+    .mp-ultimate-meter{border:1px solid rgba(196,170,125,.23);border-radius:5px}
+    .mp-ultimate-meter span{background:linear-gradient(90deg,#8e7048,#ddc799);box-shadow:0 0 9px rgba(218,189,140,.38)}
     .mp-fighter-card .sim-fighter-traits{min-height:28px}
     .mp-fighter-card .mp-fighter-affiliation{margin:0 0 10px;color:#9f9689;font:9px 'DM Mono',monospace;letter-spacing:.07em}
     .mp-fighter-meta{display:flex;justify-content:space-between;gap:8px;margin-top:10px;color:#c7b89f;font:9px 'DM Mono',monospace}
@@ -473,7 +479,7 @@
       const hit = !!old && player.hp < old.hp;
       if (hit) { impactTarget = player; if (player.hp === 0) impactFatal = true; }
       if (!!player.egoActive && !old?.egoActive) egoTarget = player;
-      const card = make("article", { className: "sim-fighter-card mp-fighter-card" + (player.hp > 0 ? "" : " sim-fighter-out") + (player.id === room.turnPlayerId ? " mp-current" : "") + (hit ? " sim-damage-pulse" : "") + (player.egoActive ? " sim-ego-awakened" : "") });
+      const card = make("article", { className: "sim-fighter-card mp-fighter-card" + (player.hp > 0 ? "" : " sim-fighter-out") + (player.id === room.turnPlayerId ? " mp-current" : "") + (hit ? " sim-damage-pulse" : "") + (player.egoActive ? " sim-ego-awakened" : "") + (player.status === "ATTACKING" || player.status === "E.G.O. STRIKE" ? " mp-attacking" : "") + (player.status === "PARRY WINDOW" ? " mp-parry-ready" : "") });
       const top = make("div", { className: "sim-fighter-top" });
       top.append(make("span", { className: "sim-team-tag" }, room.mode === "ffa" ? "FREE AGENT " + player.team : "TEAM " + player.team));
       top.append(make("span", { className: "sim-fighter-state" }, player.status || (player.hp > 0 ? (player.connected ? "ONLINE" : "OFFLINE") : "OUT")));
@@ -486,7 +492,11 @@
       hp.append(fill);
       const hpText = make("div", { className: "sim-hp-text" }, "HEALTH " + player.hp + " / 100");
       const status = make("p", { className: "sim-fighter-status" }, (player.guarding ? "GUARDING · " : "") + (player.egoUsed ? "E.G.O. USED · " : "") + (player.ultimateCharge || 0) + "/3 ULTIMATE CHARGE" + (player.ultimateUsed ? " · ULTIMATE SPENT" : ""));
-      card.append(top, name, traits, affiliation, hp, hpText, status);
+      const ultimateMeter = make("div", { className: "mp-ultimate-meter" });
+      const ultimateFill = make("span");
+      ultimateFill.style.width = Math.min(3, player.ultimateCharge || 0) / 3 * 100 + "%";
+      ultimateMeter.append(ultimateFill);
+      card.append(top, name, traits, affiliation, hp, hpText, status, ultimateMeter);
       if (player.character?.egoEligible) {
         card.append(make("p", { className: "sim-ego-label" }, player.egoActive ? "✦ " + (player.character.egoName || "E.G.O.") + " · MANIFESTED" : "E.G.O. AVAILABLE"));
       }
