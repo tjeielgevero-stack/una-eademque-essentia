@@ -336,7 +336,7 @@ function profileFieldsFromAnswers(a){
  const labelled=(label,source=detailText)=>{
   if(!source)return "";
   const escaped=label;
-  const match=source.match(new RegExp("(?:^|\\n)\\s*"+escaped+"\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:Ability \\d+|Ultimate Ability \\d+|Passive Ability|Title|Race|Likes|Dislikes)\\s*:|$)","i"));
+  const match=source.match(new RegExp("(?:^|\\n)\\s*"+escaped+"\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:Title|Race|Appearance|Ability \\d+|Ultimate Ability \\d+|Passive Ability|Personality|Backstory|Likes|Dislikes|Origin|Affiliation|Grade|Overall)\\s*:|$)","i"));
   return match?.[1]?.trim()||"";
  };
  return {get,first,combine,detailText,labelled};
@@ -348,7 +348,7 @@ function formatCharacterDossier(name,mode,answersSource){
  const race=labelled("Race")||first("race","species","complex_race")||notSet;
  const occupation=first("occupation","complex_occupation");
  const affiliation=labelled("Affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role")||occupation||notSet;
- const grade=labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position","color_title")||first("grade","classification")||notSet;
+ const grade=labelled("Grade")||combine("fixer_grade","finger_rank","syndicate_hierarchy","association_position")||first("grade","classification")||notSet;
  const appearance=labelled("Appearance")||combine("advanced_appearance","appearance","complex_09","augmentation","ego_appearance","advanced_ego_appearance","complex_44")||notSet;
  const origin=labelled("Origin")||combine("origin_type","district","upbringing","backstreet_environment","complex_14")||notSet;
  const egoStatus=first("ego_status","complex_41");
