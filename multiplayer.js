@@ -78,7 +78,6 @@
     .mp-combat-loadout{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:12px 0}
     .mp-combat-loadout label{display:flex;flex-direction:column;gap:6px;color:#bdb09e;font:9px 'DM Mono',monospace;letter-spacing:.1em}
     .mp-combat-loadout select{min-height:40px;padding:9px;background:#111;color:#eee;border:1px solid #5a5148;font:13px Georgia,serif}
-    .mp-resistance-note{color:#b7a78e;font:9px/1.5 'DM Mono',monospace;margin:7px 0}
     .mp-status-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
     .mp-status-tag{padding:4px 6px;border:1px solid #66513c;background:#211b15;color:#e0c9a8;font:8px 'DM Mono',monospace}
     .mp-book-button{margin-top:10px}
@@ -189,16 +188,6 @@
       egoName: ego.name || answer(record, ["ego_name", "complex_43"]),
       egoType: answer(record, ["ego_status", "complex_41"]),
       egoEligible: !!ego.eligible,
-      resistances: (() => {
-        const text = answer(record, ["damage_resistances"]);
-        const read = type => {
-          const match = text.match(new RegExp(type + "\\s*[×x]\\s*(0\\.5|1\\.0|1\\.5|2\\.0|2\\.5|1|2)", "i"));
-          return match ? Number(match[1]) : null;
-        };
-        const values = { slash: read("Slash"), pierce: read("Pierce"), blunt: read("Blunt") };
-        return values.slash !== null && values.pierce !== null && values.blunt !== null && Math.abs(values.slash + values.pierce + values.blunt - 3.5) < 0.001
-          ? values : { slash: 1, pierce: 1, blunt: 1.5 };
-      })(),
       personality: personality.map(String).slice(0, 8),
       abilities: abilityFields.length ? abilityFields.slice(0,4) : splitAbilities(abilityText),
       ultimateAbilities: ultimateAbilities.slice(0,2),
@@ -292,9 +281,6 @@
             </label>
           </div>
           <div class="mp-combat-loadout">
-            <label>ATTACK TYPE
-              <select id="mp-damage-type"><option value="slash">Slash</option><option value="pierce">Pierce</option><option value="blunt">Blunt</option></select>
-            </label>
             <label>STATUS EFFECT
               <select id="mp-status-effect"><option value="">None</option><option>Burn</option><option>Bleed</option><option>Rupture</option><option>Sinking</option><option>Tremor</option><option>Fragile</option><option>Bind</option><option>Paralyze</option><option>Poise</option><option>Charge</option><option>Haste</option><option>Protection</option><option>Strength</option><option>Feeble</option><option>Smoke</option><option>Fairy</option><option>Erosion</option></select>
             </label>
@@ -530,12 +516,6 @@
       fill.style.width = Math.max(0, hit ? old.hp : player.hp) + "%";
       hp.append(fill);
       const hpText = make("div", { className: "sim-hp-text" }, "HEALTH " + player.hp + " / 100");
-      const resistanceName = value => value === 0.5 ? "ENDURE" : value === 1 ? "NORMAL" : value === 1.5 ? "EFFECTIVE" : value === 2.5 ? "FATAL" : "VULNERABLE";
-      const resist = player.resistances || player.character?.resistances || { slash: 1, pierce: 1, blunt: 1.5 };
-      const resistanceNote = make("p", { className: "mp-resistance-note" }, ["SLASH", "PIERCE", "BLUNT"].map(type => {
-        const value = Number(resist[type.toLowerCase()] ?? 1);
-        return type + " " + resistanceName(value) + " ×" + value.toFixed(1);
-      }).join("  ·  "));
       const status = make("p", { className: "sim-fighter-status" }, (player.guarding ? "GUARDING · " : "") + (player.egoUsed ? "E.G.O. USED · " : "") + (player.ultimateCharge || 0) + "/3 ULTIMATE CHARGE" + (player.ultimateUsed ? " · ULTIMATE SPENT" : ""));
       const statusTags = make("div", { className: "mp-status-tags" });
       (player.statusEffects || []).forEach(effect => statusTags.append(make("span", { className: "mp-status-tag" }, effect.name + " " + effect.potency + " · " + effect.turns + "T")));
@@ -543,7 +523,7 @@
       const ultimateFill = make("span");
       ultimateFill.style.width = Math.min(3, player.ultimateCharge || 0) / 3 * 100 + "%";
       ultimateMeter.append(ultimateFill);
-      card.append(top, name, traits, affiliation, hp, hpText, status, resistanceNote);
+      card.append(top, name, traits, affiliation, hp, hpText, status);
       if (statusTags.childNodes.length) card.append(statusTags);
       card.append(ultimateMeter);
       if (player.character?.egoEligible) {
@@ -626,7 +606,6 @@
     if (!current) return;
     const body = Object.assign({}, credentials(), {
       type, targetId: $("mp-target").value,
-      damageType: $("mp-damage-type").value,
       statusEffect: $("mp-status-effect").value,
       statusPotency: Number($("mp-status-tier").value)
     });
