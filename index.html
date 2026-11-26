@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-vibe101">
+  <link rel="stylesheet" href="style.css?v=20261127-vibe102">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -300,9 +300,10 @@
       </div>
       <div class="hero-details"><span>INFINITE MIRROR WORLDS</span><span>✦</span><span>ONE SHARED ESSENCE</span></div>
       <section class="update-log" aria-labelledby="update-log-title">
-        <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 001</p><h2 id="update-log-title">VIBE CODED UPDATE 1.0.1</h2></div><span class="update-log-version">VERSION 1.0.1</span></div>
+        <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 001</p><h2 id="update-log-title">VIBE CODED UPDATE 1.0.2</h2></div><span class="update-log-version">VERSION 1.0.2</span></div>
         <p class="update-log-intro">A fresh batch of features and quality-of-life improvements for the archive.</p>
         <ul class="update-log-list">
+          <li><strong>Background and cache reliability</strong><span>Corrected offline asset caching so updated scripts and styles are refreshed, and improved image loading and saved-background recovery.</span></li>
           <li><strong>Custom background fix</strong><span>Improved image saving, restoring, and display, with a live accent-lit dropzone indicator.</span></li>
           <li><strong>Personal weapon loadouts</strong><span>Choose melee, ranged, unarmed, hybrid, or focus-based fighting styles, with fictional ammunition profiles where applicable.</span></li>
           <li><strong>Improved INFO panel</strong><span>A refreshed creator note with project information and a way to share suggestions.</span></li>
@@ -466,7 +467,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261127-vibe101"></script>
+  <script src="script.js?v=20261127-vibe102"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
   <script>
     (() => {
@@ -532,7 +533,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js").catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261127-vibe102", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
