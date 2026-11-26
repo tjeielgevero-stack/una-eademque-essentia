@@ -1948,27 +1948,36 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 .sephrus-afterimage.shattering .sephrus-pull-chain {
   animation:sephrus-chain-pull 1.55s cubic-bezier(.18,.76,.18,1) both;
 }
+.sephrus-afterimage.shattering .sephrus-fracture-web {
+  animation:sephrus-fracture-flash 1.25s ease-out both;
+}
 
 .sephrus-afterimage.shattering .sephrus-afterimage-frame {
-  animation:sephrus-afterimage-collapse 1.55s ease-in both;
+  animation:sephrus-afterimage-collapse 1.9s ease-in both;
 }
 .sephrus-afterimage.shattering .sephrus-afterimage-label,
 .sephrus-afterimage.shattering .sephrus-afterimage-text {
   animation:sephrus-afterimage-text-break .3s ease-in .62s both;
 }
 .sephrus-afterimage.shattering .sephrus-glass-shard {
-  animation:sephrus-glass-break 1.25s cubic-bezier(.2,.72,.24,1) .25s both;
+  animation:sephrus-glass-break 1.6s cubic-bezier(.16,.74,.22,1) .18s both;
 }
 @keyframes sephrus-afterimage-arrive {
   from { opacity:0; transform:translateY(14px) scale(.96); filter:blur(5px); }
   to { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
 }
 @keyframes sephrus-chain-pull {
-  0% { opacity:0; transform:var(--chain-from); }
-  14% { opacity:1; transform:var(--chain-taut); filter:brightness(1.5) grayscale(1) drop-shadow(0 0 8px rgba(255,255,255,.8)); }
-  43% { opacity:1; transform:var(--chain-taut); }
-  61% { opacity:1; transform:var(--chain-pull); filter:brightness(2.1) grayscale(1) drop-shadow(0 0 12px rgba(255,255,255,.9)); }
+  0% { opacity:0; transform:var(--chain-start); }
+  12% { opacity:1; transform:var(--chain-held); filter:brightness(1.45) grayscale(1) drop-shadow(0 0 8px rgba(255,255,255,.82)); }
+  40% { opacity:1; transform:var(--chain-held); }
+  57% { opacity:1; transform:var(--chain-recoil); filter:brightness(2) grayscale(1) drop-shadow(0 0 13px rgba(255,255,255,.96)); }
   100% { opacity:0; transform:var(--chain-end); }
+}
+@keyframes sephrus-fracture-flash {
+  0% { opacity:0; }
+  13% { opacity:1; }
+  42% { opacity:.88; }
+  100% { opacity:0; }
 }
 @keyframes sephrus-afterimage-collapse {
   0% { opacity:1; filter:brightness(1); transform:translateY(0) scale(1); }
@@ -1988,5 +1997,5 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
   .sephrus-afterimage,.sephrus-afterimage-frame { transition:none!important; animation:none!important; }
   .sephrus-afterimage.visible .sephrus-afterimage-frame { transform:none; opacity:1; }
   .sephrus-afterimage.shattering .sephrus-afterimage-frame { opacity:0; }
-  .sephrus-afterimage.shattering .sephrus-glass-shard,.sephrus-afterimage.shattering .sephrus-pull-chain { animation:none!important; }
+  .sephrus-afterimage.shattering .sephrus-glass-shard,.sephrus-afterimage.shattering .sephrus-pull-chain,.sephrus-afterimage.shattering .sephrus-fracture-web { animation:none!important; }
 }
