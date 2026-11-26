@@ -335,8 +335,7 @@ function profileFieldsFromAnswers(a){
  const detailText=first("dossier_details","profile_details","advanced_abilities","complex_abilities");
  const labelled=(label,source=detailText)=>{
   if(!source)return "";
-  const escaped=label.replace(/[.*+?^${}()|[\]\\]/g,"\\function writeOcArchive(x){try{localStorage.setItem(OC_STORAGE_KEY,JSON.stringify(x));}catch{}}
-");
+  const escaped=label;
   const match=source.match(new RegExp("(?:^|\\n)\\s*"+escaped+"\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:Ability \\d+|Ultimate Ability \\d+|Passive Ability|Title|Race|Likes|Dislikes)\\s*:|$)","i"));
   return match?.[1]?.trim()||"";
  };
