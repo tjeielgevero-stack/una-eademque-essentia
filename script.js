@@ -501,7 +501,7 @@ function setAnswer(q,choice,value,custom=""){
 function screen(n){["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");window.scrollTo({top:0,behavior:"smooth"});}
 function resetSephrusSecretState(){sephrusBrokenClickCount=0;sephrusEscapeRunning=false;}
 function sephrusSecretKey(name){
- const normalized=String(name||"").trim().toLowerCase().replace(/\\s+/g," ");
+ const normalized=String(name||"").trim().toLowerCase().replace(/\s+/g," ");
  const messages={
   "sephrus":"You have returned to the name. That does not mean you understand the one who bears it.",
   "zephyrus":"The wind carries every name. It does not promise to return them.",
