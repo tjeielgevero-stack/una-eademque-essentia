@@ -8,6 +8,10 @@
   let current = null;
   let latestRoom = null;
   let refreshTimer = null;
+  let qteTimer = null;
+  let qteSubmitting = false;
+  let activeChallengeId = null;
+  let impactTimer = null;
 
   const css = document.createElement("style");
   css.textContent = `
@@ -39,6 +43,32 @@
     .mp-hidden{display:none!important}
     .mp-section-title{border-bottom:1px solid #51483f;padding-bottom:9px;margin-top:28px;font:12px 'DM Mono',monospace;letter-spacing:.14em;color:#c8b9a6}
     .mp-back{margin-bottom:18px}
+    .mp-arena{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0 22px}
+    .mp-fighter-card{position:relative;min-height:210px}
+    .mp-fighter-card .sim-fighter-traits{min-height:28px}
+    .mp-fighter-card .mp-fighter-affiliation{margin:0 0 10px;color:#9f9689;font:9px 'DM Mono',monospace;letter-spacing:.07em}
+    .mp-fighter-meta{display:flex;justify-content:space-between;gap:8px;margin-top:10px;color:#c7b89f;font:9px 'DM Mono',monospace}
+    .mp-player-dossier{display:none;white-space:pre-wrap;max-height:300px;overflow:auto;margin-top:12px;padding:12px;border:1px solid rgba(188,164,124,.2);background:#0c0b0a;color:#d7cbbb;font:12px/1.55 'DM Mono',monospace}
+    .mp-player-dossier.open{display:block}
+    .mp-dossier-toggle{margin-top:10px;padding:7px 10px;border:1px solid #554a3e;background:#171513;color:#d7c6ad;font:9px 'DM Mono',monospace;letter-spacing:.08em}
+    .mp-qte-panel{margin:18px 0;padding:clamp(16px,3vw,26px);border:1px solid rgba(202,177,135,.55);background:radial-gradient(ellipse at top,rgba(117,88,55,.22),transparent 72%),linear-gradient(145deg,#211d18,#0b0a09);box-shadow:0 14px 44px #0009;text-align:center}
+    .mp-qte-panel.mp-qte-urgent{border-color:#c58e84;box-shadow:0 0 28px rgba(163,82,77,.2)}
+    .mp-qte-kicker{margin:0;color:#b6a183;font:9px 'DM Mono',monospace;letter-spacing:.2em}
+    .mp-qte-title{margin:8px 0;color:#eee4d5;font:clamp(22px,4vw,34px) Georgia,serif;letter-spacing:.08em}
+    .mp-qte-copy{margin:5px auto 14px;max-width:600px;color:#b5aa9a;font-size:13px;line-height:1.5}
+    .mp-qte-prompt{display:grid;place-items:center;width:clamp(76px,12vw,112px);height:clamp(76px,12vw,112px);margin:12px auto;border:1px solid #a78c66;background:radial-gradient(circle,#443522,#15110e 70%);color:#f4e6ce;font:700 clamp(36px,6vw,56px) Georgia,serif;text-shadow:0 0 20px #d7bd91;box-shadow:inset 0 0 26px #b48e5b22,0 0 24px #b48e5b22}
+    .mp-qte-progress{max-width:360px;height:5px;margin:15px auto 7px;background:#393129;overflow:hidden}
+    .mp-qte-progress span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#a68a62,#eee0c6);transform-origin:left;transition:transform .04s linear}
+    .mp-qte-step{color:#b6a58c;font:9px 'DM Mono',monospace;letter-spacing:.13em}
+    .mp-qte-buttons{display:grid;grid-template-columns:repeat(4,minmax(52px,72px));justify-content:center;gap:8px;margin-top:15px}
+    .mp-qte-buttons button{min-height:52px;border:1px solid #806b4e;background:#211c16;color:#f1e4d0;font:24px Georgia,serif;cursor:pointer;transition:transform .1s,background .1s,border-color .1s}
+    .mp-qte-buttons button:hover:not(:disabled){transform:translateY(-2px);background:#403323;border-color:#d0b48a}
+    .mp-qte-buttons button:disabled{opacity:.35;cursor:not-allowed}
+    .mp-ultimate-meter{height:5px;background:#36302a;overflow:hidden;margin-top:8px}
+    .mp-ultimate-meter span{display:block;height:100%;background:linear-gradient(90deg,#8e7048,#e0c99e);transition:width .45s ease}
+    .mp-interaction-note{color:#b8a58b;font:9px 'DM Mono',monospace;letter-spacing:.12em;margin:8px 0}
+    .mp-match-feed{max-height:380px}
+    .mp-attack-note{display:block;margin-top:6px;color:#968a78;font:8px 'DM Mono',monospace;letter-spacing:.06em}
     @media(max-width:600px){.mp-actions button{width:100%}.mp-room-code{font-size:23px}}
   `;
   document.head.append(css);
@@ -69,17 +99,80 @@
     }
     return "";
   }
+  function profileSummaryForRecord(record) {
+    if (record.profileSummary) return record.profileSummary;
+    const a = record.answers || {};
+    const read = (...keys) => {
+      for (const key of keys) {
+        const item = a[key];
+        if (!item) continue;
+        const value = item.choice === "Other / custom answer" && item.custom ? item.custom : item.value;
+        if (Array.isArray(value) && value.length) return value.join(", ");
+        if (typeof value === "string" && value.trim()) return value.trim();
+        if (value && typeof value === "object") return Object.values(value).filter(Boolean).join("; ");
+      }
+      return "";
+    };
+    const value = (text) => text || "Not specified.";
+    const ego = typeof window.simEgoProfile === "function" ? window.simEgoProfile(record) : { eligible: false, name: "" };
+    const status = read("ego_status", "complex_41");
+    const egoType = status.includes("Personally manifested") ? "Personal E.G.O." : status.includes("Volatile") ? "Volatile E.G.O." : status.includes("Distortion") ? "Distortion" : status.includes("Sinner-issued") ? "Abnormality-based (Sinner-issued)" : status.includes("Abnormality-derived") ? "Abnormality-derived" : status.includes("Lobotomy") ? "Artificial / refined Lobotomy E.G.O." : status.includes("No known") ? "Absent" : value(status);
+    const egoText = status.includes("No known") ? "No known E.G.O. or Distortion is recorded." : [status, ego.name && "Manifestation: " + ego.name, read("ego_appearance", "advanced_ego_appearance", "complex_44"), read("ego_function", "advanced_ego_function", "complex_61")].filter(Boolean).join(" | ");
+    const abilities = read("advanced_abilities", "complex_47");
+    return [
+      "Name: " + (record.name || "Unnamed Variant"),
+      "Title: " + value(read("title", "epithet", "color_title")),
+      "Race: " + value(read("race", "species")),
+      "Affiliation: " + value(read("affiliation", "association", "office", "syndicate", "occupation")),
+      "Grade: " + value(read("fixer_grade", "finger_rank", "syndicate_hierarchy", "association_position")),
+      "Appearance: " + value(read("advanced_appearance", "complex_09", "augmentation")),
+      "Origin: " + value(read("origin_type", "district", "upbringing")),
+      "E.G.O: " + value(egoText),
+      "E.G.O Type: " + egoType,
+      "Ability 1: " + value(read("ability_1") || abilities),
+      "Ability 2: " + value(read("ability_2")),
+      "Ability 3: " + value(read("ability_3")),
+      "Ability 4: " + value(read("ability_4")),
+      "Ultimate Ability 1: " + value(read("ultimate_ability_1")),
+      "Ultimate Ability 2: " + value(read("ultimate_ability_2")),
+      "Passive Ability: " + value(read("passive_ability")),
+      "Personality: " + value(read("personality", "advanced_personality", "complex_03")),
+      "Backstory: " + value(read("advanced_concept", "advanced_motivation", "backstory", "complex_15", "complex_59")),
+      "Likes: " + value(read("likes", "complex_32", "complex_33")),
+      "Dislikes: " + value(read("dislikes", "complex_37")),
+      "Overall: " + value(read("advanced_concept", "complex_60"))
+    ].join("\\n\\n");
+  }
   function characterSnapshot(record) {
     const ego = typeof window.simEgoProfile === "function" ? window.simEgoProfile(record) : { eligible: false, name: "" };
+    const a = record.answers || {};
+    const personalityItem = a.personality;
+    const personality = personalityItem?.choice === "Other / custom answer" ? [personalityItem.custom || personalityItem.value].filter(Boolean) : Array.isArray(personalityItem?.value) ? personalityItem.value : [personalityItem?.value].filter(Boolean);
+    const splitAbilities = text => typeof text === "string" ? text.split(/\\n+/).map(line => line.replace(/^\\s*Ability \\d+\\s*:\\s*/i, "").trim()).filter(Boolean).slice(0, 4) : [];
+    const abilityText = answer(record, ["advanced_abilities", "complex_47", "complex_50"]);
+    const abilityFields = ["ability_1","ability_2","ability_3","ability_4"].map(key => a[key]?.value || a[key]?.custom || "").filter(Boolean);
+    const ultimateAbilities = ["ultimate_ability_1","ultimate_ability_2"].map(key => a[key]?.value || a[key]?.custom || "").filter(Boolean);
     return {
       id: record.id,
       name: record.name || "Unnamed Variant",
+      title: answer(record, ["title", "epithet", "color_title"]),
+      race: answer(record, ["race", "species"]),
       mode: record.mode || "simple",
-      origin: answer(record, ["origin_type", "origin", "complex_1"]),
-      affiliation: answer(record, ["affiliation", "complex_5"]),
-      grade: answer(record, ["grade", "fixer_grade", "complex_12"]),
+      origin: answer(record, ["origin_type", "district", "complex_14"]),
+      affiliation: answer(record, ["affiliation", "association", "office", "syndicate", "occupation"]),
+      grade: answer(record, ["fixer_grade", "finger_rank", "syndicate_hierarchy", "association_position"]),
+      appearance: answer(record, ["advanced_appearance", "complex_09", "augmentation"]),
+      backstory: answer(record, ["advanced_concept", "advanced_motivation", "backstory", "complex_15"]),
       egoName: ego.name || answer(record, ["ego_name", "complex_43"]),
-      egoEligible: !!ego.eligible
+      egoType: answer(record, ["ego_status", "complex_41"]),
+      egoEligible: !!ego.eligible,
+      personality: personality.map(String).slice(0, 8),
+      abilities: abilityFields.length ? abilityFields.slice(0,4) : splitAbilities(abilityText),
+      ultimateAbilities: ultimateAbilities.slice(0,2),
+      passiveAbility: answer(record, ["passive_ability", "complex_passive"]),
+      likes: [answer(record, ["likes", "complex_32"]), answer(record, ["complex_33"])].filter(Boolean),
+      dislikes: [answer(record, ["dislikes", "complex_37"])].filter(Boolean),
+      profileSummary: profileSummaryForRecord(record)
     };
   }
   function getApi() { return (localStorage.getItem(API_KEY) || DEFAULT_API).trim().replace(/\/$/, ""); }
@@ -131,17 +224,35 @@
         <div id="mp-public-list"><p class="mp-muted">Refresh to look for open public rooms.</p></div>
         <div id="mp-resume-wrap" class="mp-actions mp-hidden"><button id="mp-resume" class="secondary-button" type="button">RECONNECT TO MY LAST ROOM</button></div>
       </div>
-      <div id="mp-room-view" class="mp-hidden">
+      <div id="mp-room-view" class="mp-hidden simulator-match mp-match-shell">
         <div class="mp-room-card">
           <p class="mp-kicker">ROOM CODE · SHARE THIS WITH YOUR FRIENDS</p>
           <div id="mp-room-code" class="mp-room-code">------</div>
           <p id="mp-room-meta" class="mp-muted"></p>
+          <p class="mp-interaction-note">MIRROR ARENA / LIVE CHARACTER INTERACTIONS ENABLED</p>
         </div>
-        <div class="mp-section-title">PLAYERS</div>
+        <div class="mp-section-title">ARENA / FIGHTERS</div>
+        <div id="mp-arena" class="mp-arena sim-arena-cards" aria-live="polite"></div>
+        <div class="mp-section-title">LOBBY ROSTER & DOSSIERS</div>
         <div id="mp-players" class="mp-player-list"></div>
+        <div id="mp-hit-overlay" class="sim-hit-overlay" hidden aria-hidden="true" role="status" aria-live="polite"></div>
+        <section id="mp-qte-panel" class="mp-qte-panel mp-hidden" aria-live="assertive">
+          <p id="mp-qte-kicker" class="mp-qte-kicker">MIRROR ARENA / TIMING EVENT</p>
+          <h3 id="mp-qte-title" class="mp-qte-title">PARRY WINDOW</h3>
+          <p id="mp-qte-copy" class="mp-qte-copy">Respond to the prompt before the timing window closes.</p>
+          <div id="mp-qte-prompt" class="mp-qte-prompt">↑</div>
+          <div class="mp-qte-progress"><span id="mp-qte-timebar"></span></div>
+          <p id="mp-qte-step" class="mp-qte-step"></p>
+          <div id="mp-qte-buttons" class="mp-qte-buttons">
+            <button type="button" data-qte-input="UP" aria-label="Up">↑</button>
+            <button type="button" data-qte-input="LEFT" aria-label="Left">←</button>
+            <button type="button" data-qte-input="DOWN" aria-label="Down">↓</button>
+            <button type="button" data-qte-input="RIGHT" aria-label="Right">→</button>
+          </div>
+        </section>
         <div id="mp-host-controls" class="mp-actions mp-hidden"><button id="mp-start" class="primary-button" type="button">START MATCH ↗</button></div>
         <div id="mp-battle-controls" class="mp-hidden">
-          <div class="mp-section-title">YOUR TURN</div>
+          <div class="mp-section-title">YOUR TURN / ACTIONS</div>
           <div class="mp-grid">
             <label class="mp-field">TARGET
               <select id="mp-target"></select>
@@ -151,11 +262,13 @@
             <button id="mp-attack" class="secondary-button" type="button">ATTACK</button>
             <button id="mp-defend" class="secondary-button" type="button">DEFEND</button>
             <button id="mp-ego" class="secondary-button" type="button">ACTIVATE E.G.O.</button>
+            <button id="mp-ultimate" class="primary-button" type="button">ULTIMATE · 0/3</button>
             <button id="mp-pass" class="text-button" type="button">PASS TURN</button>
           </div>
+          <small class="mp-attack-note">ATTACKS AND E.G.O. STRIKES GIVE THE TARGET A PARRY QTE. ULTIMATES REQUIRE THREE COMPLETED ACTIONS AND A FOUR-STAGE QTE.</small>
         </div>
-        <div class="mp-section-title">BATTLE FEED</div>
-        <div id="mp-log" class="mp-log" aria-live="polite"></div>
+        <div class="mp-section-title">BATTLE FEED / CHARACTER CHAT</div>
+        <div id="mp-log" class="mp-log mp-match-feed" aria-live="polite" aria-relevant="additions"></div>
         <div class="mp-actions"><button id="mp-leave" class="text-button" type="button">LEAVE ROOM</button></div>
       </div>
     </div>`;
@@ -211,6 +324,9 @@
   function disconnect() {
     if (socket) { try { socket.close(); } catch {} socket = null; }
     if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+    stopQteTimer();
+    qteSubmitting = false;
+    activeChallengeId = null;
   }
   function connect() {
     disconnect();
@@ -237,8 +353,98 @@
     $("mp-room-view").classList.remove("mp-hidden");
     connect();
   }
+  function triggerArenaEffect(kind, targetName) {
+    const overlay = $("mp-hit-overlay"), match = $("mp-room-view");
+    if (!overlay || !match) return;
+    window.clearTimeout(impactTimer);
+    overlay.className = "sim-hit-overlay sim-hit-" + kind;
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.textContent = (targetName || "MIRROR ARENA") + " / " + (kind === "fatal" ? "MATCH ENDED" : kind === "ego" ? "E.G.O. AWAKENED" : "IMPACT");
+    match.classList.remove("sim-hit-heavy", "sim-hit-fatal");
+    void match.offsetWidth;
+    if (kind !== "ego") match.classList.add("sim-hit-" + kind);
+    impactTimer = window.setTimeout(() => {
+      overlay.hidden = true;
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.className = "sim-hit-overlay";
+      match.classList.remove("sim-hit-heavy", "sim-hit-fatal");
+    }, kind === "fatal" ? 1100 : 780);
+  }
+  function qteArrow(direction) {
+    return ({ UP: "↑", DOWN: "↓", LEFT: "←", RIGHT: "→" })[direction] || "✦";
+  }
+  function stopQteTimer() {
+    if (qteTimer) { clearInterval(qteTimer); qteTimer = null; }
+  }
+  function submitQte(input) {
+    const challenge = latestRoom?.pendingChallenge;
+    if (!challenge || !current || qteSubmitting) return;
+    const isOwner = challenge.type === "parry" ? challenge.defenderId === current.playerId : challenge.qtePlayerId === current.playerId;
+    if (!isOwner) return;
+    qteSubmitting = true;
+    document.querySelectorAll("[data-qte-input]").forEach(button => button.disabled = true);
+    const type = challenge.type === "parry" ? "parry" : "qte";
+    api("/api/rooms/" + current.code + "/action", {
+      method: "POST",
+      body: JSON.stringify(Object.assign({}, credentials(), { type, challengeId: challenge.id, input }))
+    }).then(data => {
+      renderRoom(data.room);
+    }).catch(error => {
+      setStatus(error.message);
+      qteSubmitting = false;
+      if (latestRoom) renderRoom(latestRoom);
+    });
+  }
+  function renderQte(challenge, room) {
+    const panel = $("mp-qte-panel");
+    if (!challenge) {
+      panel.classList.add("mp-hidden");
+      stopQteTimer();
+      activeChallengeId = null;
+      qteSubmitting = false;
+      return;
+    }
+    const ownerId = challenge.type === "parry" ? challenge.defenderId : challenge.qtePlayerId;
+    const isOwner = ownerId === current?.playerId;
+    const owner = room.players.find(player => player.id === ownerId);
+    const attacker = room.players.find(player => player.id === challenge.attackerId);
+    const target = room.players.find(player => player.id === challenge.targetId);
+    panel.classList.remove("mp-hidden");
+    panel.classList.toggle("mp-qte-urgent", challenge.type === "ultimate" && challenge.step >= 2);
+    $("mp-qte-kicker").textContent = challenge.type === "parry" ? "MIRROR ARENA / DEFENSIVE REACTION" : "MIRROR ARENA / ULTIMATE ACTIVATION";
+    $("mp-qte-title").textContent = challenge.type === "parry" ? (isOwner ? "PARRY NOW" : "PARRY WINDOW") : (isOwner ? "COMPLETE THE ULTIMATE" : "ULTIMATE SEQUENCE");
+    $("mp-qte-copy").textContent = challenge.type === "parry"
+      ? (isOwner ? "Match the direction before the narrow timing window closes. Keyboard arrows or the on-screen buttons both work." : (owner?.name || "The defender") + " has a brief chance to parry " + (attacker?.name || "the attack") + ".")
+      : (isOwner ? "Complete all four directions in sequence. The final prompt is deliberately unforgiving." : (attacker?.name || "A player") + " is attempting an ultimate against " + (target?.name || "their target") + ".");
+    $("mp-qte-prompt").textContent = qteArrow(challenge.prompt);
+    $("mp-qte-step").textContent = challenge.type === "parry" ? "ONE RESPONSE · " + (challenge.windowMs / 1000).toFixed(2) + "s" : "ACTIVATION " + (challenge.step + 1) + " / " + challenge.totalSteps + " · " + (challenge.windowMs / 1000).toFixed(2) + "s";
+    const buttons = document.querySelectorAll("[data-qte-input]");
+    buttons.forEach(button => button.disabled = !isOwner || qteSubmitting);
+    if (activeChallengeId !== challenge.id) {
+      activeChallengeId = challenge.id;
+      qteSubmitting = false;
+      stopQteTimer();
+    }
+    if (isOwner && !qteSubmitting) {
+      const bar = $("mp-qte-timebar");
+      const remaining = Math.max(0, challenge.expiresAt - Date.now());
+      const update = () => {
+        const fraction = Math.max(0, Math.min(1, (challenge.expiresAt - Date.now()) / challenge.windowMs));
+        bar.style.transform = "scaleX(" + fraction + ")";
+        if (fraction < 0.28) panel.classList.add("mp-qte-urgent");
+      };
+      update();
+      stopQteTimer();
+      qteTimer = setInterval(update, 35);
+    } else {
+      $("mp-qte-timebar").style.transform = "scaleX(1)";
+      stopQteTimer();
+    }
+  }
   function renderRoom(room) {
     if (!room) return;
+    const previous = latestRoom;
     latestRoom = room;
     $("mp-room-code").textContent = room.code;
     $("mp-room-meta").textContent = room.mode.toUpperCase() + " · " + room.visibility.toUpperCase() + " · " + room.players.length + "/" + room.maxPlayers + " PLAYERS · " + room.status.toUpperCase() + (room.round ? " · ROUND " + room.round : "");
@@ -247,33 +453,87 @@
     room.players.forEach(player => {
       const card = make("article", { className: "mp-player" + (player.id === room.turnPlayerId ? " mp-current" : "") });
       card.append(make("strong", {}, player.name));
-      card.append(make("small", {}, (player.character?.name || "Unnamed Variant") + " · TEAM " + player.team));
+      card.append(make("p", { className: "mp-muted" }, (player.character?.name || "Unnamed Variant") + " · TEAM " + player.team));
       const hp = make("div", { className: "mp-hp" });
-      const fill = make("span");
-      fill.style.width = Math.max(0, player.hp) + "%";
+      const fill = make("span"); fill.style.width = Math.max(0, player.hp) + "%";
       hp.append(fill); card.append(hp);
       card.append(make("small", {}, player.hp + " HP" + (player.guarding ? " · DEFENDING" : "") + (player.egoUsed ? " · E.G.O. USED" : "")));
+      const toggle = make("button", { className: "mp-dossier-toggle", type: "button", onClick: () => dossier.classList.toggle("open") }, "VIEW CHARACTER DOSSIER");
+      const dossier = make("pre", { className: "mp-player-dossier" }, player.character?.profileSummary || "No saved dossier summary is available for this character.");
+      card.append(toggle, dossier);
       players.append(card);
     });
+
+    const arena = $("mp-arena");
+    arena.innerHTML = "";
+    let impactTarget = null, impactFatal = false, egoTarget = null;
+    room.players.forEach(player => {
+      const old = previous?.players?.find(item => item.id === player.id);
+      const hit = !!old && player.hp < old.hp;
+      if (hit) { impactTarget = player; if (player.hp === 0) impactFatal = true; }
+      if (!!player.egoActive && !old?.egoActive) egoTarget = player;
+      const card = make("article", { className: "sim-fighter-card mp-fighter-card" + (player.hp > 0 ? "" : " sim-fighter-out") + (player.id === room.turnPlayerId ? " mp-current" : "") + (hit ? " sim-damage-pulse" : "") + (player.egoActive ? " sim-ego-awakened" : "") });
+      const top = make("div", { className: "sim-fighter-top" });
+      top.append(make("span", { className: "sim-team-tag" }, room.mode === "ffa" ? "FREE AGENT " + player.team : "TEAM " + player.team));
+      top.append(make("span", { className: "sim-fighter-state" }, player.status || (player.hp > 0 ? (player.connected ? "ONLINE" : "OFFLINE") : "OUT")));
+      const name = make("h4", {}, player.character?.name || player.name);
+      const traits = make("p", { className: "sim-fighter-traits" }, (player.character?.personality || []).join(" · ") || "PERSONALITY NOT RECORDED");
+      const affiliation = make("p", { className: "mp-fighter-affiliation" }, [player.character?.affiliation, player.character?.grade].filter(Boolean).join(" · ") || "AFFILIATION NOT RECORDED");
+      const hp = make("div", { className: "sim-hp-track" });
+      const fill = make("span", { className: "sim-hp-fill" });
+      fill.style.width = Math.max(0, hit ? old.hp : player.hp) + "%";
+      hp.append(fill);
+      const hpText = make("div", { className: "sim-hp-text" }, "HEALTH " + player.hp + " / 100");
+      const status = make("p", { className: "sim-fighter-status" }, (player.guarding ? "GUARDING · " : "") + (player.egoUsed ? "E.G.O. USED · " : "") + (player.ultimateCharge || 0) + "/3 ULTIMATE CHARGE" + (player.ultimateUsed ? " · ULTIMATE SPENT" : ""));
+      card.append(top, name, traits, affiliation, hp, hpText, status);
+      if (player.character?.egoEligible) {
+        card.append(make("p", { className: "sim-ego-label" }, player.egoActive ? "✦ " + (player.character.egoName || "E.G.O.") + " · MANIFESTED" : "E.G.O. AVAILABLE"));
+      }
+      if ((player.character?.abilities || []).length) {
+        card.append(make("p", { className: "sim-ego-detail" }, "SIGNATURE · " + player.character.abilities.slice(0, 2).join(" / ")));
+      }
+      arena.append(card);
+      if (hit) window.requestAnimationFrame(() => { fill.style.width = Math.max(0, player.hp) + "%"; });
+    });
+    if (impactTarget) triggerArenaEffect(impactFatal ? "fatal" : "heavy", impactTarget.character?.name || impactTarget.name);
+    else if (egoTarget) triggerArenaEffect("ego", egoTarget.character?.name || egoTarget.name);
+
     $("mp-host-controls").classList.toggle("mp-hidden", !(room.hostPlayerId === current?.playerId && room.status === "lobby"));
+    $("mp-start").disabled = room.mode === "2v2" && room.players.length !== 4;
     $("mp-battle-controls").classList.toggle("mp-hidden", room.status !== "active");
-    const isMyTurn = room.status === "active" && room.turnPlayerId === current?.playerId;
-    ["mp-attack", "mp-defend", "mp-ego", "mp-pass"].forEach(id => $(id).disabled = !isMyTurn);
+    const challengeOpen = !!room.pendingChallenge;
+    const isMyTurn = room.status === "active" && room.turnPlayerId === current?.playerId && !challengeOpen;
+    ["mp-attack", "mp-defend", "mp-ego", "mp-pass", "mp-ultimate"].forEach(id => $(id).disabled = !isMyTurn);
     const target = $("mp-target");
     const oldTarget = target.value;
     target.innerHTML = "";
-    room.players.filter(p => p.hp > 0 && p.id !== current?.playerId && !(room.mode === "2v2" && room.players.find(x => x.id === current.playerId)?.team === p.team)).forEach(p => {
+    room.players.filter(p => p.hp > 0 && p.id !== current?.playerId && !(room.mode === "2v2" && room.players.find(x => x.id === current?.playerId)?.team === p.team)).forEach(p => {
       target.add(make("option", { value: p.id }, p.character?.name || p.name));
     });
     if ([...target.options].some(o => o.value === oldTarget)) target.value = oldTarget;
     const myPlayer = room.players.find(p => p.id === current?.playerId);
     $("mp-ego").disabled = !isMyTurn || !myPlayer?.character?.egoEligible || !!myPlayer?.egoUsed;
     $("mp-attack").disabled = !isMyTurn || !target.options.length;
+    $("mp-ultimate").disabled = !isMyTurn || !myPlayer || (myPlayer.ultimateCharge || 0) < 3 || !!myPlayer.ultimateUsed || !target.options.length;
+    $("mp-ultimate").textContent = myPlayer?.ultimateUsed ? "ULTIMATE · SPENT" : "ULTIMATE · " + (myPlayer?.ultimateCharge || 0) + "/3";
+    renderQte(room.pendingChallenge, room);
     const log = $("mp-log");
     log.innerHTML = "";
-    room.log.forEach(entry => log.append(make("p", {}, new Date(entry.at).toLocaleTimeString() + " · " + entry.text)));
+    room.log.forEach(entry => {
+      const kind = entry.kind || (/joined|left|finished|round|created|winner/i.test(entry.text) ? "system" : /: .+[“"]|↔/.test(entry.text) ? "chat" : "action");
+      const item = make("article", { className: "sim-log-entry sim-log-" + kind });
+      item.append(make("span", { className: "sim-log-label" }, kind === "chat" ? "CHARACTER INTERACTION" : kind === "system" ? "ARENA RECORD" : "BATTLE EVENT"));
+      item.append(make("p", {}, new Date(entry.at).toLocaleTimeString() + " · " + entry.text));
+      log.append(item);
+    });
     log.scrollTop = log.scrollHeight;
-    if (room.status === "active") setStatus(isMyTurn ? "YOUR TURN — CHOOSE AN ACTION." : "WAITING FOR " + (room.players.find(p => p.id === room.turnPlayerId)?.name || "THE NEXT PLAYER").toUpperCase() + ".");
+    if (room.pendingChallenge?.type === "parry") {
+      const isDefender = room.pendingChallenge.defenderId === current?.playerId;
+      setStatus(isDefender ? "PARRY WINDOW OPEN — RESPOND NOW." : "WAITING FOR " + (room.players.find(p => p.id === room.pendingChallenge.defenderId)?.name || "THE DEFENDER").toUpperCase() + ".");
+    } else if (room.pendingChallenge?.type === "ultimate") {
+      const isAttacker = room.pendingChallenge.qtePlayerId === current?.playerId;
+      setStatus(isAttacker ? "ULTIMATE ACTIVATION — COMPLETE THE SEQUENCE." : "WATCHING AN ULTIMATE ACTIVATION.");
+    } else if (room.status === "active") setStatus(isMyTurn ? "YOUR TURN — CHOOSE AN ACTION." : "WAITING FOR " + (room.players.find(p => p.id === room.turnPlayerId)?.name || "THE NEXT PLAYER").toUpperCase() + ".");
     else if (room.status === "finished") setStatus("MATCH FINISHED · WINNER: " + room.winner);
     else setStatus("ROOM LOBBY · WAITING FOR PLAYERS.");
   }
@@ -365,7 +625,20 @@
   $("mp-attack").addEventListener("click", () => sendAction("attack").catch(err => setStatus(err.message)));
   $("mp-defend").addEventListener("click", () => sendAction("defend").catch(err => setStatus(err.message)));
   $("mp-ego").addEventListener("click", () => sendAction("ego").catch(err => setStatus(err.message)));
+  $("mp-ultimate").addEventListener("click", () => sendAction("ultimate").catch(err => setStatus(err.message)));
   $("mp-pass").addEventListener("click", () => sendAction("pass").catch(err => setStatus(err.message)));
+  document.querySelectorAll("[data-qte-input]").forEach(button => button.addEventListener("click", () => submitQte(button.dataset.qteInput)));
+  document.addEventListener("keydown", event => {
+    if (!latestRoom?.pendingChallenge || !current) return;
+    const keyMap = { ArrowUp:"UP", w:"UP", W:"UP", ArrowDown:"DOWN", s:"DOWN", S:"DOWN", ArrowLeft:"LEFT", a:"LEFT", A:"LEFT", ArrowRight:"RIGHT", d:"RIGHT", D:"RIGHT" };
+    const input = keyMap[event.key];
+    if (!input) return;
+    const challenge = latestRoom.pendingChallenge;
+    const isOwner = challenge.type === "parry" ? challenge.defenderId === current.playerId : challenge.qtePlayerId === current.playerId;
+    if (!isOwner) return;
+    event.preventDefault();
+    submitQte(input);
+  });
   $("mp-leave").addEventListener("click", leaveRoom);
   $("mp-resume").addEventListener("click", () => resume().catch(err => setStatus(err.message)));
 
