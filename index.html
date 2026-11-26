@@ -382,6 +382,20 @@
       <section id="simulator-match" class="simulator-match hidden" aria-label="Live match">
         <div id="sim-hit-overlay" class="sim-hit-overlay" hidden aria-hidden="true" role="status" aria-live="polite"></div>
         <div class="simulator-match-heading"><div><p class="eyebrow">LIVE MIRROR MATCH</p><h3 id="sim-match-title">1V1</h3></div><span id="sim-turn-count" class="simulator-turn-count">TURN 00</span></div>
+        <section id="sim-ability-controls" class="sim-ability-controls" aria-label="Manual character abilities">
+          <div class="sim-ability-heading"><p class="eyebrow">MANUAL ACTIONS</p><h3>CHOOSE AN ABILITY</h3><p>Pick an OC, select an opposing target, then use one of its four abilities.</p></div>
+          <div class="sim-ability-selectors">
+            <label>ACTING CHARACTER<select id="sim-action-actor" aria-label="Acting character"></select></label>
+            <label>TARGET<select id="sim-action-target" aria-label="Target character"></select></label>
+          </div>
+          <div class="sim-ability-buttons">
+            <button type="button" data-sim-ability="1">ABILITY 1 · LOW · 5</button>
+            <button type="button" data-sim-ability="2">ABILITY 2 · MEDIUM · 15</button>
+            <button type="button" data-sim-ability="3">ABILITY 3 · MEDIUM · 15</button>
+            <button type="button" data-sim-ability="4">ABILITY 4 · LARGE · 20</button>
+          </div>
+          <p class="sim-ability-note">Status potency is split evenly between two or three selected status effects. Ultimates inflict Massive potency · 30 in automatic simulation turns.</p>
+        </section>
         <div class="simulator-battle-layout">
           <section class="simulator-arena-panel" aria-label="Arena"><div id="sim-arena-cards" class="sim-arena-cards"></div><div id="sim-match-status" class="sim-match-status" role="status">MATCH READY.</div><div class="simulator-match-actions"><button id="sim-next-turn-button" class="primary-button" type="button">RUN NEXT TURN <span>→</span></button><button id="sim-run-all-button" class="secondary-button" type="button">SIMULATE MATCH</button><button id="sim-rematch-button" class="text-button hidden" type="button">REMATCH</button></div></section>
           <aside class="simulator-commentary" aria-label="Character chats and interactions"><div class="sim-commentary-heading"><div><p class="eyebrow">LIVE TRANSCRIPT</p><h3>CHAT & INTERACTIONS</h3></div><span id="sim-feed-status">STANDBY</span></div><div id="sim-log" class="sim-log" aria-live="polite" aria-relevant="additions"></div></aside>
@@ -397,7 +411,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261126-head-roles2"></script>
+  <script src="script.js?v=20261126-status-passives4"></script>
   <script src="multiplayer.js?v=20261126-combat-status1"></script>
 </body>
 </html>
