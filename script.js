@@ -388,9 +388,9 @@ function completeGeneratedCharacter(name,source){
  putGenerated(a,"generated_ultimate_1","Nocturne of the Unbroken — A rare full manifestation of "+egoTheme+", transforming the immediate battlefield into an expression of a defining conviction. It demands accumulated momentum and leaves the user vulnerable during recovery.");
  putGenerated(a,"generated_ultimate_2","The Final Unmasking — An alternate culmination that converts accumulated resolve into a decisive multi-stage sequence. It is difficult to prepare, exceptionally uncommon, and cannot be repeated freely.");
  putGenerated(a,"generated_passive","Composure of the Unfinished — Repeated observation gradually sharpens the user's timing and awareness. The benefit is lost when they abandon patience or act recklessly.");
- putGenerated(a,"generated_backstory","Raised in "+origin+", this variant learned to survive by reading people and recognizing the consequences behind seemingly small choices. A defining moral decision reshaped their priorities and led them toward "+affiliation+". Their current standing ("+rank+") offers influence and obligations, but does not settle the contradictions they carry.");
- putGenerated(a,"generated_likes",generatedPick(["Quiet libraries, carefully prepared tea, old orchestral recordings, and people who keep their promises","Rain against windows, intricate craftsmanship, formal attire, and thoughtful conversation","Antique books, orderly rooms, subtle humor, and well-made objects","Late-night city lights, refined cuisine, handwritten notes, and dependable companions"]));
- putGenerated(a,"generated_dislikes",generatedPick(["Careless promises, needless cruelty, loud self-importance, and being treated as a possession","Wastefulness, public humiliation, broken agreements, and false authority","Intrusive questions, deliberate dishonesty, and avoidable collateral damage","Condescension, performative loyalty, and having choices made for them"]));
+ if(![v.advanced_concept,v.advanced_motivation,v.advanced_conflict,v.backstory,v.complex_15,v.complex_59].some(value=>String(value||"").trim()))putGenerated(a,"generated_backstory","Raised in "+origin+", this variant learned to survive by reading people and recognizing the consequences behind seemingly small choices. A defining moral decision reshaped their priorities and led them toward "+affiliation+". Their current standing ("+rank+") offers influence and obligations, but does not settle the contradictions they carry.");
+ if(![v.likes,v.complex_32,v.complex_33].some(value=>String(value||"").trim()))putGenerated(a,"generated_likes",generatedPick(["Quiet libraries, carefully prepared tea, old orchestral recordings, and people who keep their promises","Rain against windows, intricate craftsmanship, formal attire, and thoughtful conversation","Antique books, orderly rooms, subtle humor, and well-made objects","Late-night city lights, refined cuisine, handwritten notes, and dependable companions"]));
+ if(![v.dislikes,v.complex_37,v.complex_29].some(value=>String(value||"").trim()))putGenerated(a,"generated_dislikes",generatedPick(["Careless promises, needless cruelty, loud self-importance, and being treated as a possession","Wastefulness, public humiliation, broken agreements, and false authority","Intrusive questions, deliberate dishonesty, and avoidable collateral damage","Condescension, performative loyalty, and having choices made for them"]));
  putGenerated(a,"generated_overall","A "+rank+" "+affiliation+" variant shaped by "+origin+". Their "+(egoAbsent?"lack of a known E.G.O.":"E.G.O., "+egoName)+" and "+combat.toLowerCase()+" approach reflect a complicated individual whose identity is defined by deliberate choices and accepted consequences.");
  if(sephrus){
   putGenerated(a,"generated_title","The Same Essence");
@@ -428,7 +428,8 @@ function formatCharacterDossier(name,mode,answersSource){
  const egoDescription=egoStatus.includes("No known")?"No known E.G.O. or Distortion is recorded."
   :[egoStatus,egoName&&"Manifestation: "+egoName,egoLoadout&&"Loadout: "+egoLoadout,egoAppearance&&"Appearance: "+egoAppearance,egoFunction&&"Properties and function: "+egoFunction,first("ego_theme","distortion_theme","complex_42")&&"Core concept: "+first("ego_theme","distortion_theme","complex_42"),first("ego_trigger","ego_form","complex_45")&&"Manifestation circumstances: "+first("ego_trigger","ego_form","complex_45")].filter(Boolean).join(" | ")||notSet;
  const abilitySource=first("advanced_abilities","complex_47","complex_50","complex_51");
- const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||get("generated_ability_"+n)||(n===1?abilitySource:"")||notSet;
+ // Preserve a user's full capabilities write-up before falling back to generated filler.
+ const ability=(n)=>labelled("Ability "+n)||get("ability_"+n)||get("complex_ability_"+n)||(n===1?abilitySource:"")||get("generated_ability_"+n)||notSet;
  const ultimate=(n)=>labelled("Ultimate Ability "+n)||get("ultimate_ability_"+n)||get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet;
  const passive=labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
  const personality=labelled("Personality")||(String(name||"").trim().toLowerCase()==="sephrus aztiluth"?first("generated_personality"):combine("personality","advanced_personality","complex_03","complex_21","complex_24","generated_personality"))||notSet;
@@ -478,11 +479,45 @@ const DOWNSTREAM={
  association_branch:["association_section","association_position"],
  association_section:["association_position"],
  syndicate_fixer_status:["fixer_grade","color_title","association","association_branch","association_section","association_position","office"],
-  syndicate_type:["syndicate","finger_rank","syndicate_hierarchy"],
-  syndicate:["finger_rank","syndicate_hierarchy"],
+ syndicate_type:["syndicate","finger_rank","syndicate_hierarchy"],
+ syndicate:["finger_rank","syndicate_hierarchy"],
  ego_status:["ego_equipment_customizer","volatile_ego_state","ego_trigger","ego_form","ego_theme","ego_name","distortion_theme"]
 };
-function clearDownstream(id){(DOWNSTREAM[id]||[]).forEach(child=>delete answers[child]);}
+// Generated details are dependent on the answers that shaped them. Clear only affected
+// generated fields when editing a saved character, so the next completion regenerates them.
+const GENERATED_DOWNSTREAM={
+ title:["generated_title"],epithet:["generated_title"],color_title:["generated_title"],
+ race:["generated_race"],
+ origin_type:["generated_backstory","generated_overall"],district:["generated_backstory","generated_overall"],
+ upbringing:["generated_backstory","generated_overall"],backstreet_environment:["generated_backstory","generated_overall"],
+ occupation:["generated_appearance","generated_backstory","generated_overall"],
+ syndicate_type:["generated_appearance","generated_backstory","generated_overall"],
+ syndicate:["generated_appearance","generated_backstory","generated_overall"],
+ finger_rank:["generated_appearance","generated_backstory","generated_overall"],
+ syndicate_hierarchy:["generated_appearance","generated_backstory","generated_overall"],
+ fixer_grade:["generated_backstory","generated_overall"],association_position:["generated_backstory","generated_overall"],
+ association:["generated_appearance","generated_backstory","generated_overall"],
+ office:["generated_backstory","generated_overall"],workshop:["generated_appearance","generated_backstory","generated_overall"],
+ wing_role:["generated_appearance","generated_backstory","generated_overall"],
+ advanced_concept:["generated_backstory"],advanced_motivation:["generated_backstory"],advanced_conflict:["generated_backstory"],
+ backstory:["generated_backstory"],complex_15:["generated_backstory"],complex_59:["generated_backstory"],
+ likes:["generated_likes"],complex_32:["generated_likes"],complex_33:["generated_likes"],
+ dislikes:["generated_dislikes"],complex_37:["generated_dislikes"],complex_29:["generated_dislikes"],
+ advanced_abilities:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
+ complex_47:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
+ complex_50:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
+ complex_51:["generated_ability_1","generated_ability_2","generated_ability_3","generated_ability_4"],
+ ability_1:["generated_ability_1"],ability_2:["generated_ability_2"],ability_3:["generated_ability_3"],ability_4:["generated_ability_4"],
+ ego_status:["generated_ego_name","generated_overall"],
+ ego_name:["generated_overall"],
+ ego_theme:["generated_ability_1","generated_ability_4","generated_ultimate_1","generated_overall"],
+ distortion_theme:["generated_ability_1","generated_ability_4","generated_ultimate_1","generated_overall"],
+ combat_approach:["generated_ability_2","generated_overall"]
+};
+function clearDownstream(id){
+ const children=new Set([...(DOWNSTREAM[id]||[]),...(GENERATED_DOWNSTREAM[id]||[])]);
+ children.forEach(child=>delete answers[child]);
+}
 function pruneHiddenAnswers(){
  let changed=true;
  while(changed){
@@ -494,7 +529,11 @@ function pruneHiddenAnswers(){
 }
 function setAnswer(q,choice,value,custom=""){
  const previous=answers[q.id]?.value;
- if(previous!==value)clearDownstream(q.id);
+ let unchanged=previous===value;
+ if(!unchanged&&previous&&value&&typeof previous==="object"&&typeof value==="object"){
+  try{unchanged=JSON.stringify(previous)===JSON.stringify(value);}catch{}
+ }
+ if(!unchanged)clearDownstream(q.id);
  answers[q.id]={choice,value,custom};
  pruneHiddenAnswers();
 }
