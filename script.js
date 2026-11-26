@@ -257,6 +257,38 @@ const $=id=>document.getElementById(id);
   activateTab(tabs[next].dataset.settingsTab,true);
  });
  const switches=[...document.querySelectorAll("[data-effect-toggle]")];
+ const effectsRoot=document.documentElement;
+ const impactOverlay=document.querySelector(".fx-impact");
+ const pauseHoverMotion=()=>{
+  effectsRoot.classList.add("effects-pointer-paused");
+  effectsRoot.classList.remove("screenquake-hovering");
+ };
+ // Pause hover-only motion after a click. Re-arm only after the pointer leaves
+ // the button area, so a newly-rendered question cannot inherit the old hover.
+ document.addEventListener("pointerdown",event=>{
+  if(event.pointerType!=="touch")pauseHoverMotion();
+ },true);
+ document.addEventListener("click",()=>{
+  pauseHoverMotion();
+  if(!effectsRoot.classList.contains("effect-impactframe")||!impactOverlay)return;
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+  impactOverlay.classList.remove("impact-hit");
+  void impactOverlay.offsetWidth;
+  impactOverlay.classList.add("impact-hit");
+ },true);
+ document.addEventListener("pointermove",event=>{
+  if(event.pointerType==="touch")return;
+  const target=event.target instanceof Element?event.target:null;
+  const overButton=!!target?.closest("button");
+  if(effectsRoot.classList.contains("effects-pointer-paused")){
+   if(overButton)return;
+   effectsRoot.classList.remove("effects-pointer-paused");
+  }
+  effectsRoot.classList.toggle("screenquake-hovering",effectsRoot.classList.contains("effect-screenquake")&&overButton);
+ });
+ document.addEventListener("pointerout",event=>{
+  if(!event.relatedTarget)effectsRoot.classList.remove("screenquake-hovering","effects-pointer-paused");
+ });
  const storageKey="uee_visual_effects_v1";
  let saved={};
  try{
