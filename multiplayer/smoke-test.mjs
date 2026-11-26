@@ -123,6 +123,8 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
 
     const started = await startRoom(code, host);
     check(started.ok && started.data.room.status === "active", "Host could not start a 1v1 match.");
+    const reconnectedState = await getState(code, guest);
+    check(reconnectedState.ok && reconnectedState.data.room.status === "active", "Player could not recover the current room state.");
 
     const firstAttack = await action(code, host, "attack", guest.id);
     check(firstAttack.ok, "Host attack was rejected.");
@@ -151,6 +153,21 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
   } finally {
     try { socket.close(); } catch {}
   }
+});
+
+await run("Lobby host handoff when the creator leaves", async () => {
+  const created = await createRoom("1v1", "private", "Departing Host");
+  const code = created.room.code;
+  const guest = (await joinRoom(code, "New Host")).player;
+
+  const hostLeaves = await leaveRoom(code, created.player);
+  check(hostLeaves.ok && hostLeaves.data.room.status === "lobby", "Room did not remain open after the original host left.");
+  check(hostLeaves.data.room.hostPlayerId === guest.id, "The next player was not promoted to host.");
+
+  const started = await startRoom(code, guest);
+  check(started.ok && started.data.room.status === "active", "Promoted host could not start the match.");
+  const guestLeaves = await leaveRoom(code, guest);
+  check(guestLeaves.ok, "Promoted host could not leave the match.");
 });
 
 await run("Public room discovery and cleanup", async () => {
@@ -188,10 +205,14 @@ await run("2v2 format, full lobby requirement, team assignment, and friendly-fir
   check(validAttack.ok, "Attack against an opposing team was rejected.");
   check(validAttack.data.room.turnPlayerId === p2.id, "2v2 turn did not advance correctly.");
 
-  await leaveRoom(code, host);
-  await leaveRoom(code, p2);
+  const opposingPlayerLeaves = await leaveRoom(code, p2);
+  check(opposingPlayerLeaves.ok, "A player could not leave during a 2v2 match.");
+  const finalOpponentLeaves = await leaveRoom(code, p4);
+  check(finalOpponentLeaves.ok && finalOpponentLeaves.data.room.status === "finished", "2v2 match did not finish when one team left.");
+  check(finalOpponentLeaves.data.room.winner === "Team A", "2v2 winner was not reported by team.");
+
   await leaveRoom(code, p3);
-  await leaveRoom(code, p4);
+  await leaveRoom(code, host);
 });
 
 await run("Free-for-all format and four-player turn progression", async () => {
