@@ -710,12 +710,12 @@ function simRenderArena(){
   const state=document.createElement("span");state.className="sim-fighter-state";state.textContent=f.egoActive?"E.G.O. ACTIVE":f.alive?"ACTIVE":"OUT";top.append(team,state);
   const name=document.createElement("h4");name.textContent=f.name;
   const traits=document.createElement("p");traits.className="sim-fighter-traits";traits.textContent=f.personality.length?f.personality.join(" · "):"PERSONALITY NOT RECORDED";
-  const hp=document.createElement("div");hp.className="sim-hp-track";const fill=document.createElement("span");fill.className="sim-hp-fill";fill.style.width=Math.max(0,f.hp)+"%";hp.append(fill);
+  const hp=document.createElement("div");hp.className="sim-hp-track";const fill=document.createElement("span");fill.className="sim-hp-fill";fill.style.width=Math.max(0,f.justHit?(f.previousHp??f.hp):f.hp)+"%";hp.append(fill);
   const hpText=document.createElement("div");hpText.className="sim-hp-text";hpText.textContent="HEALTH "+f.hp+" / 100";
   const status=document.createElement("p");status.className="sim-fighter-status";status.textContent=f.status||"READY";
   card.append(top,name,traits,hp,hpText,status);
   if(f.egoEligible){const ego=document.createElement("p");ego.className="sim-ego-label";ego.textContent=f.egoActive?"✦ "+f.egoName+" · MANIFESTED":f.egoType+" AVAILABLE";card.append(ego);}
-  arena.append(card);f.justHit=false;
+  arena.append(card);if(f.justHit){const newWidth=Math.max(0,f.hp)+"%";window.requestAnimationFrame(()=>{fill.style.width=newWidth;});}f.justHit=false;
  });
  $("sim-turn-count").textContent="TURN "+String(simMatch.turn).padStart(2,"0");
 }
@@ -737,7 +737,7 @@ function simRunTurn(){
  }
  let impact=9+Math.floor(Math.random()*10)+(actor.egoActive?6:0);
  if(Math.random()<.18){impact=Math.max(5,impact-5);target.status="BRACED";}else target.status="REPOSITIONING";
- target.hp=Math.max(0,target.hp-impact);target.justHit=true;
+ target.previousHp=target.hp;target.hp=Math.max(0,target.hp-impact);target.justHit=true;
  actor.status=actor.egoActive?"E.G.O. MOMENTUM +":"MOMENTUM +";
  simAddLog("action",actor.name,"uses "+move+(actor.egoActive?" through their manifested form":"")+". "+target.name+" loses "+impact+" health.");
  simAddLog("chat",actor.name,'"'+simQuote(actor)+'"');
