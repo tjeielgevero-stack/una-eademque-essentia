@@ -1603,4 +1603,154 @@ body:has(#simulator-screen:not(.hidden)) main{width:min(1420px,calc(100% - 48px)
 @media(prefers-reduced-motion:reduce){.sim-hit-overlay.sim-hit-ego{animation:none!important}}
 
 
-
+/* SEPHRUS SECRET — chained broken records and the hidden exit. */
+.choice.personality-broken {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  gap:10px;
+  padding:13px 14px;
+  color:#ff7777;
+  border-color:rgba(166,48,54,.56);
+  background:linear-gradient(100deg,rgba(42,13,16,.96),rgba(19,13,15,.98));
+  box-shadow:inset 0 0 22px rgba(140,24,31,.12),0 0 8px rgba(150,26,34,.07);
+  cursor:pointer;
+  animation:choice-arrive .34s cubic-bezier(.2,.75,.2,1) both,sephrus-broken-tremble 1.65s ease-in-out infinite;
+  animation-delay:var(--choice-delay,0ms),var(--fracture-delay,0s);
+  animation-fill-mode:both,none;
+}
+.choice.personality-broken::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.48;
+  background:
+    linear-gradient(127deg,transparent 0 35%,rgba(255,111,111,.52) 35.2% 35.6%,transparent 35.9%),
+    linear-gradient(72deg,transparent 0 67%,rgba(255,111,111,.42) 67.2% 67.5%,transparent 67.8%),
+    linear-gradient(151deg,transparent 0 83%,rgba(255,111,111,.36) 83.2% 83.5%,transparent 83.8%);
+}
+.choice.personality-broken::after { content:none; }
+.personality-broken .choice-mark {
+  position:relative;
+  z-index:1;
+  width:11px;
+  height:11px;
+  border:1px solid #d54e55;
+  border-radius:0;
+  transform:rotate(45deg);
+  box-shadow:0 0 8px rgba(226,59,69,.42);
+}
+.personality-chain {
+  position:relative;
+  z-index:1;
+  flex:0 0 auto;
+  color:#b84b50;
+  font-size:17px;
+  line-height:1;
+  text-shadow:0 0 8px rgba(220,61,70,.45);
+}
+.personality-broken > span:not(.personality-chain):not(.personality-cracks) {
+  position:relative;
+  z-index:1;
+  color:#ff7777;
+  letter-spacing:.14em;
+  text-shadow:0 0 8px rgba(230,50,61,.35);
+}
+.personality-cracks {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.5;
+  background:
+    linear-gradient(118deg,transparent 0 47%,rgba(255,183,174,.75) 47.2% 47.5%,transparent 47.8%),
+    linear-gradient(62deg,transparent 0 53%,rgba(255,130,130,.62) 53.2% 53.5%,transparent 53.8%),
+    linear-gradient(160deg,transparent 0 72%,rgba(255,183,174,.62) 72.2% 72.5%,transparent 72.8%);
+}
+.choice.personality-broken:hover {
+  border-color:rgba(255,105,112,.9);
+  background:linear-gradient(100deg,rgba(61,15,19,.98),rgba(25,12,15,.99));
+  box-shadow:inset 0 0 25px rgba(174,25,34,.2),0 0 18px rgba(180,35,45,.18);
+}
+.choice.personality-broken-struck {
+  border-color:#ffb0a8!important;
+  box-shadow:inset 0 0 28px rgba(230,45,55,.32),0 0 22px rgba(230,45,55,.32)!important;
+  filter:brightness(1.22);
+}
+.choice.personality-canonical {
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+  color:#f2e4c4;
+  border-color:rgba(231,207,158,.85);
+  background:linear-gradient(105deg,rgba(55,46,31,.98),rgba(26,23,20,.99));
+  box-shadow:inset 0 0 24px rgba(229,198,138,.12),0 0 18px rgba(229,198,138,.18);
+}
+.choice.personality-canonical::before {
+  content:"";
+  position:absolute;
+  inset:-3px;
+  z-index:-1;
+  border:1px solid rgba(239,213,161,.5);
+  box-shadow:0 0 13px rgba(239,213,161,.26),0 0 30px rgba(239,213,161,.16);
+  pointer-events:none;
+  animation:sephrus-canonical-aura 2.5s ease-in-out infinite;
+}
+.choice.personality-canonical::after {
+  content:"✦";
+  color:#f5dfab;
+  opacity:1;
+  text-shadow:0 0 10px rgba(255,224,167,.85);
+}
+.choice.personality-canonical .choice-mark {
+  border:4px solid #e7cf9e;
+  box-shadow:0 0 10px rgba(239,213,161,.5);
+}
+.choice.personality-canonical-touched { filter:brightness(1.2); }
+.sephrus-fracture-status {
+  margin:8px 0 0;
+  min-height:18px;
+  color:#ba7474;
+  font:9px/1.7 'DM Mono',monospace;
+  letter-spacing:.12em;
+  text-align:center;
+  text-shadow:0 0 10px rgba(180,52,59,.28);
+  animation:sephrus-status-arrive .35s ease both;
+}
+.sephrus-fracture-status[hidden] { display:none!important; }
+.sephrus-void-transition {
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  background:#000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 2.1s cubic-bezier(.55,0,.9,.35);
+}
+.sephrus-void-transition.active {
+  opacity:1;
+  pointer-events:auto;
+}
+@keyframes sephrus-broken-tremble {
+  0%,100% { transform:translateX(0) rotate(0); }
+  18% { transform:translateX(-1px) rotate(-.16deg); }
+  36% { transform:translateX(1px) rotate(.14deg); }
+  58% { transform:translateX(-.7px) rotate(-.1deg); }
+  78% { transform:translateX(.7px) rotate(.12deg); }
+}
+@keyframes sephrus-canonical-aura {
+  0%,100% { opacity:.42; transform:scale(.995); }
+  50% { opacity:1; transform:scale(1.012); }
+}
+@keyframes sephrus-status-arrive {
+  from { opacity:0; transform:translateY(4px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .choice.personality-broken,.choice.personality-canonical::before,.sephrus-fracture-status {
+    animation:none!important;
+  }
+  .sephrus-void-transition { transition:none!important; }
+}
