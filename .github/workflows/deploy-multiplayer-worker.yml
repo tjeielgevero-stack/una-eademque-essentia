@@ -1,4 +1,5 @@
 name: Deploy Multiplayer Worker
+# Re-triggered after Cloudflare repository secrets setup.
 
 on:
   push:
