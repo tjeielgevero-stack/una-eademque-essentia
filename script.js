@@ -365,7 +365,7 @@ function render(){
  $("page-count").textContent=`PAGE ${String(index+1).padStart(2,"0")} / ${String(qs.length).padStart(2,"0")}`;
  const pct=Math.round((index+1)/qs.length*100);$("progress-percent").textContent=`${pct}%`;$("progress-fill").style.width=`${pct}%`;
  $("step-category").textContent=q.category;$("step-title").textContent=q.title;$("step-description").textContent=typeof q.description==="function"?q.description(values()):q.description;
- $("choice-list").innerHTML="";$("validation-message").textContent="";$("back-button").disabled=index===0;$("back-button").style.opacity=index===0?".35":"1";
+ $("choice-list").innerHTML="";$("validation-message").textContent="";$("back-button").disabled=false;$("back-button").style.opacity=index===0?".85":"1";
  $("next-button").innerHTML=index===qs.length-1?'CONFIRM & COMPLETE <span>↗</span>':'CONFIRM CUSTOM ANSWER <span>→</span>';
  $("next-button").classList.toggle("hidden",saved.choice!=="Other / custom answer");
  $("custom-label").htmlFor="custom-answer";
