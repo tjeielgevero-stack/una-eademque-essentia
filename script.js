@@ -842,8 +842,13 @@ function render(){
     const m=document.createElement("span");m.className="choice-mark";
     const t=document.createElement("span");t.textContent=opt;
     if(isBroken){
+     const chainLeft=document.createElement("span");chainLeft.className="personality-chain";chainLeft.textContent="⛓";chainLeft.setAttribute("aria-hidden","true");
      const cracks=document.createElement("span");cracks.className="personality-cracks";cracks.setAttribute("aria-hidden","true");
-     b.append(m,t,cracks);
+     const chainRight=document.createElement("span");chainRight.className="personality-chain";chainRight.textContent="⛓";chainRight.setAttribute("aria-hidden","true");
+     t.textContent="";
+     "BROKEN".split("").forEach((letter,index)=>{const glyph=document.createElement("span");glyph.className="broken-glyph";glyph.textContent=letter;glyph.style.setProperty("--glyph-tilt",String(((i*7+index*11)%19)-9)+"deg");glyph.style.setProperty("--glyph-y",String(((i*5+index*7)%13)-6)+"px");t.append(glyph);});
+     t.className="broken-word";
+     b.append(chainLeft,m,t,cracks,chainRight);
      b.setAttribute("aria-label","BROKEN — damaged personality record");
      b.style.setProperty("--fracture-delay",(i%7)*.11+"s");
      b.onclick=()=>{
@@ -1209,3 +1214,35 @@ $("sim-next-turn-button")?.addEventListener("click",simRunTurn);
 $("sim-run-all-button")?.addEventListener("click",simRunAll);
 $("sim-rematch-button")?.addEventListener("click",simRematch);
 $("sim-create-oc-button")?.addEventListener("click",()=>{document.body.classList.remove("simulator-entered");screen("home");$("begin-button").click();});
+
+// Original, procedural ambient archive soundtrack (starts only after an explicit user action).
+(function setupAmbientMusic(){
+ const toggle=document.getElementById("ambient-music-toggle");
+ const status=document.getElementById("ambient-music-status");
+ if(!toggle)return;
+ const storageKey="uee_ambient_music_enabled_v1";
+ let wanted=false,context=null,master=null,nodes=[];
+ try{wanted=localStorage.getItem(storageKey)==="true";}catch{}
+ toggle.checked=wanted;
+ function stop(){
+  if(master){try{master.gain.cancelScheduledValues(context.currentTime);master.gain.setTargetAtTime(0,context.currentTime,.8);}catch{}}
+  const oldNodes=nodes.slice();nodes=[];
+  window.setTimeout(()=>oldNodes.forEach(node=>{try{node.stop?.();node.disconnect();}catch{}}),2800);
+  if(status)status.textContent="AMBIENT MUSIC PAUSED";
+ }
+ function start(){
+  const AudioCtor=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtor){toggle.checked=false;if(status)status.textContent="AUDIO IS NOT SUPPORTED IN THIS BROWSER.";return false;}
+  if(!context)context=new AudioCtor();
+  if(context.state==="suspended")context.resume();
+  master=context.createGain();master.gain.value=.00001;master.gain.setTargetAtTime(.11,context.currentTime,2.5);master.connect(context.destination);
+  const filter=context.createBiquadFilter();filter.type="lowpass";filter.frequency.value=620;filter.Q.value=.55;filter.connect(master);
+  const notes=[55,82.41,110,164.81];
+  notes.forEach((frequency,index)=>{const osc=context.createOscillator(),gain=context.createGain();osc.type=index===1?"triangle":"sine";osc.frequency.value=frequency;osc.detune.value=index%2?4:-3;gain.gain.value=[.22,.09,.12,.045][index];osc.connect(gain);gain.connect(filter);osc.start();nodes.push(osc,gain);});
+  const slow=context.createOscillator(),depth=context.createGain();slow.frequency.value=.035;depth.gain.value=105;slow.connect(depth);depth.connect(filter.frequency);slow.start();nodes.push(slow,depth,filter);
+  if(status)status.textContent="AMBIENT MUSIC PLAYING · ORIGINAL SOUNDTRACK";
+  return true;
+ }
+ toggle.addEventListener("change",()=>{wanted=toggle.checked;try{localStorage.setItem(storageKey,String(wanted));}catch{}if(wanted){if(!start()){wanted=false;toggle.checked=false;try{localStorage.setItem(storageKey,"false");}catch{}}}else stop();});
+ if(wanted&&status)status.textContent="MUSIC ENABLED · PRESS PLAY TO START";
+})();
