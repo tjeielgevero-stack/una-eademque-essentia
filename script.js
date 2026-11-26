@@ -424,7 +424,7 @@ function completeGeneratedCharacter(name,source){
 }
 function formatWeaponLoadout(value){
  if(!value||typeof value!=="object")return "Not specified.";
- return [value.style,value.weapon,value.ammo&&"Ammo: "+value.ammo,value.custom].filter(Boolean).join(" · ")||"Not specified.";
+ return [value.style,value.weapon,value.ammoType&&"Profile: "+value.ammoType,value.ammo&&"Ammo: "+value.ammo,value.custom].filter(Boolean).join(" · ")||"Not specified.";
 }
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
@@ -476,7 +476,7 @@ function formatCharacterDossier(name,mode,answersSource){
   "Origin: "+origin,
   "E.G.O: "+egoDescription,
   "E.G.O Type: "+egoType,
-  "Weapon Loadout: "+formatWeaponLoadout(get("weapon_loadout")),
+  "Weapon Loadout: "+formatWeaponLoadout(a.weapon_loadout?.value),
   "Ability 1: "+ability(1),
   "Ability 2: "+ability(2),
   "Ability 3: "+ability(3),
