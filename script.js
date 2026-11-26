@@ -907,13 +907,13 @@ function renderWeaponCustomizer(saved){
  function updateAmmo(){
   const styleValue=style.value,weaponValue=type.value;
   const isBow=styleValue==="Ranged"&&/bow|crossbow/i.test(weaponValue);
-  const isGun=styleValue==="Ranged"&&/sidearm|revolver|longarm|scatter|rapid-fire|precision firearm|energy firearm|arcane firearm/i.test(weaponValue);
+  const isGun=styleValue==="Ranged"&&/sidearm|revolver|longarm|scatter|rapid-fire|precision firearm|energy firearm|arcane firearm|payload launcher/i.test(weaponValue);
   ammoWrap.hidden=!(isBow||isGun);ammoChoiceWrap.hidden=!(isBow||isGun);
   if(!isBow&&!isGun)return;
   ammoTypeLabel.textContent=isBow?"ARROW PROFILE":"AMMUNITION PROFILE";
-  const families=isBow?["Arrow","Specialized fictional arrow"]:weaponValue.includes("Revolver")?["Cylinder-form fictional charge"]:weaponValue.includes("Scatter")?["Scatter-type fictional capsule"]:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?["Energy-cell profile"]:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?["Long-form fictional charge"]:weaponValue.includes("Rapid")?["Rapid-form fictional charge"]:["Compact fictional charge"];
+  const families=isBow?["Arrow","Specialized fictional arrow"]:weaponValue.includes("Revolver")?["Cylinder-form fictional charge"]:weaponValue.includes("Scatter")?["Scatter-type fictional capsule"]:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?["Energy-cell profile"]:weaponValue.includes("Launcher")?["Sealed-payload profile"]:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?["Long-form fictional charge"]:weaponValue.includes("Rapid")?["Rapid-form fictional charge"]:["Compact fictional charge"];
   fill(ammoType,families,initial.ammoType);
-  const options=isBow?BOW_AMMO:weaponValue.includes("Revolver")?GUN_AMMO.revolver:weaponValue.includes("Scatter")?GUN_AMMO.scatter:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?GUN_AMMO.energy:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?GUN_AMMO.long:weaponValue.includes("Rapid")?GUN_AMMO.rapid:GUN_AMMO.compact;
+  const options=isBow?BOW_AMMO:weaponValue.includes("Revolver")?GUN_AMMO.revolver:weaponValue.includes("Scatter")?GUN_AMMO.scatter:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?GUN_AMMO.energy:weaponValue.includes("Launcher")?GUN_AMMO.payload:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?GUN_AMMO.long:weaponValue.includes("Rapid")?GUN_AMMO.rapid:GUN_AMMO.compact;
   fill(ammo,options,initial.ammo);
  }
  style.addEventListener("change",()=>{initial.weapon="";initial.ammo="";initial.ammoType="";updateType();});
