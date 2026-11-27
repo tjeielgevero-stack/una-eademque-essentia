@@ -14,9 +14,40 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
+  <script>if (window.__TAURI_INTERNALS__) document.documentElement.classList.add("tauri-app");</script>
   <link rel="stylesheet" href="style.css?v=20261127-desktop-shell2">
+  <style id="website-transition-landing-styles">
+    html:not(.tauri-app), html:not(.tauri-app) body { min-height:100%; background:#090909; }
+    html:not(.tauri-app) body { display:block; }
+    html:not(.tauri-app) body > :not(#website-transition-landing):not(script):not(style) { display:none !important; }
+    #website-transition-landing { min-height:100vh; display:grid; place-items:center; padding:32px 20px; color:#eeeae3; background:radial-gradient(ellipse at 50% 15%,#292725 0%,#111 48%,#080808 100%); }
+    .website-transition-card { width:min(720px,100%); padding:clamp(28px,6vw,64px); text-align:center; border:1px solid rgba(184,170,150,.36); background:linear-gradient(145deg,rgba(34,31,28,.72),rgba(10,10,10,.86)); box-shadow:0 28px 90px rgba(0,0,0,.5),inset 0 0 70px rgba(255,255,255,.018); }
+    .website-transition-kicker,.website-transition-footnote { color:#91887c; font:9px 'DM Mono',monospace; letter-spacing:.17em; }
+    .website-transition-emblem { width:82px;height:82px;margin:28px auto;border:1px solid #918779;border-radius:50%;display:grid;place-items:center;color:#e5ded3;font:500 20px 'Cormorant Garamond',serif;letter-spacing:.08em;transform:rotate(-8deg); }
+    .website-transition-card h1 { margin:18px 0 25px;font-size:clamp(42px,8vw,76px);line-height:.98;letter-spacing:.035em;font-weight:500; }
+    .website-transition-card h1 em { color:#aaa39a;font-weight:400; }
+    .website-transition-message { max-width:540px;margin:0 auto 16px;font-size:clamp(20px,3vw,26px);line-height:1.35; }
+    .website-transition-support { max-width:490px;margin:0 auto 30px;color:#a7a19a;font-size:17px;line-height:1.5; }
+    .website-transition-install { display:inline-flex;align-items:center;gap:24px;padding:16px 22px;border:1px solid #d8d1c6;background:#d8d1c6;color:#111;text-decoration:none;font:500 10px 'DM Mono',monospace;letter-spacing:.12em;transition:.18s ease; }
+    .website-transition-install:hover { background:#fff;border-color:#fff;transform:translateY(-1px); }
+    .website-transition-install span { font-size:15px; }
+    .website-transition-footnote { margin:28px 0 0;font-size:8px; }
+    @media(max-width:520px){.website-transition-card{padding:30px 20px}.website-transition-message{font-size:20px}}
+  </style>
 </head>
 <body>
+  <main id="website-transition-landing" aria-labelledby="website-transition-title">
+    <div class="website-transition-card">
+      <p class="website-transition-kicker">UNA EADEMQUE ESSENTIA / ARCHIVE NOTICE</p>
+      <div class="website-transition-emblem" aria-hidden="true">U.E.E.</div>
+      <h1 id="website-transition-title">A NEW HOME<br><em>FOR THE ARCHIVE</em></h1>
+      <p class="website-transition-message">Sorry! This website stopped Updating and instead switched to an app. The Creator thought the app would be better.</p>
+      <p class="website-transition-support">The website will remain available as an announcement page. New features and improvements will focus on the desktop application.</p>
+      <a class="website-transition-install" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/latest" target="_blank" rel="noopener noreferrer">INSTALL THE DESKTOP APP <span aria-hidden="true">↗</span></a>
+      <p class="website-transition-footnote">WINDOWS DESKTOP EDITION · FREE COMMUNITY PROJECT</p>
+    </div>
+  </main>
+
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
     <span class="fx-layer fx-embers"></span>
     <span class="fx-layer fx-rain"></span>
