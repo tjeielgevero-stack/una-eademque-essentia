@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261127-desktop071">
+  <link rel="stylesheet" href="style.css?v=20261128-desktop072">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -79,14 +79,14 @@
         <button class="desktop-dashboard-card" data-desktop-action="simulator" type="button"><span class="desktop-dashboard-index">02 / SIMULATION</span><strong>Fighting Simulator</strong><small>Run fictional matchups between characters in your local archive.</small><b>ENTER SIMULATOR →</b></button>
         <button class="desktop-dashboard-card" data-desktop-action="multiplayer" type="button"><span class="desktop-dashboard-index">03 / NETWORK</span><strong>Multiplayer Arena</strong><small>Create or join a shared room and play with other archive users.</small><b>OPEN ARENA →</b></button>
         <button class="desktop-dashboard-card" data-desktop-action="settings" type="button"><span class="desktop-dashboard-index">04 / CONFIGURATION</span><strong>Archive Settings</strong><small>Adjust appearance, sound, accessibility, and interface effects.</small><b>CONFIGURE →</b></button>
-        <button class="desktop-dashboard-card" data-desktop-action="observatory" type="button"><span class="desktop-dashboard-index">05 / ANALYSIS</span><strong>Mirror Observatory</strong><small>Compare saved variants, inspect archive insights, and export dossiers and backups.</small><b>OPEN OBSERVATORY →</b></button>
+        <button class="desktop-dashboard-card" data-desktop-action="observatory" type="button"><span class="desktop-dashboard-index">05 / ANALYSIS</span><strong>Mirror Observatory</strong><small>Compare saved variants, inspect archive insights, and export dossiers.</small><b>OPEN OBSERVATORY →</b></button>
         <button class="desktop-dashboard-card" data-desktop-action="about" type="button"><span class="desktop-dashboard-index">06 / PROJECT FILE</span><strong>About U.E.E.</strong><small>Read the project note and learn how the local archive works.</small><b>READ THE NOTE →</b></button>
       </div>
     </section>
     <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>UNA EADEMQUE ESSENTIA / DESKTOP</span></div>
+    <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
+    <button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER <span>↗</span></button>
   </section>
-  <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
-  <button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER <span>↗</span></button>
   <dialog id="desktop-sephrus-prompt" class="desktop-sephrus-prompt" aria-labelledby="desktop-sephrus-title">
     <form method="dialog" class="desktop-sephrus-panel" id="desktop-sephrus-form">
       <p class="desktop-dashboard-kicker">RESTRICTED ARCHIVE ACCESS</p>
@@ -105,7 +105,7 @@
   <div class="desktop-sidebar-brand"><img src="./app-icon.svg" alt=""><span>UNA EADEMQUE<br>ESSENTIA</span></div>
   <div class="desktop-sidebar-caption">ARCHIVE NAVIGATION</div>
   <nav class="desktop-sidebar-nav">
-     
+    <button type="button" data-desktop-nav="home" class="is-active"><span>⌂</span> Overview</button>
     <button type="button" data-desktop-nav="create"><span>✧</span> Character Creation</button>
     <button type="button" data-desktop-nav="archive"><span>▤</span> Character Archive</button>
     <button type="button" data-desktop-nav="lore"><span>◈</span> Lore Encyclopedia</button>
@@ -115,11 +115,11 @@
     <button type="button" data-desktop-nav="observatory"><span>✦</span> Mirror Observatory</button>
     <button type="button" data-desktop-nav="about"><span>ⓘ</span> About U.E.E.</button>
   </nav>
-  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.7.1</small></div>
+  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.7.2</small></div>
 </aside>
 <header id="desktop-workspace-topbar" hidden>
   <div><p id="desktop-workspace-kicker">MIRROR WORLD ARCHIVE</p><h2 id="desktop-workspace-title">OVERVIEW</h2></div>
-  <button type="button" id="desktop-workspace-home">OPEN CHARACTER ARCHIVE ↗</button>
+  <button type="button" id="desktop-workspace-home">BACK TO OVERVIEW ↗</button>
 </header>
 
   <header class="site-header">
@@ -144,7 +144,7 @@
         <p>Choose how you want to access the archive.</p>
       </div>
       <div class="app-install-choice-options">
-        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.7.1/Una.Eademque.Essentia_0.7.1_x64-setup.exe" target="_blank" rel="noopener noreferrer">
+        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.5.0/Una.Eademque.Essentia_0.5.0_x64-setup.exe" target="_blank" rel="noopener noreferrer">
           <span class="app-install-option-icon" aria-hidden="true">▣</span>
           <span><strong>DESKTOP APP</strong><small>Windows installer · Dedicated desktop experience</small></span>
           <span class="app-install-option-arrow" aria-hidden="true">↗</span>
@@ -626,9 +626,9 @@
       <p class="eyebrow">NATIVE WINDOWS APPLICATION</p>
       <h2 id="desktop-download-title">TAKE THE ARCHIVE <span>WITH YOU.</span></h2>
       <p>Prefer a dedicated desktop experience? Download the native Windows edition and explore the archive in its own desktop dashboard.</p>
-      <p class="desktop-download-status" role="status">WINDOWS INSTALLER AVAILABLE · VERSION 0.7.1</p>
+      <p class="desktop-download-status" role="status">WINDOWS INSTALLER AVAILABLE · VERSION 0.5.0</p>
     </div>
-    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.7.1/Una.Eademque.Essentia_0.7.1_x64-setup.exe" target="_blank" rel="noopener noreferrer">DOWNLOAD WINDOWS INSTALLER <span>↗</span></a>
+    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.5.0/Una.Eademque.Essentia_0.5.0_x64-setup.exe" target="_blank" rel="noopener noreferrer">DOWNLOAD WINDOWS INSTALLER <span>↗</span></a>
   </section>
   <footer>
     <span>PROJECT MOON CHARACTER ARCHIVE</span>
@@ -636,7 +636,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261127-desktop071"></script>
+  <script src="script.js?v=20261128-desktop072"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
   <script src="lore-book.js?v=20261127-lore1"></script>
   <script>
@@ -716,7 +716,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261127-desktop06", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop072", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
@@ -741,11 +741,10 @@
       const feedback = document.getElementById("desktop-sephrus-feedback");
       if (!dashboard || !sidebar || !topbar) return;
 
-      root.classList.add("tauri-app", "desktop-workspace-active");
-      root.classList.remove("desktop-dashboard-active");
-      dashboard.hidden = true;
-      sidebar.hidden = false;
-      topbar.hidden = false;
+      root.classList.add("tauri-app", "desktop-dashboard-active");
+      dashboard.hidden = false;
+      sidebar.hidden = true;
+      topbar.hidden = true;
 
       const views = {
         home: ["OVERVIEW", "MIRROR WORLD ARCHIVE"],
@@ -777,7 +776,16 @@
         count.textContent = String(records.length);
       }
       function showDashboard() {
-        openAction("archive");
+        hideAllScreens();
+        refreshDashboardStats();
+        root.classList.add("desktop-dashboard-active");
+        root.classList.remove("desktop-workspace-active");
+        root.dataset.desktopView = "home";
+        dashboard.hidden = false;
+        sidebar.hidden = true;
+        topbar.hidden = true;
+        setActiveNav("home");
+        window.scrollTo({ top: 0, behavior: "auto" });
       }
       window.ueeDesktopShowDashboard = showDashboard;
       refreshDashboardStats();
@@ -809,7 +817,7 @@
         return panel;
       }
       function openAction(action) {
-        if (action === "home") { openAction("archive"); return; }
+        if (action === "home") { showDashboard(); return; }
         showWorkspace(action);
         if (action === "create" || action === "quick-create") {
           showOnlyScreen("mode-screen");
@@ -846,7 +854,7 @@
           const panel=resetWorkspacePanel("MIRROR OBSERVATORY", "Compare saved Mirror World identities and preserve your archive outside the application.");
           if(!panel)return;
           panel.classList.add("desktop-observatory");
-          panel.innerHTML=`<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP EXCLUSIVE</p><h2>MIRROR OBSERVATORY</h2><p class="desktop-observatory-intro">Compare saved Mirror World identities and preserve your archive outside the application.</p><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / VARIANT COMPARISON</p><h3>Compare two records</h3><label for="observatory-left">FIRST VARIANT</label><select id="observatory-left"></select><label for="observatory-right">SECOND VARIANT</label><select id="observatory-right"></select><button type="button" class="primary-button" id="observatory-compare">COMPARE RECORDS ↗</button><div id="observatory-result" class="desktop-observatory-result" aria-live="polite">Select two saved characters to begin.</div></section><section class="desktop-observatory-card"><p class="eyebrow">02 / DOSSIER ARCHIVE</p><h3>Export your records</h3><p>Generate one text file containing every saved character dossier. Your local records remain unchanged.</p><strong id="observatory-count" class="desktop-observatory-count">0 RECORDS FOUND</strong><button type="button" class="primary-button" id="observatory-export">EXPORT ALL DOSSIERS ↗</button><p class="desktop-observatory-note">Export is processed locally; no character data is uploaded.</p></section><section class="desktop-observatory-card"><p class="eyebrow">03 / ARCHIVE INSIGHTS</p><h3>Mirror World index</h3><p id="observatory-insights">Archive statistics will appear here.</p></section><section class="desktop-observatory-card"><p class="eyebrow">04 / DATA PRESERVATION</p><h3>Archive backup</h3><p>Save a complete JSON backup of your local character records, or merge a previous backup into this device without duplicating matching record IDs.</p><button type="button" class="primary-button" id="observatory-backup">EXPORT BACKUP ↗</button><input type="file" id="observatory-restore-file" accept=".json,application/json" hidden><button type="button" class="secondary-button" id="observatory-restore">RESTORE / MERGE BACKUP</button><p id="observatory-backup-status" class="desktop-observatory-note" aria-live="polite">Backup files stay on your device.</p></section></div><button type="button" class="secondary-button" id="observatory-back">RETURN TO CHARACTER ARCHIVE</button>`;
+          panel.innerHTML=`<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP EXCLUSIVE</p><h2>MIRROR OBSERVATORY</h2><p class="desktop-observatory-intro">Compare saved Mirror World identities and preserve your archive outside the application.</p><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / VARIANT COMPARISON</p><h3>Compare two records</h3><label for="observatory-left">FIRST VARIANT</label><select id="observatory-left"></select><label for="observatory-right">SECOND VARIANT</label><select id="observatory-right"></select><button type="button" class="primary-button" id="observatory-compare">COMPARE RECORDS ↗</button><div id="observatory-result" class="desktop-observatory-result" aria-live="polite">Select two saved characters to begin.</div></section><section class="desktop-observatory-card"><p class="eyebrow">02 / DOSSIER ARCHIVE</p><h3>Export your records</h3><p>Generate one text file containing every saved character dossier. Your local records remain unchanged.</p><strong id="observatory-count" class="desktop-observatory-count">0 RECORDS FOUND</strong><button type="button" class="primary-button" id="observatory-export">EXPORT ALL DOSSIERS ↗</button><p class="desktop-observatory-note">Export is processed locally; no character data is uploaded.</p></section><section class="desktop-observatory-card"><p class="eyebrow">03 / ARCHIVE INSIGHTS</p><h3>Mirror World index</h3><p id="observatory-insights">Archive statistics will appear here.</p></section></div><button type="button" class="secondary-button" id="observatory-back">RETURN TO OVERVIEW</button>`;
           const records=typeof readOcArchive==="function"?readOcArchive():[];
           const left=panel.querySelector("#observatory-left"),right=panel.querySelector("#observatory-right"),result=panel.querySelector("#observatory-result");
           records.forEach((record,index)=>{for(const select of [left,right]){const option=document.createElement("option");option.value=String(index);option.textContent=(record.name||"Unnamed Variant")+" · "+String(record.mode||"simple").toUpperCase();select.append(option);}});
@@ -872,31 +880,7 @@
             const contents=records.map(record=>typeof formatCharacterDossier==="function"?formatCharacterDossier(record.name,record.mode,record.answers):JSON.stringify(record.answers,null,2)).join("\n\n"+"═".repeat(48)+"\n\n");
             const url=URL.createObjectURL(new Blob([contents],{type:"text/plain;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download="UEE-character-dossiers.txt";link.click();URL.revokeObjectURL(url);
           });
-          const backupStatus=panel.querySelector("#observatory-backup-status");
-          panel.querySelector("#observatory-backup").addEventListener("click",()=>{
-            const payload={format:"uee-local-archive",version:1,exportedAt:new Date().toISOString(),records:readOcArchive()};
-            const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}));
-            const link=document.createElement("a");link.href=url;link.download="UEE-archive-backup-"+new Date().toISOString().slice(0,10)+".json";link.click();URL.revokeObjectURL(url);
-            backupStatus.textContent=payload.records.length+" RECORDS EXPORTED. Keep this file somewhere safe.";
-          });
-          const restoreFile=panel.querySelector("#observatory-restore-file");
-          panel.querySelector("#observatory-restore").addEventListener("click",()=>restoreFile.click());
-          restoreFile.addEventListener("change",async()=>{
-            const file=restoreFile.files?.[0];if(!file)return;
-            try{
-              const parsed=JSON.parse(await file.text());
-              const incoming=Array.isArray(parsed)?parsed:parsed?.records;
-              if(!Array.isArray(incoming)||!incoming.every(record=>record&&typeof record==="object"&&typeof record.id==="string"&&typeof record.name==="string"&&record.answers&&typeof record.answers==="object"&&!Array.isArray(record.answers)))throw new Error("This file is not a valid U.E.E. archive backup.");
-              const current=readOcArchive(),byId=new Map(current.map(record=>[record.id,record]));
-              let added=0,updated=0;
-              incoming.forEach(record=>{if(byId.has(record.id))updated++;else added++;byId.set(record.id,record);});
-              const merged=[...byId.values()];writeOcArchive(merged);
-              backupStatus.textContent="RESTORE COMPLETE: "+added+" ADDED, "+updated+" MATCHING RECORDS UPDATED. TOTAL: "+merged.length+".";
-              panel.querySelector("#observatory-count").textContent=merged.length+" RECORD"+(merged.length===1?"":"S")+" FOUND";
-            }catch(error){backupStatus.textContent=error.message||"Could not read that backup file.";}
-            restoreFile.value="";
-          });
-          panel.querySelector("#observatory-back").addEventListener("click",()=>openAction("archive"));
+          panel.querySelector("#observatory-back").addEventListener("click",showDashboard);
         }
       }
       dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
@@ -905,7 +889,15 @@
       sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
         button.addEventListener("click", () => openAction(button.dataset.desktopNav));
       });
-      document.getElementById("desktop-workspace-home")?.addEventListener("click", () => openAction("archive"));
+      document.getElementById("desktop-workspace-home")?.addEventListener("click", showDashboard);
+
+      const returnButton = document.createElement("button");
+      returnButton.type = "button";
+      returnButton.id = "desktop-dashboard-return";
+      returnButton.className = "settings-open desktop-dashboard-return";
+      returnButton.textContent = "OVERVIEW";
+      returnButton.addEventListener("click", showDashboard);
+      document.querySelector(".header-tools")?.prepend(returnButton);
 
       gate?.addEventListener("click", () => {
         feedback.textContent = "";
@@ -935,25 +927,12 @@
           name.focus();
         }
       });
-      // Start in the archive workspace. Avoid triggering the website creation
-      // button during desktop boot; that button belongs to the shared web flow.
-      try {
-        openAction("archive");
-      } catch (error) {
-        console.error("Desktop workspace startup failed; restoring archive view.", error);
-        root.classList.add("tauri-app", "desktop-workspace-active");
-        dashboard.hidden = true;
-        sidebar.hidden = false;
-        topbar.hidden = false;
-        document.querySelectorAll(".screen").forEach(node => node.classList.add("hidden"));
-        const archive = document.getElementById("home-screen");
-        if (archive) {
-          archive.classList.remove("hidden");
-          archive.classList.add("desktop-archive-view");
+      document.addEventListener("click", event => {
+        if (event.target.closest("#mode-back, #home-button, #simulator-back-button, #mp-back, #restart-button")) {
+          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+          if (root.classList.contains("desktop-workspace-active")) showDashboard();
         }
-        title.textContent = "CHARACTER ARCHIVE";
-        kicker.textContent = "LOCAL RECORDS";
-      }
+      });
     })();
   </script>
 
