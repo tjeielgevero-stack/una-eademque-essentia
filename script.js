@@ -713,7 +713,7 @@ function renderOcHistory(){
    };
    const copy=document.createElement("button");copy.type="button";copy.className="text-button";copy.textContent="COPY DOSSIER";
    copy.onclick=async()=>{
-    const dossier=r.profileSummary||formatCharacterDossier(r.name||"Unnamed Variant",r.mode,r.answers||{});
+    const dossier=formatCharacterDossier(r.name||"Unnamed Variant",r.mode,r.answers||{});
     try{await navigator.clipboard.writeText(dossier);copy.textContent="COPIED";copy.disabled=true;window.setTimeout(()=>{copy.textContent="COPY DOSSIER";copy.disabled=false;},1400);}
     catch{copy.textContent="COPY UNAVAILABLE";window.setTimeout(()=>{copy.textContent="COPY DOSSIER";},1600);}
    };
