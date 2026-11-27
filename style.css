@@ -2427,34 +2427,6 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 
 
 
-/* Desktop v0.8.0: restore the original website landing page inside Tauri. */
-.tauri-app.desktop-website-active .site-header,.tauri-app.desktop-website-active footer {display:flex!important}
-.tauri-app.desktop-website-active .ornament {display:block!important}
-.tauri-app.desktop-website-active .desktop-download-section,.tauri-app.desktop-website-active .app-install-button {display:none!important}
-.tauri-app.desktop-website-active main {display:grid!important;width:min(850px,calc(100% - 40px))!important;max-width:850px!important;margin:auto!important;padding:60px 0 70px!important}
-.tauri-app.desktop-website-active main>.screen {width:100%}
-.tauri-app.desktop-website-active .desktop-tools-open {border-color:rgba(var(--accent-rgb),.5);color:var(--accent)}
-.tauri-app.desktop-website-active #desktop-sephrus-gate {position:fixed;z-index:80;right:13px;bottom:12px;width:26px;height:26px;border:1px solid rgba(160,148,130,.12);background:transparent;color:rgba(200,190,175,.14);font:18px Georgia,serif;cursor:pointer;opacity:.25}
-.tauri-app.desktop-website-active #desktop-sephrus-gate:hover {opacity:.9;color:#d8d1c6;border-color:#8d806e}
-.tauri-app.desktop-website-active #desktop-sephrus-maker {position:fixed;z-index:80;right:18px;bottom:48px;padding:10px 14px;border:1px solid #9d8a6e;background:#171411;color:#e9dfd0;font:9px 'DM Mono',monospace;letter-spacing:.12em;cursor:pointer}
-.tauri-app.desktop-website-active .desktop-observatory-v2 {width:100%;max-width:1050px;margin:0 auto;padding:28px 24px;text-align:left}
-.tauri-app.desktop-website-active .desktop-observatory-header {display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px}
-.tauri-app.desktop-website-active .desktop-observatory-header h2 {margin:8px 0;font:500 clamp(30px,4vw,48px) Georgia,serif;letter-spacing:.07em}
-.tauri-app.desktop-website-active .desktop-observatory-header p:not(.eyebrow),.tauri-app.desktop-website-active .desktop-observatory-card>p:not(.eyebrow) {color:#aaa198;line-height:1.65}
-.tauri-app.desktop-website-active .desktop-observatory-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-.tauri-app.desktop-website-active .desktop-observatory-card {min-width:0;padding:20px;border:1px solid rgba(142,130,113,.3);background:linear-gradient(145deg,rgba(35,31,27,.8),rgba(17,17,17,.95))}
-.tauri-app.desktop-website-active .desktop-observatory-card h3 {margin:8px 0 10px;color:#eee7dc;font:500 22px Georgia,serif}
-.tauri-app.desktop-website-active .desktop-observatory-card label {margin:12px 0 6px}
-.tauri-app.desktop-website-active .desktop-observatory-card select,.tauri-app.desktop-website-active .desktop-observatory-card input[type="search"] {width:100%;margin:5px 0 10px;padding:11px;border:1px solid #4b4339;background:#141210;color:#eee7dc;font:11px 'DM Mono',monospace}
-.tauri-app.desktop-website-active .desktop-observatory-card button {margin:7px 7px 0 0}
-.tauri-app.desktop-website-active .desktop-observatory-card [role="status"] {display:block;margin-top:13px;color:#aaa198;font-size:12px;line-height:1.6}
-.tauri-app.desktop-website-active .desktop-observatory-diff,.tauri-app.desktop-website-active .desktop-observatory-record-row {display:grid;grid-template-columns:.8fr 1fr 1fr;gap:8px;padding:9px;border-bottom:1px solid rgba(142,130,113,.2);font-size:12px;overflow-wrap:anywhere}
-.tauri-app.desktop-website-active .desktop-observatory-diff span:first-child {color:#b8a58b;font:9px 'DM Mono',monospace}
-.tauri-app.desktop-website-active .desktop-observatory-record-row {grid-template-columns:1fr auto;align-items:center}
-.tauri-app.desktop-website-active .desktop-observatory-record-row button {padding:7px 10px;border:1px solid #625747;background:#1a1714;color:#e9dfd0;font:9px 'DM Mono',monospace;cursor:pointer}
-.tauri-app.desktop-website-active .desktop-observatory-card button:disabled {opacity:.4;cursor:not-allowed}
-@media(max-width:760px){.tauri-app.desktop-website-active .desktop-observatory-grid{grid-template-columns:1fr}.tauri-app.desktop-website-active .desktop-observatory-header{display:block}.tauri-app.desktop-website-active main{width:calc(100% - 28px)!important;padding:34px 0 45px!important}}
-
 /* Dedicated desktop application shell */
 .tauri-app .site-header,.tauri-app footer,.tauri-app .ornament,.tauri-app .desktop-download-section {display:none!important}
 .tauri-app.desktop-workspace-active body {min-height:100vh;background:#0d0c0b}
@@ -2578,4 +2550,142 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
   }
+}
+
+
+/* DESKTOP v0.9.0 — independent launch center and native workspace */
+#desktop-dashboard { display:none; }
+#desktop-dashboard[hidden] { display:none !important; }
+.tauri-app.desktop-dashboard-active body { min-height:100vh; overflow:auto; background:#0d0c0b; }
+.tauri-app.desktop-dashboard-active #desktop-dashboard {
+  display:grid; position:relative; grid-template-columns:minmax(0,1fr); gap:24px;
+  width:min(1160px,calc(100% - 64px)); min-height:100vh; margin:0 auto;
+  padding:30px 0 26px; align-content:start; color:#eee9e0;
+}
+.tauri-app.desktop-dashboard-active main,
+.tauri-app.desktop-dashboard-active .site-header,
+.tauri-app.desktop-dashboard-active footer,
+.tauri-app.desktop-dashboard-active .ornament { display:none !important; }
+.tauri-app .desktop-dashboard-top,
+.tauri-app .desktop-dashboard-footer {
+  display:flex; justify-content:space-between; align-items:center; gap:16px;
+  color:#928a7f; font:9px 'DM Mono',monospace; letter-spacing:.16em;
+}
+.tauri-app .desktop-dashboard-status { display:flex; align-items:center; gap:9px; }
+.tauri-app .desktop-dashboard-status i { width:6px; height:6px; border-radius:50%; background:#9eae89; }
+.tauri-app .desktop-dashboard-hero {
+  display:grid; grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);
+  align-items:center; gap:28px; padding:clamp(28px,4vw,48px);
+  border:1px solid rgba(190,176,153,.25);
+  background:radial-gradient(ellipse at 82% 48%,rgba(120,105,82,.14),transparent 38%),linear-gradient(135deg,#211e1a,#11100f 72%);
+  text-align:left; overflow:hidden;
+}
+.tauri-app .desktop-dashboard-hero-copy { position:relative; z-index:2; min-width:0; }
+.tauri-app .desktop-dashboard-overline { margin:0 0 13px; color:#b9aa91; font:9px 'DM Mono',monospace; letter-spacing:.24em; }
+.tauri-app .desktop-dashboard-hero h1 { margin:0; color:#f0e9dd; font:500 clamp(36px,5.2vw,66px)/.98 Georgia,serif; letter-spacing:.035em; }
+.tauri-app .desktop-dashboard-hero h1 span { color:#b9aa91; }
+.tauri-app .desktop-dashboard-intro { max-width:580px; margin:18px 0 0; color:#b7aea2; font-size:16px; line-height:1.65; }
+.tauri-app .desktop-dashboard-hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+.tauri-app .desktop-dashboard-hero-actions button {
+  min-height:44px; padding:0 16px; cursor:pointer; font:9px 'DM Mono',monospace;
+  letter-spacing:.1em; transition:background .15s,border-color .15s,transform .15s;
+}
+.tauri-app .desktop-dashboard-action-primary { border:1px solid #b6a58a; background:#b6a58a; color:#171411; }
+.tauri-app .desktop-dashboard-action-secondary { border:1px solid #625849; background:#171513; color:#e6ded1; }
+.tauri-app .desktop-dashboard-hero-actions button:hover { transform:translateY(-2px); border-color:#e2d2b8; }
+.tauri-app .desktop-dashboard-metrics { display:flex; flex-wrap:wrap; gap:28px; margin-top:30px; padding-top:18px; border-top:1px solid rgba(190,176,153,.18); }
+.tauri-app .desktop-dashboard-metrics div { display:grid; gap:4px; }
+.tauri-app .desktop-dashboard-metrics strong { color:#eee6d9; font:500 25px Georgia,serif; font-variant-numeric:tabular-nums; }
+.tauri-app .desktop-dashboard-metrics span { color:#958a7a; font:8px 'DM Mono',monospace; letter-spacing:.14em; }
+.tauri-app .desktop-dashboard-hero-art { position:relative; display:grid; place-items:center; min-height:280px; isolation:isolate; }
+.tauri-app .desktop-dashboard-emblem { position:relative; z-index:2; width:min(190px,65%); height:auto; }
+.tauri-app .desktop-dashboard-hero-art>span { position:absolute; z-index:3; bottom:22px; color:#a99a83; font:10px 'DM Mono',monospace; letter-spacing:.35em; }
+.tauri-app .desktop-dashboard-orbit { position:absolute; z-index:1; border:1px solid rgba(187,169,139,.26); border-radius:50%; }
+.tauri-app .desktop-dashboard-orbit-one { width:92%; height:54%; transform:rotate(-28deg); }
+.tauri-app .desktop-dashboard-orbit-two { width:76%; height:82%; transform:rotate(38deg); }
+.tauri-app .desktop-dashboard-orbit-three { width:58%; height:96%; transform:rotate(-8deg); border-color:rgba(187,169,139,.13); }
+.tauri-app .desktop-dashboard-section-heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin-bottom:12px; }
+.tauri-app .desktop-dashboard-section-heading p { margin:0 0 6px; color:#978a77; font:8px 'DM Mono',monospace; letter-spacing:.18em; }
+.tauri-app .desktop-dashboard-section-heading h2 { margin:0; color:#e9e2d7; font:500 24px Georgia,serif; letter-spacing:.06em; }
+.tauri-app .desktop-dashboard-section-heading>span,
+.tauri-app .desktop-dashboard-section-heading>button { color:#a99d8b; font:8px 'DM Mono',monospace; letter-spacing:.12em; }
+.tauri-app .desktop-dashboard-section-heading>button { padding:8px 0; border:0; background:transparent; cursor:pointer; }
+.tauri-app .desktop-dashboard-section-heading>button:hover { color:#eee6d9; }
+.tauri-app .desktop-dashboard-recent-list { display:grid; gap:8px; }
+.tauri-app .desktop-dashboard-recent-row {
+  display:flex; justify-content:space-between; align-items:center; gap:16px; min-width:0;
+  padding:13px 16px; border:1px solid rgba(190,176,153,.18); background:linear-gradient(100deg,rgba(255,255,255,.035),rgba(0,0,0,.13));
+}
+.tauri-app .desktop-dashboard-recent-identity { display:grid; min-width:0; gap:5px; }
+.tauri-app .desktop-dashboard-recent-identity strong { overflow:hidden; color:#e8e0d4; font:500 17px Georgia,serif; text-overflow:ellipsis; white-space:nowrap; }
+.tauri-app .desktop-dashboard-recent-identity small { overflow:hidden; color:#958a7a; font:8px 'DM Mono',monospace; letter-spacing:.09em; text-overflow:ellipsis; white-space:nowrap; }
+.tauri-app .desktop-dashboard-recent-open { flex:0 0 auto; padding:9px 11px; border:1px solid #514638; background:#171513; color:#d0c4b2; cursor:pointer; font:8px 'DM Mono',monospace; letter-spacing:.1em; }
+.tauri-app .desktop-dashboard-recent-open:hover { border-color:#b9ad9a; color:#fff; }
+.tauri-app .desktop-dashboard-empty { margin:0; padding:17px; border:1px dashed rgba(190,176,153,.22); color:#9b9287; font:10px/1.6 'DM Mono',monospace; }
+.tauri-app .desktop-dashboard-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.tauri-app .desktop-dashboard-card {
+  display:flex; min-height:148px; min-width:0; flex-direction:column; align-items:flex-start;
+  padding:17px 18px; border:1px solid #3e3831; background:linear-gradient(145deg,#1c1a18,#111);
+  color:#eee9e0; text-align:left; cursor:pointer; transition:border-color .15s,background .15s,transform .15s;
+}
+.tauri-app .desktop-dashboard-card:hover { border-color:#b9ad9a; background:linear-gradient(145deg,#28231e,#151412); transform:translateY(-2px); }
+.tauri-app .desktop-dashboard-index { color:#a99d8b; font:8px 'DM Mono',monospace; letter-spacing:.15em; }
+.tauri-app .desktop-dashboard-card strong { margin:11px 0 5px; color:#eee8dd; font:500 20px Georgia,serif; letter-spacing:.025em; }
+.tauri-app .desktop-dashboard-card small { color:#aaa198; font-size:12px; line-height:1.45; }
+.tauri-app .desktop-dashboard-card b { margin-top:auto; padding-top:13px; color:#d0c4b2; font:8px 'DM Mono',monospace; letter-spacing:.1em; }
+.tauri-app .desktop-dashboard-release {
+  display:grid; grid-template-columns:minmax(220px,.75fr) minmax(0,1.25fr); align-items:center; gap:20px;
+  padding:17px 20px; border-left:2px solid #8f7b5e; background:linear-gradient(90deg,rgba(149,124,87,.11),rgba(255,255,255,.018));
+}
+.tauri-app .desktop-dashboard-release .desktop-dashboard-index { margin:0 0 7px; }
+.tauri-app .desktop-dashboard-release h2 { margin:0; color:#e9e2d7; font:500 20px Georgia,serif; letter-spacing:.04em; }
+.tauri-app .desktop-dashboard-release>p { margin:0; color:#aaa198; font:10px/1.7 'DM Mono',monospace; }
+.tauri-app .desktop-dashboard-footer { padding-top:15px; border-top:1px solid #39342e; }
+.tauri-app.desktop-workspace-active body { min-height:100vh; background:#0d0c0b; }
+.tauri-app.desktop-workspace-active #desktop-sidebar { display:flex; }
+.tauri-app.desktop-workspace-active #desktop-workspace-topbar { display:flex; }
+.tauri-app.desktop-workspace-active main { display:block !important; min-height:100vh; margin:0 0 0 238px; padding:108px 34px 44px; width:auto; max-width:none; }
+.tauri-app.desktop-workspace-active main>.screen { width:min(1050px,100%); margin:0 auto; }
+.tauri-app.desktop-workspace-active .screen:not(.hidden) { animation:desktopWorkspaceEnter .18s ease both; }
+.tauri-app.desktop-workspace-active .simulator-screen,
+.tauri-app.desktop-workspace-active .mp-screen { width:100%; max-width:1100px; }
+.tauri-app.desktop-workspace-active .simulator-topbar { display:none; }
+.tauri-app .desktop-sidebar-nav button { min-height:42px; }
+@media(max-width:850px) {
+  .tauri-app.desktop-dashboard-active #desktop-dashboard { width:calc(100% - 36px); }
+  .tauri-app .desktop-dashboard-hero { grid-template-columns:minmax(0,1fr) 260px; padding:25px; gap:15px; }
+  .tauri-app .desktop-dashboard-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:760px) {
+  .tauri-app.desktop-dashboard-active #desktop-dashboard { width:calc(100% - 30px); padding:20px 0; }
+  .tauri-app .desktop-dashboard-hero { grid-template-columns:1fr; padding:22px; }
+  .tauri-app .desktop-dashboard-hero-art { min-height:170px; }
+  .tauri-app .desktop-dashboard-emblem { width:125px; }
+  .tauri-app .desktop-dashboard-release { grid-template-columns:1fr; gap:9px; }
+  .tauri-app .desktop-dashboard-section-heading { align-items:flex-start; }
+  .tauri-app.desktop-workspace-active #desktop-sidebar { width:190px; padding-inline:10px; }
+  .tauri-app.desktop-workspace-active #desktop-workspace-topbar { left:190px; padding-inline:20px; }
+  .tauri-app.desktop-workspace-active main { margin-left:190px; padding-inline:20px; }
+  .tauri-app .desktop-sidebar-nav button { font-size:10px; padding:10px 8px; }
+}
+@media(max-width:650px) {
+  .tauri-app.desktop-workspace-active #desktop-sidebar { width:62px; padding:18px 7px; }
+  .tauri-app .desktop-sidebar-brand { justify-content:center; padding:0 0 18px; }
+  .tauri-app .desktop-sidebar-brand span,
+  .tauri-app .desktop-sidebar-caption,
+  .tauri-app .desktop-sidebar-nav button { font-size:0 !important; }
+  .tauri-app .desktop-sidebar-nav button { justify-content:center; padding:12px 4px; }
+  .tauri-app .desktop-sidebar-nav button span { font-size:17px !important; }
+  .tauri-app .desktop-sidebar-bottom { display:none; }
+  .tauri-app.desktop-workspace-active #desktop-workspace-topbar { left:62px; padding-inline:12px; }
+  .tauri-app.desktop-workspace-active main { margin-left:62px; padding:98px 12px 30px; }
+  .tauri-app .desktop-dashboard-grid { grid-template-columns:1fr; }
+  .tauri-app .desktop-dashboard-top,
+  .tauri-app .desktop-dashboard-footer { font-size:7px; letter-spacing:.06em; }
+  .tauri-app .desktop-dashboard-metrics { gap:16px; }
+}
+@media(max-width:480px) {
+  .tauri-app .desktop-dashboard-section-heading { flex-direction:column; gap:5px; }
+  .tauri-app .desktop-dashboard-recent-row { align-items:flex-start; flex-direction:column; }
+  .tauri-app .desktop-dashboard-recent-open { align-self:flex-start; }
 }
