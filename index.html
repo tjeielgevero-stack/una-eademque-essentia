@@ -846,7 +846,7 @@
           });
           panel.querySelector("#observatory-export").addEventListener("click",()=>{
             if(!records.length){result.textContent="There are no saved records to export yet.";return;}
-            const contents=records.map(record=>typeof formatCharacterDossier==="function"?formatCharacterDossier(record.name,record.mode,record.answers):JSON.stringify(record.answers,null,2)).join("\\n\\n"+"═".repeat(48)+"\\n\\n");
+            const contents=records.map(record=>typeof formatCharacterDossier==="function"?formatCharacterDossier(record.name,record.mode,record.answers):JSON.stringify(record.answers,null,2)).join("\n\n"+"═".repeat(48)+"\n\n");
             const url=URL.createObjectURL(new Blob([contents],{type:"text/plain;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download="UEE-character-dossiers.txt";link.click();URL.revokeObjectURL(url);
           });
           panel.querySelector("#observatory-back").addEventListener("click",showDashboard);
