@@ -769,8 +769,15 @@
         document.querySelectorAll(".screen").forEach(node => node.classList.add("hidden"));
         document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
       }
+      function refreshDashboardStats() {
+        const count = document.getElementById("desktop-dashboard-record-count");
+        if (!count) return;
+        const records = typeof readOcArchive === "function" ? readOcArchive() : [];
+        count.textContent = String(records.length);
+      }
       function showDashboard() {
         hideAllScreens();
+        refreshDashboardStats();
         root.classList.add("desktop-dashboard-active");
         root.classList.remove("desktop-workspace-active");
         root.dataset.desktopView = "home";
@@ -781,6 +788,7 @@
         window.scrollTo({ top: 0, behavior: "auto" });
       }
       window.ueeDesktopShowDashboard = showDashboard;
+      refreshDashboardStats();
       function showWorkspace(action) {
         if (action !== "archive") document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
         const [heading, subheading] = views[action] || views.home;
