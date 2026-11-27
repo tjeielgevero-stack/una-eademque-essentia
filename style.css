@@ -2519,3 +2519,11 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
  .tauri-app.desktop-workspace-active #desktop-workspace-topbar {left:62px;padding-inline:12px}
  .tauri-app.desktop-workspace-active main {margin-left:62px;padding:98px 12px 30px}
 }
+
+.tauri-app.desktop-workspace-active .desktop-workspace-placeholder {min-height:420px;display:grid;place-items:center}
+.tauri-app .desktop-module-empty {max-width:520px;text-align:center;padding:55px 25px;border:1px solid #3d352c;background:radial-gradient(ellipse at 50% 0%,#29221a 0%,#151311 68%)}
+.tauri-app .desktop-module-emblem {display:block;color:#b8a58b;font-size:34px;margin-bottom:18px}
+.tauri-app .desktop-module-empty h2 {margin:10px 0;color:#eee7dc;font:500 32px Georgia,serif;letter-spacing:.08em}
+.tauri-app .desktop-module-empty p:not(.eyebrow) {color:#aaa198;font-size:13px;line-height:1.7}
+.tauri-app .desktop-module-rule {display:block;width:70px;height:1px;margin:26px auto;background:#74624b}
+.tauri-app .desktop-module-empty small {color:#847a6e;font:8px 'DM Mono',monospace;letter-spacing:.14em}
