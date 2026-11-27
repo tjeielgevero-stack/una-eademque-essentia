@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-race1">
+  <link rel="stylesheet" href="style.css?v=20261127-desktop-shell1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -743,6 +743,7 @@
         });
       }
       function showDashboard() {
+        document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
         root.classList.add("desktop-dashboard-active");
         root.classList.remove("desktop-workspace-active");
         root.dataset.desktopView = "home";
@@ -753,6 +754,7 @@
         window.scrollTo({ top: 0, behavior: "auto" });
       }
       function showWorkspace(action) {
+        if (action !== "archive") document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
         const [heading, subheading] = views[action] || views.home;
         root.classList.remove("desktop-dashboard-active");
         root.classList.add("desktop-workspace-active");
@@ -839,7 +841,7 @@
       document.addEventListener("click", event => {
         if (event.target.closest("#mode-back, #simulator-back-button, #mp-back, #restart-button")) {
           document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
-          if (root.classList.contains("desktop-workspace-active")) showWorkspace("home");
+          if (root.classList.contains("desktop-workspace-active")) showDashboard();
         }
       });
     })();
