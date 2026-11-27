@@ -657,6 +657,13 @@ function formatCharacterDossier(name,mode,answersSource){
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
  const rows=readOcArchive();
+ let migrated=false;
+ rows.forEach(record=>{
+  if(normalizeSephrusCharacterName(record.name)==="Sephrus Aztiluth"&&record.name!=="Sephrus Aztiluth"){
+   record.name="Sephrus Aztiluth";migrated=true;
+  }
+ });
+ if(migrated)writeOcArchive(rows);
  const search=String($("oc-archive-search")?.value||"").trim().toLowerCase();
  const mode=$("oc-archive-mode")?.value||"all";
  const sort=$("oc-archive-sort")?.value||window.ueeReadPreference?.("archiveSort","recent")||"recent";
