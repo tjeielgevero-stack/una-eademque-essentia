@@ -508,7 +508,7 @@ function formatCharacterDossier(name,mode,answersSource){
  const lazyField=label=>isLazy?labelled(label):"";
  const isSephrus=String(name||"").trim().toLowerCase()==="sephrus aztiluth";
  const title=lazyField("Title")||labelled("Title")||first("generated_title_description","title","epithet","color_title","generated_title")||notSet;
- const raceRaw=lazyField("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||"Human";
+ const raceRaw=first("race")||lazyField("Race")||labelled("Race")||first("species","complex_race","generated_race")||"Human";
  const race=raceRaw==="Human"?"Human — A human individual whose identity and capabilities are shaped by personal history, training, choices, and any recorded E.G.O. manifestation.":(raceRaw.length>160||raceRaw.includes(" — ")?raceRaw:raceRaw+" — This identifies the character’s stated lineage or species. Any unusual traits, cultural details, or physical characteristics are described elsewhere in the dossier rather than assumed from the label alone.");
  const occupation=first("occupation","complex_occupation");
  const affiliation=lazyField("Affiliation")||labelled("Affiliation")||(mode==="complex"?"Not specified — this Complex profile does not assign a formal Association, organization, or Office.":first("generated_affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet);
@@ -597,7 +597,7 @@ function renderOcHistory(){
  draw(list,general,false);draw(sephrusList,sephrus,true);
 }
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));characterName=normalizeSephrusCharacterName(characterName);const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
-function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":r.mode==="laziness"?"laziness":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};index=0;$("character-name").value=characterName;render();screen("picker");}
+function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":r.mode==="laziness"?"laziness":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};if(!answers.race)answers.race={choice:"Human",value:"Human",custom:""};syncRaceSelector(profileAnswerText(answers.race.value)||"Human");index=0;$("character-name").value=characterName;render();screen("picker");}
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
 // and kept separate from Advanced / Complex mode so existing saved answers remain compatible.
 const SIMPLE_OPTION_EXPANSIONS = {
@@ -918,6 +918,23 @@ function showSephrusAfterimage(messageText){
   notice.classList.add("shattering");
   window.setTimeout(()=>{notice.remove();window.ueeEasterEggAudio?.endGrim();},2300);
  },5000);
+}
+function returnHomeFromLazinessSephrus(){
+ if(sephrusEscapeRunning)return;
+ sephrusEscapeRunning=true;
+ window.ueeEasterEggAudio?.beginGrim();
+ const overlay=document.createElement("div");
+ overlay.className="sephrus-void-transition";
+ overlay.setAttribute("aria-hidden","true");
+ document.body.append(overlay);
+ requestAnimationFrame(()=>overlay.classList.add("active"));
+ window.setTimeout(()=>{
+  answers={};characterName="";creationMode="simple";editingOcId=null;index=0;
+  $("character-name").value="";$("name-validation").textContent="";$("validation-message").textContent="";
+  renderOcHistory();screen("home");
+  requestAnimationFrame(()=>overlay.classList.remove("active"));
+  window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage("No. Laziness is not apart of me.");},2250);
+ },2100);
 }
 function returnHomeFromSephrusSecret(){
  if(sephrusEscapeRunning)return;
@@ -1288,6 +1305,7 @@ function render(){
 }
 function finish(){
  pruneHiddenAnswers();
+ if(creationMode==="laziness"&&String(answers.laziness_profile?.value||"").toLowerCase().includes("sephrus")){returnHomeFromLazinessSephrus();return;}
  if(creationMode!=="laziness")completeGeneratedCharacter(characterName,answers);
  saveCurrentOc();
  $("result-character-name").textContent=characterName||"UNNAMED VARIANT";const modeStamp=$("result-creation-mode");if(modeStamp)modeStamp.textContent=(creationMode==="complex"?"COMPLEX":creationMode==="advanced"?"ADVANCED":creationMode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION DOSSIER";
@@ -1334,7 +1352,7 @@ function randomizedWriting(q){if(q.id==="complex_43"){const status=values().comp
 
 function randomizeAll(mode=creationMode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
- answers={};index=0;editingOcId=null;
+ answers={race:selectedRaceAnswer()};index=0;editingOcId=null;
  characterName=randomCharacterName();$("character-name").value=characterName;
  for(const q of activeQuestions()){
   if(q.showIf&&!q.showIf(values()))continue;
@@ -1364,7 +1382,21 @@ $("name-continue").onclick=()=>{
 };
 $("character-name").addEventListener("keydown",event=>{if(event.key==="Enter")$("name-continue").click();});
 $("mode-back").onclick=()=>screen("home");
-function launchSelectedMode(){resetSephrusSecretState();answers={};editingOcId=null;index=0;characterName="";$("character-name").value="";$("name-validation").textContent="";screen("name");$("character-name").focus();}
+function selectedRaceAnswer(){
+ const selector=$("character-race"),custom=$("custom-race");
+ const choice=selector?.value||"Human";
+ const value=choice==="Other"?(custom?.value.trim()||"Other"):choice;
+ return {choice,value,custom:choice==="Other"?(custom?.value.trim()||""):""};
+}
+function syncRaceSelector(value){
+ const selector=$("character-race"),custom=$("custom-race");
+ if(!selector)return;
+ const known=["Human","Bloodfiend"];
+ selector.value=known.includes(value)?value:"Other";
+ if(custom){custom.hidden=selector.value!=="Other";custom.value=selector.value==="Other"&&value!=="Other"?value:"";}
+}
+$("character-race")?.addEventListener("change",()=>{const custom=$("custom-race");if(custom){custom.hidden=$("character-race").value!=="Other";if(!custom.hidden)custom.focus();}});
+function launchSelectedMode(){resetSephrusSecretState();answers={race:selectedRaceAnswer()};editingOcId=null;index=0;characterName="";$("character-name").value="";$("name-validation").textContent="";screen("name");$("character-name").focus();}
 function beginSelectedMode(mode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
  answers={};editingOcId=null;index=0;
