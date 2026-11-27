@@ -3,7 +3,7 @@
   "productName": "Una Eademque Essentia",
   "version": "0.1.0",
   "identifier": "com.unaeademqueessentia.desktop",
-  "build": { "frontendDist": "../" },
+  "build": { "frontendDist": "../dist" },
   "app": {
     "windows": [{
       "title": "Una Eademque Essentia",
