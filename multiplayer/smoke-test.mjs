@@ -202,14 +202,14 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     const ultimate = await action(code, host, "ultimate", guest.id);
     check(ultimate.ok && ultimate.data.room.pendingChallenge?.type === "ultimate", "Charged player could not begin the ultimate QTE.");
     let challenge = ultimate.data.room.pendingChallenge;
-    check(challenge.totalSteps === 4 && challenge.prompt, "Ultimate did not require four activation prompts or reveal the first prompt to its owner.");
+    check(challenge.totalSteps === 3 && challenge.prompt, "Ultimate did not require three activation prompts or reveal the first prompt to its owner.");
     const spectatorView = await getState(code, guest);
     check(spectatorView.data.room.pendingChallenge?.prompt === null, "Ultimate direction was exposed to the opponent.");
 
-    for (let step = 0; step < 4; step += 1) {
+    for (let step = 0; step < 3; step += 1) {
       const result = await action(code, host, "qte", undefined, { challengeId: challenge.id, input: challenge.prompt });
       check(result.ok, "Ultimate QTE step " + (step + 1) + " failed.");
-      if (step < 3) {
+      if (step < 2) {
         challenge = result.data.room.pendingChallenge;
         check(challenge && challenge.step === step + 1, "Ultimate QTE did not advance to the next activation.");
       } else {
