@@ -1,28 +1,41 @@
 # Una Eademque Essentia — Project Moon Character Archive
 
-An unofficial, community-made Project Moon character and Mirror World variant builder.
+An unofficial, community-made Project Moon character and Mirror World variant builder. The v1.0.0 super-massive release expands the creator, weapon catalogue, personalization, accessibility, and archive workflows.
 
-## Features
+## Character creation
+- Simple, Advanced, Complex, and one-page Laziness creation modes.
+- Conditional questions, custom answers, randomization, and standardized copyable dossiers.
+- Expanded personality, upbringing, reputation, professional specialty, and fictional combat-approach choices.
+- Saved character archive with search across names, titles, and dossier text, creation-mode filters, and sorting.
 
-- Conditional character creation, custom answers, randomization, and copyable summaries.
-- Separate searchable catalogues.
-- A Settings dialog with a draggable two-dimensional saturation/brightness square and rainbow hue slider.
-- Custom accent color saved in the browser.
-- Separate Appearance and Effects tabs in Settings, with four mix-and-match visual effects: Ambient Dust, CRT Scanlines, Accent Pulse, and Glitch Flicker.
-- Visual-effect selections are saved locally, and animated effects respect reduced-motion preferences.
-- Opening Settings keeps the page scrollable without collapsing the page scrollbar.
-- Responsive archive-inspired design with an original moon-headed archive-clerk illustration.
+## Fictional weapon catalogue
+- Seven fighting styles: Melee, Ranged, Unarmed, Hybrid / Transforming, Focus / Conduit, Thrown / Returning, and Summoned / Construct.
+- A substantially expanded catalogue of original fantasy weapon and implement concepts.
+- Searchable weapon selector with custom naming and fictional details.
+- Optional fictional ammunition profiles for supported ranged archetypes.
+
+## Personalization and settings
+- Custom accent color, local background image, original ambient soundtrack, interface sounds, and 20 optional visual effects.
+- Accessibility and performance controls: reduce motion, low-performance mode, high contrast, larger text, and compact layout.
+- Creator preferences: show or hide question hints, confirm before deletion, remember the last creation mode, and choose a default weapon style.
+- Archive preferences include default sorting. Personal settings and saved characters remain on the user's device.
+
+## Multiplayer
+- Shared-room battles, 1v1, 2v2, and free-for-all modes.
+- Improved parry response windows and three-step QTE regression coverage.
 
 ## Files
-
-- `index.html` — page structure, Settings dialog, and image placement.
-- `style.css` — responsive styling, color picker, and archive design.
-- `script.js` — character creation flow, catalog interactions, randomizer, summary export, and color persistence.
-- `data.js` — editable character and catalogue data.
-- `assets/archive-clerk.webp` — original unofficial illustration used on the homepage.
+- `index.html` — page structure, creator screens, archive, and Settings.
+- `style.css` — responsive design, personalization, accessibility, and visual effects.
+- `script.js` — creator flow, weapon catalogue, dossier formatter, archive, and preference storage.
+- `multiplayer.js` — multiplayer interface.
+- `multiplayer/src/index.js` — Cloudflare Worker game logic.
+- `multiplayer/smoke-test.mjs` — multiplayer integration smoke tests.
+- `data.js` and `lore-book.js` — character references and lore content.
+- `service-worker.js` — offline app shell and cache updates.
+- `src-tauri/` — Tauri desktop application and updater configuration.
 
 ## Deployment
-
-Keep the four application files and the `assets` folder together in the same Cloudflare Pages project directory. Preserve the `assets/archive-clerk.webp` path so the homepage illustration loads correctly.
+The website deploys from the repository's `main` branch through Cloudflare Pages. The desktop Windows installer is built from the same shared application source, with desktop-only features retained.
 
 This is an unofficial fan-made project and is not affiliated with or endorsed by Project Moon.

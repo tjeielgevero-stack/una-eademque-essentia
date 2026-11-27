@@ -70,13 +70,13 @@ function customLastUnique(options){
 }
 
 const QUESTIONS = [
-{id:"personality",category:"PERSONALITY & TEMPERAMENT",title:"Personality",description:"Select every trait that fits this character. Choose Custom to enter your own personality description instead; Custom cannot be combined with preset traits.",multiple:true,options:["Aloof","Reserved","Stoic","Calm and composed","Analytical","Pragmatic","Cynical","Sarcastic","Witty","Cheerful","Outgoing","Charismatic","Gentle","Compassionate","Patient","Idealistic","Ambitious","Proud","Arrogant","Eccentric","Mischievous","Impulsive","Hot-headed","Anxious","Paranoid","Melancholic","Detached","Secretive","Protective","Loyal","Manipulative","Ruthless","Soft-spoken","Other / custom answer"]},
+{id:"personality",category:"PERSONALITY & TEMPERAMENT",title:"Personality",description:"Select every trait that fits this character. Choose Custom to enter your own personality description instead; Custom cannot be combined with preset traits.",multiple:true,options:["Aloof","Reserved","Stoic","Calm and composed","Analytical","Pragmatic","Cynical","Sarcastic","Witty","Cheerful","Outgoing","Charismatic","Gentle","Compassionate","Patient","Idealistic","Ambitious","Proud","Arrogant","Eccentric","Mischievous","Impulsive","Hot-headed","Anxious","Paranoid","Melancholic","Detached","Secretive","Protective","Loyal","Manipulative","Ruthless","Soft-spoken","Other / custom answer","Disciplined","Empathetic","Blunt","Curious","Perfectionistic","Nostalgic","Soft-hearted","Distrustful","Principled","Playful","Self-sacrificing","Nonchalant","Protective of a select few","Resourceful","Inquisitive"]},
 {id:"era",category:"SETTING & TIMELINE",title:"Story Era",description:"At what point in the Project Moon timeline does this variant's story take place?",options:["Before the events of Lobotomy Corporation","During the Lobotomy Corporation era","After the White Nights and Dark Days","During the Library of Ruina era","During the Limbus Company era","An alternate Mirror World / original timeline","Other / custom answer"]},
 {id:"origin_type",category:"GEOGRAPHY & ORIGIN",title:"Place of Origin",description:"Which part of the world was this variant born or first raised in?",options:["A Nest in the City","The Backstreets of a District","The Outskirts","The Ruins beneath the City","Outside the known setting / custom Mirror World","Unknown / undisclosed"]},
 {id:"district",category:"GEOGRAPHY & ORIGIN",title:"District / Corp.",description:"Choose the combined District and corresponding Corp. entry. The archive extends the alphabetical pattern through District 26 - Z Corp.; that final entry is an extrapolation, not a confirmed in-game reveal.",showIf:a=>["A Nest in the City","The Backstreets of a District"].includes(a.origin_type),options:Object.values(DISTRICT_CORP).concat(["Unknown / undisclosed","Other / custom answer"])},
 {id:"nest_status",category:"GEOGRAPHY & ORIGIN",title:"Nest Status",description:"What is this variant's relationship to Nest life?",showIf:a=>a.origin_type==="A Nest in the City",options:["Resident / ordinary citizen","Wing employee (Feather)","Wing executive or privileged employee","Resident with precarious status","Former Nest resident, now displaced","Other / custom answer","Unknown / undisclosed"]},
 {id:"backstreet_environment",category:"GEOGRAPHY & ORIGIN",title:"Backstreet Environment",description:"What kind of Backstreets environment shaped this variant? Conditions differ significantly between areas.",showIf:a=>a.origin_type==="The Backstreets of a District",options:["Relatively stable neighborhood","Territory controlled by a major Syndicate","Territory controlled by a smaller Syndicate","Area maintained by Fixer Offices","Workshop-dominated neighborhood","Highly lawless area","Near a Nest boundary","Other / custom answer","Unknown / undisclosed"]},
-{id:"upbringing",category:"HISTORY & SOCIAL POSITION",title:"Upbringing",description:"What circumstances shaped this variant's childhood and formative years?",options:["Born into a prominent Fixer family","Born into an ordinary Nest household","Born into a Backstreets household","Raised by a Fixer Office","Raised within a Syndicate","Raised by a Wing / corporate household","Raised in a Workshop environment","Orphaned or raised without stable guardians","Spent formative years in the Outskirts or Ruins","Other / custom answer"]},
+{id:"upbringing",category:"HISTORY & SOCIAL POSITION",title:"Upbringing",description:"What circumstances shaped this variant's childhood and formative years?",options:["Born into a prominent Fixer family","Born into an ordinary Nest household","Born into a Backstreets household","Raised by a Fixer Office","Raised within a Syndicate","Raised by a Wing / corporate household","Raised in a Workshop environment","Orphaned or raised without stable guardians","Spent formative years in the Outskirts or Ruins","Other / custom answer","Raised by a single guardian","Raised by a close-knit community","Educated by a private tutor","Raised in an institutional facility","Frequently relocated between districts","Raised among performers or artists","Raised among researchers or archivists","Raised by an unconventional mentor"]},
 {id:"family_status",category:"HISTORY & SOCIAL POSITION",title:"Family Standing",description:"How was this variant's family regarded? This is social standing, not automatically their personal rank.",options:["Prominent and influential family","Established Fixer family","Known Workshop family","Family connected to a Wing","Family connected to a Syndicate","Ordinary working family","Impoverished household","Disgraced or notorious family","No known family / raised independently","Other / custom answer"]},
 {id:"augmentation",category:"HISTORY & SOCIAL POSITION",title:"Augmentations",description:"What is this variant's relationship with the City's commonplace body-modification technology? Keep this at a narrative level.",options:["No known technological augmentations","Minor quality-of-life modifications","Medical or prosthetic replacements","Specialized professional augmentations","Extensive bodily augmentation","Experimental or unusual modifications","Unknown / undisclosed","Other / custom answer"]},
 {id:"education",category:"HISTORY & SOCIAL POSITION",title:"Training & Education",description:"Where did this variant acquire their knowledge and professional training?",options:["Family instruction","Fixer Office apprenticeship","Association training","Syndicate training","Wing education or corporate training","Workshop apprenticeship","Self-taught","Formal private education","Several sources","Other / custom answer"]},
@@ -96,9 +96,9 @@ const QUESTIONS = [
 {id:"office",category:"PROFESSION & AFFILIATION",title:"Fixer Office / Previous Office",description:"Does this variant belong, or did they previously belong, to a particular Fixer Office? An Office is distinct from an Association.",showIf:a=>hasFixerTrack(a),options:["Owns or leads an Office","Member of an established Office","Office manager","Office administrator or clerk","Member of a small independent Office","Works alone without an Office","No longer affiliated with an Office","Other / custom answer"]},
 {id:"wing_role",category:"PROFESSION & AFFILIATION",title:"Wing Role",description:"If employed by a Wing, what is this variant's relationship to it?",showIf:a=>a.occupation==="Wing employee (Feather)",options:["Research / technical staff","Administrative employee","Security / enforcement role","Field operative","Executive / management","Ordinary employee","Other / custom answer"]},
 {id:"workshop",category:"PROFESSION & AFFILIATION",title:"Workshop Relationship",description:"Workshops produce and maintain the City's equipment and specialized products. What is this variant's connection to one?",showIf:a=>a.occupation==="Workshop artisan or craftsperson"||a.education==="Workshop apprenticeship",options:["Independent craftsperson","Workshop employee","Workshop owner","Workshop family / heir","Workshop engineer","Workshop designer","Workshop repair specialist","Commissioned specialist","Other / custom answer"]},
-{id:"reputation",category:"PROFESSION & AFFILIATION",title:"Reputation",description:"How are they regarded by clients, peers, rivals, or the organizations around them?",options:["Respected professional","Feared for their capabilities","Infamous or notorious","Reliable but unremarkable","Quietly influential","Controversial","Little-known","Reputation differs by District","Other / custom answer"]},
-{id:"specialty",category:"SKILLS & CHARACTERISTICS",title:"Professional Specialty",description:"What field best defines their expertise? This describes narrative specialization, not real-world instruction.",options:["Investigation and information gathering","Negotiation and mediation","Protection and escort work","Retrieval and recovery assignments","Reconnaissance and observation","Technical or Workshop expertise","Close-quarters combat specialist","Team coordination and leadership","Specialist in a particular Singularity or technology","Other / custom answer"]},
-{id:"combat_approach",category:"SKILLS & CHARACTERISTICS",title:"Combat Approach",description:"At a high level, how does this character tend to approach fictional confrontations?",options:["Precise and economical","Defensive and patient","Fast and aggressive","Adaptive and opportunistic","Methodical and analytical","Team-oriented and supportive","Unorthodox and unpredictable","Avoids confrontation where possible","Other / custom answer"]},
+{id:"reputation",category:"PROFESSION & AFFILIATION",title:"Reputation",description:"How are they regarded by clients, peers, rivals, or the organizations around them?",options:["Respected professional","Feared for their capabilities","Infamous or notorious","Reliable but unremarkable","Quietly influential","Controversial","Little-known","Reputation differs by District","Other / custom answer","Known for unusual methods","Trusted as a discreet problem-solver","Admired by ordinary residents","Misunderstood by their peers"]},
+{id:"specialty",category:"SKILLS & CHARACTERISTICS",title:"Professional Specialty",description:"What field best defines their expertise? This describes narrative specialization, not real-world instruction.",options:["Investigation and information gathering","Negotiation and mediation","Protection and escort work","Retrieval and recovery assignments","Reconnaissance and observation","Technical or Workshop expertise","Close-quarters combat specialist","Team coordination and leadership","Specialist in a particular Singularity or technology","Other / custom answer","E.G.O. manifestation research","Abnormality observation and documentation","Archive and record preservation","Disguise and identity work","Resonance and sound-based performance","Field support and coordination"]},
+{id:"combat_approach",category:"SKILLS & CHARACTERISTICS",title:"Combat Approach",description:"At a high level, how does this character tend to approach fictional confrontations?",options:["Precise and economical","Defensive and patient","Fast and aggressive","Adaptive and opportunistic","Methodical and analytical","Team-oriented and supportive","Unorthodox and unpredictable","Avoids confrontation where possible","Other / custom answer","Counter-focused and reactive","Controls the pace of an encounter","Protects allies and controls space","Uses misdirection and decoys","Alternates between support and offense","Uses E.G.O. as a visual extension of movement"]},
 {id:"technical_level",category:"SKILLS & CHARACTERISTICS",title:"Technical Proficiency",description:"How exceptional is this variant within their chosen specialty? This is an OC power scale, not an official City classification.",options:["Competent professional","Highly skilled specialist","Among the best in their Office","Exceptional Grade 1-level specialist","Comparable to a renowned veteran","Color Fixer-level overall capability","Beyond ordinary City classifications (deliberate AU)","Other / custom answer"]},
 {id:"singularity_contact",category:"CITY TECHNOLOGY",title:"Singularity Exposure",description:"Has this variant encountered, worked with, or been affected by a Wing's Singularity?",options:["No known exposure","Works with technology derived from a Singularity","Directly employed by a Wing researching it","Affected by an incident involving it","Has privileged knowledge of it","Original Mirror World-specific circumstance","Unknown / undisclosed"]},
 {id:"abnormality_contact",category:"LOBOTOMY & ABNORMALITY CONTEXT",title:"Abnormality-Related Experience",description:"Abnormalities are entities associated with Lobotomy Corporation's research and the human psyche; they are not a normal place of origin. What is this variant's connection to them?",options:["No known contact","Encountered an Abnormality","Worked at a Lobotomy Corporation facility","Used extracted Abnormality E.G.O.","Has knowledge through research or records","Was involved in an Abnormality-related incident","Other / custom answer","Unknown / undisclosed"]},
@@ -286,6 +286,70 @@ const $=id=>document.getElementById(id);
  document.addEventListener("pointerout",event=>{if(!event.relatedTarget)root.classList.remove("screenquake-hovering","effects-pointer-paused");});
  updateWarningStatus();
 })();
+// Local accessibility, performance, and creator workflow preferences.
+(function setupInterfacePreferences(){
+ const storageKey="uee_interface_preferences_v1";
+ const defaults={reduceMotion:false,lowPerformance:false,highContrast:false,largeText:false,compactLayout:false,showHints:true,confirmDelete:true,rememberMode:true,defaultWeaponStyle:"Melee",archiveSort:"recent",lastCreationMode:"simple"};
+ const validStyles=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit","Thrown / Returning","Summoned / Construct"];
+ const validModes=["simple","advanced","complex","laziness"];
+ let saved={...defaults};
+ try{
+  const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved={...saved,...parsed};
+ }catch{}
+ if(!validStyles.includes(saved.defaultWeaponStyle))saved.defaultWeaponStyle=defaults.defaultWeaponStyle;
+ if(!["recent","name","oldest"].includes(saved.archiveSort))saved.archiveSort=defaults.archiveSort;
+ if(!validModes.includes(saved.lastCreationMode))saved.lastCreationMode=defaults.lastCreationMode;
+ const controls=[...document.querySelectorAll("[data-interface-pref]")],root=document.documentElement;
+ function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}}
+ function read(key,fallback){return saved[key]===undefined?fallback:saved[key];}
+ function apply(){
+  root.classList.toggle("pref-reduce-motion",saved.reduceMotion===true);
+  root.classList.toggle("pref-low-performance",saved.lowPerformance===true);
+  root.classList.toggle("pref-high-contrast",saved.highContrast===true);
+  root.classList.toggle("pref-large-text",saved.largeText===true);
+  root.classList.toggle("pref-compact-layout",saved.compactLayout===true);
+  root.classList.toggle("pref-hide-hints",saved.showHints===false);
+  controls.forEach(control=>{
+   const value=saved[control.dataset.interfacePref];
+   if(control.type==="checkbox")control.checked=value===true;
+   else if(value!==undefined)control.value=String(value);
+  });
+  const archiveSort=$("oc-archive-sort");
+  if(archiveSort&&saved.archiveSort)archiveSort.value=saved.archiveSort;
+  window.ueeRefreshOcArchive?.();
+ }
+ window.ueeReadPreference=read;
+ window.ueeSavePreference=(key,value)=>{
+  if(key==="lastCreationMode"&&saved.rememberMode!==true)return;
+  saved[key]=value;persist();apply();
+ };
+ controls.forEach(control=>control.addEventListener("change",()=>{
+  const key=control.dataset.interfacePref;
+  saved[key]=control.type==="checkbox"?control.checked:control.value;
+  persist();apply();
+ }));
+ $("interface-preferences-reset")?.addEventListener("click",()=>{
+  saved={...defaults};persist();apply();window.ueeMarkLastMode?.();
+ });
+ window.ueeMarkLastMode=()=>{
+  const mode=saved.lastCreationMode;
+  const ids={simple:"mode-simple",advanced:"mode-advanced",complex:"mode-complex",laziness:"mode-laziness"};
+  Object.values(ids).forEach(id=>{
+   const button=$(id);if(!button)return;
+   button.classList.remove("mode-last-used");
+   button.querySelector(".mode-last-used-label")?.remove();
+  });
+  if(saved.rememberMode!==true)return;
+  const button=$(ids[mode]);if(!button)return;
+  button.classList.add("mode-last-used");
+  const label=document.createElement("span");label.className="mode-last-used-label";label.textContent="LAST USED";
+  button.insertBefore(label,button.firstElementChild?.nextSibling||null);
+ };
+ apply();
+ $("begin-button")?.addEventListener("click",()=>requestAnimationFrame(()=>window.ueeMarkLastMode?.()));
+})();
+
 // Show the community disclaimer once per browser tab session.
 (function setupWelcomeNotice(){
  const overlay=$("welcome-notice"),button=$("notice-continue");
@@ -596,19 +660,78 @@ function formatCharacterDossier(name,mode,answersSource){
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
  const rows=readOcArchive();
- const isSephrus=r=>normalizeSephrusCharacterName(r.name)==="Sephrus Aztiluth";
- const general=rows.filter(r=>!isSephrus(r)),sephrus=rows.filter(isSephrus);
- // Repair older locally saved alias records so they remain visible in the dedicated archive.
  let migrated=false;
- sephrus.forEach(r=>{if(r.name!=="Sephrus Aztiluth"){r.name="Sephrus Aztiluth";migrated=true;}});
+ rows.forEach(record=>{
+  if(normalizeSephrusCharacterName(record.name)==="Sephrus Aztiluth"&&record.name!=="Sephrus Aztiluth"){
+   record.name="Sephrus Aztiluth";migrated=true;
+  }
+ });
  if(migrated)writeOcArchive(rows);
- $("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";sephrusList.innerHTML="";
+ const search=String($("oc-archive-search")?.value||"").trim().toLowerCase();
+ const mode=$("oc-archive-mode")?.value||"all";
+ const sort=$("oc-archive-sort")?.value||window.ueeReadPreference?.("archiveSort","recent")||"recent";
+ const titleOf=r=>r.answers?.title?.value||r.answers?.epithet?.value||r.answers?.color_title?.value||r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";
+ const filtered=rows.filter(r=>{
+  const recordMode=r.mode||"simple";
+  if(mode!=="all"&&recordMode!==mode)return false;
+  if(!search)return true;
+  const haystack=[r.name,titleOf(r),r.profileSummary].join(" ").toLowerCase();
+  return haystack.includes(search);
+ });
+ filtered.sort((a,b)=>{
+  if(sort==="name")return String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"});
+  const aTime=new Date(a.updatedAt||0).getTime(),bTime=new Date(b.updatedAt||0).getTime();
+  return sort==="oldest"?aTime-bTime:bTime-aTime;
+ });
+ const isFiltered=!!search||mode!=="all";
+ $("oc-count").textContent=isFiltered?filtered.length+" MATCHES / "+rows.length+" SAVED":rows.length+" SAVED";
+ list.innerHTML="";sephrusList.innerHTML="";
+ const general=filtered.filter(r=>normalizeSephrusCharacterName(r.name)!=="Sephrus Aztiluth");
+ const sephrus=filtered.filter(r=>normalizeSephrusCharacterName(r.name)==="Sephrus Aztiluth");
  if(sephrusSection)sephrusSection.hidden=sephrus.length===0;
  function draw(target,items,isSpecial){
-  if(!items.length){const p=document.createElement("p");p.className="oc-empty";p.textContent=isSpecial?"NO SEPHRUS VARIANTS RECORDED YET.":"NO CHARACTER RECORDS YET.";target.append(p);return;}
-  items.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");const recordTitle=r.answers?.title?.value||r.answers?.epithet?.value||r.answers?.color_title?.value||r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";name.textContent=isSpecial?"Sephrus Aztiluth ("+recordTitle+")":(r.name||"Unnamed Variant");const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":r.mode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);target.append(card);});}
+  if(!items.length){
+   const p=document.createElement("p");p.className="oc-empty";
+   p.textContent=isFiltered?"NO MATCHING RECORDS. TRY CHANGING OR CLEARING YOUR FILTERS.":isSpecial?"NO SEPHRUS VARIANTS RECORDED YET.":"NO CHARACTER RECORDS YET.";
+   target.append(p);return;
+  }
+  items.forEach(r=>{
+   const card=document.createElement("article");card.className="oc-history-card";
+   const info=document.createElement("div");info.className="oc-history-info";
+   const name=document.createElement("strong");
+   name.textContent=isSpecial?"Sephrus Aztiluth ("+titleOf(r)+")":(r.name||"Unnamed Variant");
+   const meta=document.createElement("small");
+   meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":r.mode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();
+   info.append(name,meta);
+   const actions=document.createElement("div");actions.className="oc-history-actions";
+   const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);
+   const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";
+   del.onclick=()=>{
+    const confirmDelete=window.ueeReadPreference?.("confirmDelete",true)!==false;
+    if(confirmDelete&&!confirm("Delete "+(r.name||"this character")+" from this device?"))return;
+    writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();
+   };
+   const copy=document.createElement("button");copy.type="button";copy.className="text-button";copy.textContent="COPY DOSSIER";
+   copy.onclick=async()=>{
+    const dossier=formatCharacterDossier(r.name||"Unnamed Variant",r.mode,r.answers||{});
+    try{await navigator.clipboard.writeText(dossier);copy.textContent="COPIED";copy.disabled=true;window.setTimeout(()=>{copy.textContent="COPY DOSSIER";copy.disabled=false;},1400);}
+    catch{copy.textContent="COPY UNAVAILABLE";window.setTimeout(()=>{copy.textContent="COPY DOSSIER";},1600);}
+   };
+   actions.append(edit,copy,del);card.append(info,actions);target.append(card);
+  });
+ }
  draw(list,general,false);draw(sephrusList,sephrus,true);
 }
+window.ueeRefreshOcArchive=renderOcHistory;
+(function setupOcArchiveControls(){
+ const search=$("oc-archive-search"),mode=$("oc-archive-mode"),sort=$("oc-archive-sort"),clear=$("oc-archive-clear");
+ if(!search||!mode||!sort)return;
+ sort.value=window.ueeReadPreference?.("archiveSort","recent")||"recent";
+ search.addEventListener("input",renderOcHistory);
+ mode.addEventListener("change",renderOcHistory);
+ sort.addEventListener("change",()=>{window.ueeSavePreference?.("archiveSort",sort.value);renderOcHistory();});
+ clear?.addEventListener("click",()=>{search.value="";mode.value="all";sort.value=window.ueeReadPreference?.("archiveSort","recent")||"recent";renderOcHistory();search.focus();});
+})();
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));characterName=normalizeSephrusCharacterName(characterName);const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":r.mode==="laziness"?"laziness":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};if(!answers.race)answers.race={choice:"Human",value:"Human",custom:""};syncRaceSelector(profileAnswerText(answers.race.value)||"Human");index=0;$("character-name").value=characterName;render();screen("picker");}
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
@@ -978,13 +1101,34 @@ function returnHomeFromSephrusSecret(){
   window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage(afterimageMessage);},2250);
  },2100);
 }
-const WEAPON_STYLE_OPTIONS=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit"];
+const WEAPON_STYLE_OPTIONS=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit","Thrown / Returning","Summoned / Construct"];
 const WEAPON_CATALOGUE={
- "Melee":["Fists","Knuckle Guards","Cestus","Gauntlets","Tonfa","Baton","Short Sword","Longsword","Greatsword","Rapier","Saber","Katana","Paired Blades","Dagger","Ceremonial Knife","Spear","Lance","Halberd","Glaive","Polearm","Quarterstaff","Warhammer","Mace","Flail","Battle Axe","Great Axe","Scythe","Shield","Umbrella","Cane","Combat Fan","Chain-Blade (fantasy)","Whip (fantasy)","Flexible Ribbon-Blade (fantasy)","Twin Staffs","Trident","Hooked Staff","Folding Blade (fantasy)","Guitar with Enhanced Strings (fantasy melee instrument)","Resonance String Guitar","Blade-Fan","Segmented Ribbon Saber","Bell-Hammer","Grimoire Gauntlet"],
- "Ranged":["Longbow","Shortbow","Recurve Bow","Composite Bow (fictional setting)","Crossbow","Hand Crossbow","Sidearm","Revolver-style Sidearm","Longarm","Scatter-type Firearm","Rapid-fire Firearm","Precision Firearm","Energy Firearm","Arcane Firearm","Handheld Energy Projector","Fictional Payload Launcher"],
- "Unarmed":["Fists","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style"],
- "Hybrid / Transforming":["Blade + Firearm (transforming fantasy weapon)","Sword + Sidearm (fictional hybrid)","Greatsword + Energy Projector","Dagger + Arcane Focus","Bayonet-form Transforming Blade","Scythe + Spear","Halberd + Staff","Whip + Sword","Segmented Chain-Blade + Focus","Shield + Energy Cannon","Shield + Blade","Gauntlet + Blade","Gauntlet + Focus","Bow + Sword","Crossbow + Staff (fictional hybrid)","Guitar + Resonance Blade","Musical Instrument + Weapon (fantasy hybrid)","Grimoire + Staff","Book + Blade","Umbrella + Rapier","Cane + Hidden Fantasy Blade","Twin-form Weapon","Modular Staff","Split-form Polearm","Blade-and-Focus Pair","Collapsible Fantasy Weapon","Weapon-and-Shield Pair","Modular Multi-form Weapon","Custom Hybrid / Transforming Weapon"],
- "Focus / Conduit":["Arcane Focus","Catalyst","Talisman Set","Grimoire","Resonance Bell","Ritual Instrument","Mechanical Conduit","E.G.O.-independent Device"]
+ "Melee":[
+  "Fists","Knuckle Guards","Cestus","Gauntlets","Tonfa","Baton","Short Sword","Longsword","Greatsword","Rapier","Saber","Katana","Paired Blades","Dagger","Ceremonial Knife","Spear","Lance","Halberd","Glaive","Polearm","Quarterstaff","Warhammer","Mace","Flail","Battle Axe","Great Axe","Scythe","Shield","Umbrella","Cane","Combat Fan","Chain-Blade (fantasy)","Whip (fantasy)","Flexible Ribbon-Blade (fantasy)","Twin Staffs","Trident","Hooked Staff","Folding Blade (fantasy)","Guitar with Enhanced Strings (fantasy melee instrument)","Resonance String Guitar","Blade-Fan","Segmented Ribbon Saber","Bell-Hammer","Grimoire Gauntlet",
+  "Moonlit Crescent Sabre","Mirror-Edge Twinblades","Memory-Thread Rapier","Starfall Greatsword","Resonance Maul","Glasswing Glaive","Inkbound Scythe","Hollow Bell Flail","Gravemark Pike","Prism Knuckle Guards","Shatterglass Tonfa","Vesper Longstaff","Lantern-Bearing Polearm","Whispering Cane","Tideglass Trident","Oathkeeper Blade","Ashen Hookblade","Clockwork Estoc","Chorus Bell-Hammer","Folding Crescent Staff","Silkline Ribbon Spear","Mirror Lacquer Fan","Veil-Slicer Dagger","Memory Spindle","Runic Tuning Fork","Thorned Scepter"
+ ],
+ "Ranged":[
+  "Longbow","Shortbow","Recurve Bow","Composite Bow (fictional setting)","Crossbow","Hand Crossbow","Sidearm","Revolver-style Sidearm","Longarm","Scatter-type Firearm","Rapid-fire Firearm","Precision Firearm","Energy Firearm","Arcane Firearm","Handheld Energy Projector","Fictional Payload Launcher",
+  "Starfall Bow","Mirror-Shard Bow","Resonance Longbow","Glyphstring Crossbow","Constellation Crossbow","Frostglass Arc-Bow","Echo Lantern Projector","Prism Lens Projector","Sigil Arc Projector","Spectral Flarecaster","Clockwork Sparrowcaster","Runic Harp Projector","Moonwell Beamcaster","Starlit Threadcaster","Veilglass Sightline Caster","Mnemonic Light Projector","Chorus Bell Projector","Shardsong Bow","Whispering Beacon Launcher"
+ ],
+ "Unarmed":[
+  "Barehanded Combat Style","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style",
+  "Mirror-Step Style","Resonance Palm Style","Flowing Current Style","Crescendo Footwork","Counterweight Style","Aerial Spiral Style","Stillwater Guard Style","Echoing Form Style","E.G.O.-Attuned Unarmed Style","Deflection and Redirection Style","Dance-Like Movement Style","Improvised Acrobatics Style"
+ ],
+ "Hybrid / Transforming":[
+  "Blade + Firearm (transforming fantasy weapon)","Sword + Sidearm (fictional hybrid)","Greatsword + Energy Projector","Dagger + Arcane Focus","Bayonet-form Transforming Blade","Scythe + Spear","Halberd + Staff","Whip + Sword","Segmented Chain-Blade + Focus","Shield + Energy Cannon","Shield + Blade","Gauntlet + Blade","Gauntlet + Focus","Bow + Sword","Crossbow + Staff (fictional hybrid)","Guitar + Resonance Blade","Musical Instrument + Weapon (fantasy hybrid)","Grimoire + Staff","Book + Blade","Umbrella + Rapier","Cane + Hidden Fantasy Blade","Twin-form Weapon","Modular Staff","Split-form Polearm","Blade-and-Focus Pair","Collapsible Fantasy Weapon","Weapon-and-Shield Pair","Modular Multi-form Weapon","Custom Hybrid / Transforming Weapon",
+  "Lantern + Spear","Fan + Dagger","Whip + Grimoire","Shield + Grimoire","Chain + Resonance Bell","Staff + Harp","Scythe + Talisman","Rapier + Prism Focus","Thread Spool + Ribbon Blade","Cane + Lantern","Umbrella + Grimoire","Book + Chain-Blade","Bow + Chakram","Paired Blades + Shared Focus","Mirror-Shard Blade + Floating Sigils","Guitar + Echo Projector","Grimoire + Bell","Segmented Staff + Chain","Prism Shield + Beam Focus","Twin Lanterns + Chain","Modular Crescent Polearm","Returning Disc + Sword","Custom Relic Hybrid"
+ ],
+ "Focus / Conduit":[
+  "Arcane Focus","Catalyst","Talisman Set","Grimoire","Resonance Bell","Ritual Instrument","Mechanical Conduit","E.G.O.-independent Device",
+  "Memory Lantern","Mirror Prism","Ink-Sealed Grimoire","Astral Orrery","Echo Chamber Reliquary","Gilded Astrolabe","Threaded Sigil Loom","Mnemonic Hourglass","Pale Glass Reliquary","Whispering Mask","Choral Bell Array","Liminal Compass","Candle of Lost Names","Paper Seal Deck","Clockwork Orison","Dreamcatcher Mandala","Voidglass Lens","Archive Key Relic","Frosted Memory Vessel","Constellation Globe","Shifting Tarot Archive","Resonance Monolith","Silent Music Box","Mirror-Well Vial","Cinderglass Reliquary"
+ ],
+ "Thrown / Returning":[
+  "Returning Crescent Disc","Twin Orbiting Chakrams","Resonance Ringblade","Astral Discus","Sealed Sigil Coin","Guided Lantern Shard","Echoing Throwing Star","Prism Boomerang","Mirrored Returning Blade","Orbiting Bell Rings","Starglass Javelin","Whisperwind Disc","Rune-Cut Ring","Memory-Trace Darts","Tethered Crescent","Harmonic Disc Array"
+ ],
+ "Summoned / Construct":[
+  "Spectral Blade Manifestation","Floating Rune Array","Living Ink Familiar","Mirror-Shard Sentinel","Bound Paper Crane Swarm","Clockwork Wisp","Astral Chain Construct","Memory Echo Companion","Prism Ward Assembly","Constellation Bow Construct","Lantern Wraith","Chorus of Glass Orbs","Inkbound Guardian","Pale Star Familiar","Votive Bell Swarm","Tideglass Shield Construct","Mnemonic Double","Shifting Sigil Mantle"
+ ]
 };
 const BOW_AMMO=["Plain Arrow (fictional profile)","Ember Arrow","Frost Arrow","Thunder Arrow","Gale Arrow","Binding Arrow","Resonance Arrow","Light Arrow","Echo Arrow","Dream Arrow","Signal Arrow","Status-inflicting Arrow","Custom Fictional Arrow"];
 const GUN_AMMO={
@@ -996,14 +1140,16 @@ const GUN_AMMO={
  "energy":["Energy Cell","Ember Cell","Frost Cell","Thunder Cell","Light Cell","Resonance Cell","Custom Fictional Cell"],
  "payload":["Sealed Utility Payload","Signal Payload","Binding Payload","Smoke-like Fictional Veil Payload","Resonance Payload","Custom Fictional Payload"]
 };
+
 function readWeaponDraft(){
  const val=id=>document.getElementById("weapon-"+id)?.value||"";
  return {style:val("style"),weapon:val("type"),ammoType:val("ammo-type"),ammo:val("ammo"),custom:val("custom")};
 }
 function renderWeaponCustomizer(saved){
  const initial=saved.value&&typeof saved.value==="object"?saved.value:{};
+ const preferredStyle=window.ueeReadPreference?.("defaultWeaponStyle","Melee")||"Melee";
  const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal weapon-customizer";
- const note=document.createElement("p");note.className="loadout-note";note.textContent="NON-E.G.O. EQUIPMENT · CHOOSE A STYLE, THEN BUILD A PERSONAL LOADOUT. RANGED AMMUNITION IS PURELY FICTIONAL.";
+ const note=document.createElement("p");note.className="loadout-note";note.textContent="NON-E.G.O. EQUIPMENT · SEARCH THE EXPANDED CATALOGUE, CHOOSE A STYLE, THEN BUILD A PERSONAL LOADOUT. ALL SPECIAL EFFECTS ARE FICTIONAL.";
  panel.append(note);
  const fields=document.createElement("div");fields.className="loadout-fields weapon-fields";
  function addSelect(id,label,options,value){
@@ -1014,7 +1160,12 @@ function renderWeaponCustomizer(saved){
   if(value&&options.includes(value))select.value=value;
   wrap.append(lab,select);fields.append(wrap);return select;
  }
- const style=addSelect("style","FIGHTING STYLE",WEAPON_STYLE_OPTIONS,initial.style||"Melee");
+ const style=addSelect("style","FIGHTING STYLE",WEAPON_STYLE_OPTIONS,initial.style||preferredStyle);
+ const searchWrap=document.createElement("div");searchWrap.className="loadout-field weapon-search-field";
+ const searchLabel=document.createElement("label");searchLabel.htmlFor="weapon-search";searchLabel.textContent="SEARCH WEAPON CATALOGUE";
+ const search=document.createElement("input");search.id="weapon-search";search.type="search";search.maxLength=80;search.placeholder="Type a name, form, or keyword…";search.autocomplete="off";
+ const resultCount=document.createElement("small");resultCount.className="weapon-search-count";resultCount.setAttribute("aria-live","polite");
+ searchWrap.append(searchLabel,search,resultCount);fields.append(searchWrap);
  const typeWrap=document.createElement("div");typeWrap.className="loadout-field";
  const typeLabel=document.createElement("label");typeLabel.htmlFor="weapon-type";typeLabel.textContent="WEAPON / IMPLEMENT";
  const type=document.createElement("select");type.id="weapon-type";typeWrap.append(typeLabel,type);fields.append(typeWrap);
@@ -1028,10 +1179,26 @@ function renderWeaponCustomizer(saved){
  const customLabel=document.createElement("label");customLabel.htmlFor="weapon-custom";customLabel.textContent="CUSTOM DETAILS (OPTIONAL)";
  const custom=document.createElement("input");custom.id="weapon-custom";custom.type="text";custom.maxLength=240;custom.placeholder="Name, appearance, or fictional special property";
  custom.value=initial.custom||"";customWrap.append(customLabel,custom);fields.append(customWrap);
- function fill(select,items,value){select.innerHTML="";items.forEach(item=>{const opt=document.createElement("option");opt.value=item;opt.textContent=item;select.append(opt);});if(value&&items.includes(value))select.value=value;}
+ function fill(select,items,value){
+  select.innerHTML="";
+  const normalized=items.map(item=>typeof item==="string"?{value:item,label:item}:item);
+  normalized.forEach(item=>{const opt=document.createElement("option");opt.value=item.value;opt.textContent=item.label;if(item.disabled)opt.disabled=true;select.append(opt);});
+  if(value&&normalized.some(item=>item.value===value))select.value=value;
+  else if(normalized.length)select.value=normalized[0].value;
+ }
+ let selectedWeapon=initial.weapon||"";
  function updateType(){
-  const styleValue=style.value;const items=WEAPON_CATALOGUE[styleValue]||[];
-  fill(type,items,initial.weapon);updateAmmo();
+  const styleValue=style.value,items=WEAPON_CATALOGUE[styleValue]||[];
+  if(selectedWeapon&&!items.includes(selectedWeapon))selectedWeapon="";
+  const query=search.value.trim().toLowerCase();
+  const matches=items.filter(item=>!query||item.toLowerCase().includes(query));
+  const filtered=matches.slice();
+  if(selectedWeapon&&!matches.includes(selectedWeapon))filtered.unshift({value:selectedWeapon,label:selectedWeapon+" · CURRENT SELECTION"});
+  if(!filtered.length)filtered.push({value:"",label:"NO MATCHES · TRY ANOTHER SEARCH",disabled:true});
+  fill(type,filtered,selectedWeapon);
+  if(!selectedWeapon&&type.value)selectedWeapon=type.value;
+  resultCount.textContent=matches.length+" MATCH"+(matches.length===1?"":"ES")+" IN "+styleValue.toUpperCase();
+  updateAmmo();
  }
  function updateAmmo(){
   const styleValue=style.value,weaponValue=type.value;
@@ -1045,10 +1212,11 @@ function renderWeaponCustomizer(saved){
   const options=isBow?BOW_AMMO:weaponValue.includes("Revolver")?GUN_AMMO.revolver:weaponValue.includes("Scatter")?GUN_AMMO.scatter:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?GUN_AMMO.energy:weaponValue.includes("Launcher")?GUN_AMMO.payload:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?GUN_AMMO.long:weaponValue.includes("Rapid")?GUN_AMMO.rapid:GUN_AMMO.compact;
   fill(ammo,options,initial.ammo);
  }
- style.addEventListener("change",()=>{initial.weapon="";initial.ammo="";initial.ammoType="";updateType();});
- type.addEventListener("change",()=>{initial.ammo="";initial.ammoType="";updateAmmo();});
+ style.addEventListener("change",()=>{selectedWeapon="";search.value="";initial.weapon="";initial.ammo="";initial.ammoType="";updateType();});
+ search.addEventListener("input",updateType);
+ type.addEventListener("change",()=>{selectedWeapon=type.value;initial.weapon=selectedWeapon;initial.ammo="";initial.ammoType="";updateAmmo();});
  updateType();panel.append(fields);
- const hint=document.createElement("p");hint.className="weapon-loadout-hint";hint.textContent="Melee includes close-range weapon families and fists. Ranged includes bows and fictional firearm archetypes; ammunition choices are invented for this setting and only describe the character's loadout.";
+ const hint=document.createElement("p");hint.className="weapon-loadout-hint";hint.textContent="The expanded catalogue includes melee, ranged, unarmed, hybrid, focus, thrown, and summoned designs. Search within the selected style; custom details can describe a unique name, visual motif, or fictional property.";
  panel.append(hint);$("choice-list").append(panel);
  $("next-button").classList.remove("hidden");$("next-button").innerHTML="SAVE WEAPON LOADOUT <span>→</span>";$("custom-wrap").classList.add("hidden");
 }
@@ -1365,6 +1533,8 @@ function randomizedWriting(q){if(q.id==="complex_43"){const status=values().comp
 
 function randomizeAll(mode=creationMode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
+ window.ueeSavePreference?.("lastCreationMode",creationMode);
+ window.ueeMarkLastMode?.();
  answers={race:selectedRaceAnswer()};index=0;editingOcId=null;
  characterName=randomCharacterName();$("character-name").value=characterName;
  for(const q of activeQuestions()){
@@ -1374,6 +1544,10 @@ function randomizeAll(mode=creationMode){
   if(q.id==="ego_name"){const name=randomEgoName(values().ego_theme);answers[q.id]={choice:"Other / custom answer",value:name,custom:name};continue;}
   if(q.customizer){
    const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+   if(q.weaponCustomizer){
+    const style=pick(WEAPON_STYLE_OPTIONS),weapon=pick(WEAPON_CATALOGUE[style]||["Custom Hybrid / Transforming Weapon"]);
+    answers[q.id]={choice:"Weapon loadout",value:{style,weapon,ammoType:"",ammo:"",custom:""},custom:""};continue;
+   }
    const egoPath=egoPathOf(values().ego_status),isLcorp=egoPath==="lobotomy",synergyPool=getSynergyAbnormalities(values().ego_status);
    if(egoPath==="sinner"){answers[q.id]={choice:"Abnormality E.G.O.",value:{sinner_ego:pick(SINNER_EGO_WEAPON_CATALOGUE)},custom:""};continue;}
    answers[q.id]={choice:"Custom E.G.O. loadout",value:{synergy:pick(synergyPool),suit:isLcorp?pick(EGO_SUIT_CATALOGUE):"",category4:pick(isLcorp?L_CORP_EGO_WEAPON_CATALOGUE:DERIVED_EGO_WEAPON_CATALOGUE),gift:isLcorp?pick(EGO_GIFT_CATALOGUE):""},custom:""};continue;
@@ -1412,6 +1586,8 @@ $("character-race")?.addEventListener("change",()=>{const custom=$("custom-race"
 function launchSelectedMode(){resetSephrusSecretState();answers={race:selectedRaceAnswer()};editingOcId=null;index=0;characterName="";$("character-name").value="";$("name-validation").textContent="";screen("name");$("character-name").focus();}
 function beginSelectedMode(mode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
+ window.ueeSavePreference?.("lastCreationMode",creationMode);
+ window.ueeMarkLastMode?.();
  answers={};editingOcId=null;index=0;
  if(creationMode==="laziness"){launchSelectedMode();return;}
  const dlg=$("randomize-confirm-dialog");

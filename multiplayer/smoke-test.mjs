@@ -53,6 +53,27 @@ async function getState(code, player) {
 async function action(code, player, type, targetId, extra = {}) {
   return request("/api/rooms/" + code + "/action", "POST", playerBody(player, { type, targetId, ...extra }));
 }
+
+async function completeParry(code, player, challenge) {
+  let result = null;
+  for (let step = 0; step < Number(challenge.totalSteps || 1); step += 1) {
+    const state = await getState(code, player);
+    check(state.ok, "Could not retrieve the active parry prompt.");
+    const active = state.data.room.pendingChallenge;
+    check(active && active.id === challenge.id, "Parry sequence ended before all prompts were answered.");
+    check(!!active.prompt, "Defender did not receive the next private parry prompt.");
+    result = await action(code, player, "parry", undefined, {
+      challengeId: challenge.id,
+      input: active.prompt
+    });
+    check(result.ok, result.data.error || "Parry input was rejected.");
+    if (result.data.parried === true) return result;
+    check(result.data.parried === "step", "Parry sequence failed before completion.");
+  }
+  check(result?.data?.parried === true, "Parry sequence did not complete.");
+  return result;
+}
+
 async function leaveRoom(code, player) {
   return request("/api/rooms/" + code + "/leave", "POST", playerBody(player));
 }
@@ -134,7 +155,7 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     const defenderView = await getState(code, guest);
     check(defenderView.data.room.pendingChallenge?.prompt, "Defender did not receive the private parry prompt.");
 
-    const parry = await action(code, guest, "parry", undefined, { challengeId: firstParry.id, input: defenderView.data.room.pendingChallenge.prompt });
+    const parry = await completeParry(code, guest, firstParry);
     check(parry.ok && parry.data.parried === true, "Correct parry input was not accepted.");
     check(parry.data.room.players.find(player => player.id === guest.id).hp === 100, "Successful parry did not prevent the incoming damage.");
     check(parry.data.room.turnPlayerId === guest.id, "Parry resolution did not advance the turn.");
@@ -159,7 +180,7 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     check(egoChallenge.prompt === null, "E.G.O. attacker was incorrectly shown the defender's parry direction.");
     const hostEgoView = await getState(code, host);
     check(!!hostEgoView.data.room.pendingChallenge?.prompt, "E.G.O. defender did not receive the private parry prompt.");
-    const egoParry = await action(code, host, "parry", undefined, { challengeId: egoChallenge.id, input: hostEgoView.data.room.pendingChallenge.prompt });
+    const egoParry = await completeParry(code, host, egoChallenge);
     check(egoParry.ok && egoParry.data.room.players.find(player => player.id === host.id).hp === 100, "E.G.O. strike did not respect a successful parry.");
 
     check(egoParry.data.room.turnPlayerId === host.id, "Turn did not return to the host after the E.G.O. parry.");
@@ -215,7 +236,7 @@ await run("Parry QTE timeout resolves automatically", async () => {
 
   const attack = await action(code, host, "attack", guest.id);
   check(attack.ok && attack.data.room.pendingChallenge?.type === "parry", "Attack did not open the timeout test parry.");
-  await new Promise(resolve => setTimeout(resolve, 1450));
+  await new Promise(resolve => setTimeout(resolve, 3900));
 
   const state = await getState(code, host);
   check(state.ok, "Could not read state after the parry timer expired.");
@@ -283,7 +304,7 @@ await run("2v2 format, full lobby requirement, team assignment, and friendly-fir
   check(parryChallenge.prompt === null, "Attacking teammate view revealed the opponent's parry prompt.");
   const p2View = await getState(code, p2);
   check(!!p2View.data.room.pendingChallenge?.prompt, "Target player did not receive the parry prompt.");
-  const parryResult = await action(code, p2, "parry", undefined, { challengeId: parryChallenge.id, input: p2View.data.room.pendingChallenge.prompt });
+  const parryResult = await completeParry(code, p2, parryChallenge);
   check(parryResult.ok && parryResult.data.parried, "Opposing player could not parry during a 2v2 match.");
   check(parryResult.data.room.turnPlayerId === p2.id, "2v2 turn did not advance after the parry.");
 
@@ -314,7 +335,7 @@ await run("Free-for-all format and four-player turn progression", async () => {
   check(ffaChallenge.prompt === null, "Attacking player view revealed the FFA defender's parry prompt.");
   const p4View = await getState(code, p4);
   check(!!p4View.data.room.pendingChallenge?.prompt, "FFA defender did not receive the private parry prompt.");
-  const ffaParry = await action(code, p4, "parry", undefined, { challengeId: ffaChallenge.id, input: p4View.data.room.pendingChallenge.prompt });
+  const ffaParry = await completeParry(code, p4, ffaChallenge);
   check(ffaParry.ok && ffaParry.data.parried && ffaParry.data.room.turnPlayerId === p2.id, "FFA parry or turn progression failed.");
 
   await leaveRoom(code, p2);
