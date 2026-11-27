@@ -39,7 +39,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "RWSJcmZautI14wyKrriwLyRpT740VZ60yv1OwvhNjYDxDwA67tNC4G8M",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUzMzVEMkJBNUE2NjcyODkKUldTSmNtWmF1dEkxNHd5S3JyaXdMeVJwVDc0MFZaNjB5djFPd3ZoTmpZRHhEd0E2N3ROQzRHOE0K",
       "endpoints": [
         "https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/latest/download/latest.json"
       ],
