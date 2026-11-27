@@ -803,6 +803,13 @@
         if (target) target.classList.remove("hidden");
         else console.warn("Desktop workspace target not found:", id);
       }
+      function resetWorkspacePanel(titleText, copyText) {
+        const panel = document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
+        if (!panel) return null;
+        panel.classList.remove("desktop-observatory");
+        panel.innerHTML = `<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP</p><h2 id="desktop-placeholder-title">${titleText}</h2><p id="desktop-placeholder-copy">${copyText}</p><span class="desktop-module-rule"></span><small>SELECT ANOTHER MODULE FROM THE LEFT NAVIGATION.</small>`;
+        return panel;
+      }
       function openAction(action) {
         if (action === "home") { showDashboard(); return; }
         showWorkspace(action);
@@ -816,8 +823,7 @@
           document.querySelector(".oc-archive")?.scrollIntoView({ behavior: "auto", block: "start" });
         } else if (action === "lore") {
           showOnlyScreen("desktop-workspace-placeholder");
-          document.getElementById("desktop-placeholder-title").textContent = "THE LORE BOOK";
-          document.getElementById("desktop-placeholder-copy").textContent = "The reference encyclopedia is open in its own archive panel.";
+          resetWorkspacePanel("THE LORE BOOK", "The reference encyclopedia is open in its own archive panel.");
           document.getElementById("lore-book-open")?.click();
         } else if (action === "simulator") {
           showOnlyScreen("simulator-screen");
@@ -827,8 +833,7 @@
           document.getElementById("open-multiplayer-button")?.click();
         } else if (action === "settings" || action === "effects") {
           showOnlyScreen("desktop-workspace-placeholder");
-          document.getElementById("desktop-placeholder-title").textContent = action === "effects" ? "EFFECTS STUDIO" : "ARCHIVE SETTINGS";
-          document.getElementById("desktop-placeholder-copy").textContent = "Personalize the archive's appearance, sound, and visual effects.";
+          resetWorkspacePanel(action === "effects" ? "EFFECTS STUDIO" : "ARCHIVE SETTINGS", "Personalize the archive's appearance, sound, and visual effects.");
           document.getElementById("settings-open")?.click();
           if (action === "effects") document.querySelector('[data-settings-tab="effects"]')?.click();
         } else if (action === "about") {
@@ -840,7 +845,7 @@
           }
         } else if (action === "observatory") {
           showOnlyScreen("desktop-workspace-placeholder");
-          const panel=document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
+          const panel=resetWorkspacePanel("MIRROR OBSERVATORY", "Compare saved Mirror World identities and preserve your archive outside the application.");
           if(!panel)return;
           panel.classList.add("desktop-observatory");
           panel.innerHTML=`<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP EXCLUSIVE</p><h2>MIRROR OBSERVATORY</h2><p class="desktop-observatory-intro">Compare saved Mirror World identities and preserve your archive outside the application.</p><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / VARIANT COMPARISON</p><h3>Compare two records</h3><label for="observatory-left">FIRST VARIANT</label><select id="observatory-left"></select><label for="observatory-right">SECOND VARIANT</label><select id="observatory-right"></select><button type="button" class="primary-button" id="observatory-compare">COMPARE RECORDS ↗</button><div id="observatory-result" class="desktop-observatory-result" aria-live="polite">Select two saved characters to begin.</div></section><section class="desktop-observatory-card"><p class="eyebrow">02 / DOSSIER ARCHIVE</p><h3>Export your records</h3><p>Generate one text file containing every saved character dossier. Your local records remain unchanged.</p><strong id="observatory-count" class="desktop-observatory-count">0 RECORDS FOUND</strong><button type="button" class="primary-button" id="observatory-export">EXPORT ALL DOSSIERS ↗</button><p class="desktop-observatory-note">Export is processed locally; no character data is uploaded.</p></section><section class="desktop-observatory-card"><p class="eyebrow">03 / ARCHIVE INSIGHTS</p><h3>Mirror World index</h3><p id="observatory-insights">Archive statistics will appear here.</p></section></div><button type="button" class="secondary-button" id="observatory-back">RETURN TO OVERVIEW</button>`;
