@@ -703,7 +703,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261127-desktop-release1", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261127-desktop-shell2", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
@@ -848,7 +848,7 @@
         }
       });
       document.addEventListener("click", event => {
-        if (event.target.closest("#mode-back, #simulator-back-button, #mp-back, #restart-button")) {
+        if (event.target.closest("#mode-back, #home-button, #simulator-back-button, #mp-back, #restart-button")) {
           document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
           if (root.classList.contains("desktop-workspace-active")) showDashboard();
         }
