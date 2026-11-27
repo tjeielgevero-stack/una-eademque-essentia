@@ -473,33 +473,24 @@ function formatWeaponLoadout(value){
  if(!value||typeof value!=="object")return "Not specified.";
  return [value.style,value.weapon,value.ammoType&&"Profile: "+value.ammoType,value.ammo&&"Ammo: "+value.ammo,value.custom].filter(Boolean).join(" · ")||"Not specified.";
 }
-function limitDossierOutput(sections,maxCharacters=4200){
+function limitDossierOutput(sections,maxCharacters=9000){
  const weights=[.25,1,.65,1.15,1,1.35,1.2,1.55,.85,1.05,1.05,1.05,1.05,1.2,1.2,1.05,1.35,1.5,1.5,.95,.95,1.25];
- const build=limit=>{
-  const separators=(sections.length-1)*2;
-  const labels=sections.reduce((sum,line)=>sum+line.slice(0,line.indexOf(":")+2).length,0);
-  const available=Math.max(0,limit-separators-labels);
-  const weightTotal=weights.reduce((sum,value)=>sum+value,0);
-  return sections.map((line,index)=>{
-   const colon=line.indexOf(":");
-   if(colon<0)return line;
-   const heading=line.slice(0,colon+2),body=line.slice(colon+2).trim();
-   const budget=Math.max(24,Math.floor(available*(weights[index]||1)/weightTotal));
-   if(body.length<=budget)return heading+body;
-   let cut=budget-2;
-   const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut),body.lastIndexOf("; ",cut));
-   if(sentenceCut>budget*.52)cut=sentenceCut+1;
-   else{const wordCut=body.lastIndexOf(" ",cut);if(wordCut>budget*.7)cut=wordCut;}
-   return heading+body.slice(0,cut).trimEnd()+"…";
-  }).join("\n\n");
- };
- let output=build(maxCharacters);
- const estimate=value=>Math.ceil(Math.max(value.length/3,value.trim().split(/\s+/).length*1.3));
- while(estimate(output)>1400&&maxCharacters>1900){
-  maxCharacters-=150;
-  output=build(maxCharacters);
- }
- return output;
+ const separators=(sections.length-1)*2;
+ const labels=sections.reduce((sum,line)=>sum+line.slice(0,line.indexOf(":")+2).length,0);
+ const available=Math.max(0,maxCharacters-separators-labels);
+ const weightTotal=weights.reduce((sum,value)=>sum+value,0);
+ return sections.map((line,index)=>{
+  const colon=line.indexOf(":");
+  if(colon<0)return line;
+  const heading=line.slice(0,colon+2),body=line.slice(colon+2).trim();
+  const budget=Math.max(24,Math.floor(available*(weights[index]||1)/weightTotal));
+  if(body.length<=budget)return heading+body;
+  let cut=budget-2;
+  const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut),body.lastIndexOf("; ",cut));
+  if(sentenceCut>budget*.52)cut=sentenceCut+1;
+  else{const wordCut=body.lastIndexOf(" ",cut);if(wordCut>budget*.7)cut=wordCut;}
+  return heading+body.slice(0,cut).trimEnd()+"…";
+ }).join("\n\n");
 }
 
 function formatCharacterDossier(name,mode,answersSource){
@@ -538,7 +529,7 @@ function formatCharacterDossier(name,mode,answersSource){
  const personality=field("Personality")||labelled("Personality")||first("advanced_personality","complex_03","generated_personality")||"Reserved and observant, the character prefers to understand a situation before deciding how much to reveal.";
  const storyParts=["advanced_concept","advanced_motivation","advanced_conflict","advanced_code","advanced_relationships","advanced_arc","advanced_extra_lore","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59"].map(get).filter(Boolean);
  const backstory=field("Backstory")||labelled("Backstory")||(storyParts.length?storyParts.join(" "):first("generated_backstory","backstory","upbringing","complex_14"))||notSet;
- const naturalList=value=>{const parts=[...new Set(String(value||"").split(/[,;·]\s*/).map(x=>x.trim()).filter(Boolean))];if(parts.length<2)return parts[0]||notSet;return parts.length===2?parts.join(" and "):parts.slice(0,-1).join(", ")+", and "+parts.at(-1);};
+ const naturalList=value=>{const parts=[...new Set(String(value||"").split(/[,;·]\\s*/).map(x=>x.trim().replace(/^(?:and|&)\\s+/i,"").replace(/[.\\s]+$/,"")).filter(Boolean))];if(parts.length<2)return parts[0]||notSet;return parts.length===2?parts.join(" and "):parts.slice(0,-1).join(", ")+", and "+parts.at(-1);};
  const likesRaw=field("Likes")||labelled("Likes")||first("complex_32","complex_33","likes","generated_likes");
  const dislikesRaw=field("Dislikes")||labelled("Dislikes")||first("complex_37","complex_29","dislikes","generated_dislikes");
  const likes=likesRaw&&likesRaw.length>160?likesRaw:(likesRaw?"The character enjoys "+naturalList(likesRaw)+".":notSet);
@@ -553,7 +544,7 @@ function formatCharacterDossier(name,mode,answersSource){
   ...(isSephrusAztiluth?[["Passive Ability 2",passive2]]:[]),
   ["Personality",personality],["Backstory",backstory],["Likes",likes],["Dislikes",dislikes],["Overall",overall]
  ];
- return limitDossierOutput(sections.map(([label,value])=>label+": "+value),4200);
+ return limitDossierOutput(sections.map(([label,value])=>label+": "+value),9000);
 }
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
