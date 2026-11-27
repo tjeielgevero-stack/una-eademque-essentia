@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261128-desktop081">
+  <link rel="stylesheet" href="style.css?v=20261128-desktop082">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -673,7 +673,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop081", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop082", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
@@ -728,6 +728,8 @@
     maker?.addEventListener("click",()=>{home();document.getElementById("begin-button")?.click();document.getElementById("mode-laziness")?.click();const n=document.getElementById("character-name");if(n){n.value="Sephrus Aztiluth";n.focus();}});
     document.addEventListener("click",()=>{if(!document.getElementById("home-screen")?.classList.contains("hidden"))tools.setAttribute("aria-pressed","false");});
     window.ueeDesktopShowHome=home;
+    window.ueeDesktopShowDashboard=home;
+    home();
   })();
   </script>
 
