@@ -533,6 +533,8 @@ function formatCharacterDossier(name,mode,answersSource){
  const ability=n=>field("Ability "+n)||labelled("Ability "+n)||(mode==="complex"?(get("complex_ability_"+n)||get("generated_ability_"+n)||notSet):(first("generated_ability_"+n)||notSet));
  const ultimate=n=>field("Ultimate Ability "+n)||labelled("Ultimate Ability "+n)||(mode==="complex"?(get("complex_ultimate_"+n)||get("generated_ultimate_"+n)||notSet):(first("generated_ultimate_"+n)||notSet));
  const passive=field("Passive Ability")||labelled("Passive Ability")||first("passive_ability","complex_passive","generated_passive")||notSet;
+ const isSephrusAztiluth=normalizeSephrusCharacterName(name)==="Sephrus Aztiluth";
+ const passive2=isSephrusAztiluth?(field("Passive Ability 2")||labelled("Passive Ability 2")||first("passive_ability_2","complex_passive_2","generated_passive_2")||notSet):"";
  const personality=field("Personality")||labelled("Personality")||first("advanced_personality","complex_03","generated_personality")||"Reserved and observant, the character prefers to understand a situation before deciding how much to reveal.";
  const storyParts=["advanced_concept","advanced_motivation","advanced_conflict","advanced_code","advanced_relationships","advanced_arc","advanced_extra_lore","complex_15","complex_16","complex_17","complex_18","complex_19","complex_20","complex_51","complex_52","complex_59"].map(get).filter(Boolean);
  const backstory=field("Backstory")||labelled("Backstory")||(storyParts.length?storyParts.join(" "):first("generated_backstory","backstory","upbringing","complex_14"))||notSet;
@@ -548,6 +550,7 @@ function formatCharacterDossier(name,mode,answersSource){
   ["E.G.O",egoDescription],["E.G.O Type",egoType],
   ["Ability 1",ability(1)],["Ability 2",ability(2)],["Ability 3",ability(3)],["Ability 4",ability(4)],
   ["Ultimate Ability 1",ultimate(1)],["Ultimate Ability 2",ultimate(2)],["Passive Ability",passive],
+  ...(isSephrusAztiluth?[["Passive Ability 2",passive2]]:[]),
   ["Personality",personality],["Backstory",backstory],["Likes",likes],["Dislikes",dislikes],["Overall",overall]
  ];
  return limitDossierOutput(sections.map(([label,value])=>label+": "+value),4200);
