@@ -113,7 +113,9 @@
     <button type="button" data-desktop-nav="lore"><span>◈</span> Lore Encyclopedia</button>
     <button type="button" data-desktop-nav="simulator"><span>⚔</span> Fighting Simulator</button>
     <button type="button" data-desktop-nav="multiplayer"><span>⌁</span> Multiplayer Arena</button>
-    <button type="button" data-desktop-nav="settings"><span>⚙</span> Settings</button>\n    <button type="button" data-desktop-nav="observatory"><span>✦</span> Mirror Observatory</button>
+    <button type="button" data-desktop-nav="settings"><span>⚙</span> Settings</button>
+    <button type="button" data-desktop-nav="observatory"><span>✦</span> Mirror Observatory</button>
+    <button type="button" data-desktop-nav="about"><span>ⓘ</span> About U.E.E.</button>
   </nav>
   <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.5.0</small></div>
 </aside>
@@ -765,8 +767,12 @@
           button.classList.toggle("is-active", button.dataset.desktopNav === action);
         });
       }
-      function showDashboard() {
+      function hideAllScreens() {
+        document.querySelectorAll(".screen").forEach(node => node.classList.add("hidden"));
         document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+      }
+      function showDashboard() {
+        hideAllScreens();
         root.classList.add("desktop-dashboard-active");
         root.classList.remove("desktop-workspace-active");
         root.dataset.desktopView = "home";
@@ -792,14 +798,16 @@
         window.scrollTo({ top: 0, behavior: "auto" });
       }
       function showOnlyScreen(id) {
-        document.querySelectorAll("main > .screen").forEach(node => node.classList.add("hidden"));
+        hideAllScreens();
         const target = document.getElementById(id);
         if (target) target.classList.remove("hidden");
+        else console.warn("Desktop workspace target not found:", id);
       }
       function openAction(action) {
         if (action === "home") { showDashboard(); return; }
         showWorkspace(action);
-        if (action === "create") {
+        if (action === "create" || action === "quick-create") {
+          showOnlyScreen("mode-screen");
           document.getElementById("begin-button")?.click();
         } else if (action === "archive") {
           document.body.classList.remove("simulator-entered");
@@ -812,10 +820,10 @@
           document.getElementById("desktop-placeholder-copy").textContent = "The reference encyclopedia is open in its own archive panel.";
           document.getElementById("lore-book-open")?.click();
         } else if (action === "simulator") {
-          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+          showOnlyScreen("simulator-screen");
           document.getElementById("open-simulator-button")?.click();
         } else if (action === "multiplayer") {
-          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+          showOnlyScreen("multiplayer-screen");
           document.getElementById("open-multiplayer-button")?.click();
         } else if (action === "settings" || action === "effects") {
           showOnlyScreen("desktop-workspace-placeholder");
@@ -823,8 +831,13 @@
           document.getElementById("desktop-placeholder-copy").textContent = "Personalize the archive's appearance, sound, and visual effects.";
           document.getElementById("settings-open")?.click();
           if (action === "effects") document.querySelector('[data-settings-tab="effects"]')?.click();
-        } else if (action === "quick-create") {
-          document.getElementById("begin-button")?.click();
+        } else if (action === "about") {
+          showOnlyScreen("desktop-workspace-placeholder");
+          const panel = document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
+          if (panel) {
+            panel.classList.remove("desktop-observatory");
+            panel.innerHTML = `<span class="desktop-module-emblem">ⓘ</span><p class="eyebrow">PROJECT FILE / DESKTOP EDITION</p><h2>ABOUT U.E.E.</h2><p>Una Eademque Essentia is a Mirror World archive for creating, preserving, and exploring alternate character identities. Every variant may live a different life, yet each remains connected by one shared essence.</p><div class="desktop-module-rule"></div><p>Created as an unofficial fan project. Character records are stored locally on this device unless a feature explicitly uses the multiplayer service.</p><small>UNA EADEMQUE ESSENTIA · ONE AND THE SAME ESSENCE</small>`;
+          }
         } else if (action === "observatory") {
           showOnlyScreen("desktop-workspace-placeholder");
           const panel=document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
