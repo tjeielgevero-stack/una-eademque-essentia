@@ -2610,3 +2610,10 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
   .tauri-app .desktop-dashboard-section-heading {align-items:start;flex-direction:column}
   .tauri-app .desktop-dashboard-metrics {gap:18px}
 }
+
+/* Desktop navigation correction: the landing dashboard is not part of the app flow. */
+.tauri-app #desktop-dashboard { display:none!important; }
+.tauri-app.desktop-workspace-active #desktop-sidebar { display:flex; }
+.tauri-app.desktop-workspace-active #desktop-workspace-topbar { display:flex; }
+.tauri-app #desktop-sephrus-gate { position:fixed; right:18px; bottom:18px; z-index:60; }
+.tauri-app #desktop-sephrus-maker { position:fixed; right:18px; bottom:58px; z-index:60; }
