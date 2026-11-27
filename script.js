@@ -289,15 +289,13 @@ const $=id=>document.getElementById(id);
 // Local accessibility, performance, and creator workflow preferences.
 (function setupInterfacePreferences(){
  const storageKey="uee_interface_preferences_v1";
- const defaults={reduceMotion:false,lowPerformance:false,highContrast:false,largeText:false,compactLayout:false,showHints:true,confirmDelete:true,rememberMode:true,defaultWeaponStyle:"Melee",archiveSort:"recent",lastCreationMode:"simple"};
- const validStyles=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit","Thrown / Returning","Summoned / Construct"];
+ const defaults={reduceMotion:false,lowPerformance:false,highContrast:false,largeText:false,compactLayout:false,showHints:true,confirmDelete:true,rememberMode:true,archiveSort:"recent",lastCreationMode:"simple"};
  const validModes=["simple","advanced","complex","laziness"];
  let saved={...defaults};
  try{
   const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
   if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved={...saved,...parsed};
  }catch{}
- if(!validStyles.includes(saved.defaultWeaponStyle))saved.defaultWeaponStyle=defaults.defaultWeaponStyle;
  if(!["recent","name","oldest"].includes(saved.archiveSort))saved.archiveSort=defaults.archiveSort;
  if(!validModes.includes(saved.lastCreationMode))saved.lastCreationMode=defaults.lastCreationMode;
  const controls=[...document.querySelectorAll("[data-interface-pref]")],root=document.documentElement;
@@ -1101,34 +1099,13 @@ function returnHomeFromSephrusSecret(){
   window.setTimeout(()=>{overlay.remove();resetSephrusSecretState();showSephrusAfterimage(afterimageMessage);},2250);
  },2100);
 }
-const WEAPON_STYLE_OPTIONS=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit","Thrown / Returning","Summoned / Construct"];
+const WEAPON_STYLE_OPTIONS=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit"];
 const WEAPON_CATALOGUE={
- "Melee":[
-  "Fists","Knuckle Guards","Cestus","Gauntlets","Tonfa","Baton","Short Sword","Longsword","Greatsword","Rapier","Saber","Katana","Paired Blades","Dagger","Ceremonial Knife","Spear","Lance","Halberd","Glaive","Polearm","Quarterstaff","Warhammer","Mace","Flail","Battle Axe","Great Axe","Scythe","Shield","Umbrella","Cane","Combat Fan","Chain-Blade (fantasy)","Whip (fantasy)","Flexible Ribbon-Blade (fantasy)","Twin Staffs","Trident","Hooked Staff","Folding Blade (fantasy)","Guitar with Enhanced Strings (fantasy melee instrument)","Resonance String Guitar","Blade-Fan","Segmented Ribbon Saber","Bell-Hammer","Grimoire Gauntlet",
-  "Moonlit Crescent Sabre","Mirror-Edge Twinblades","Memory-Thread Rapier","Starfall Greatsword","Resonance Maul","Glasswing Glaive","Inkbound Scythe","Hollow Bell Flail","Gravemark Pike","Prism Knuckle Guards","Shatterglass Tonfa","Vesper Longstaff","Lantern-Bearing Polearm","Whispering Cane","Tideglass Trident","Oathkeeper Blade","Ashen Hookblade","Clockwork Estoc","Chorus Bell-Hammer","Folding Crescent Staff","Silkline Ribbon Spear","Mirror Lacquer Fan","Veil-Slicer Dagger","Memory Spindle","Runic Tuning Fork","Thorned Scepter"
- ],
- "Ranged":[
-  "Longbow","Shortbow","Recurve Bow","Composite Bow (fictional setting)","Crossbow","Hand Crossbow","Sidearm","Revolver-style Sidearm","Longarm","Scatter-type Firearm","Rapid-fire Firearm","Precision Firearm","Energy Firearm","Arcane Firearm","Handheld Energy Projector","Fictional Payload Launcher",
-  "Starfall Bow","Mirror-Shard Bow","Resonance Longbow","Glyphstring Crossbow","Constellation Crossbow","Frostglass Arc-Bow","Echo Lantern Projector","Prism Lens Projector","Sigil Arc Projector","Spectral Flarecaster","Clockwork Sparrowcaster","Runic Harp Projector","Moonwell Beamcaster","Starlit Threadcaster","Veilglass Sightline Caster","Mnemonic Light Projector","Chorus Bell Projector","Shardsong Bow","Whispering Beacon Launcher"
- ],
- "Unarmed":[
-  "Barehanded Combat Style","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style",
-  "Mirror-Step Style","Resonance Palm Style","Flowing Current Style","Crescendo Footwork","Counterweight Style","Aerial Spiral Style","Stillwater Guard Style","Echoing Form Style","E.G.O.-Attuned Unarmed Style","Deflection and Redirection Style","Dance-Like Movement Style","Improvised Acrobatics Style"
- ],
- "Hybrid / Transforming":[
-  "Blade + Firearm (transforming fantasy weapon)","Sword + Sidearm (fictional hybrid)","Greatsword + Energy Projector","Dagger + Arcane Focus","Bayonet-form Transforming Blade","Scythe + Spear","Halberd + Staff","Whip + Sword","Segmented Chain-Blade + Focus","Shield + Energy Cannon","Shield + Blade","Gauntlet + Blade","Gauntlet + Focus","Bow + Sword","Crossbow + Staff (fictional hybrid)","Guitar + Resonance Blade","Musical Instrument + Weapon (fantasy hybrid)","Grimoire + Staff","Book + Blade","Umbrella + Rapier","Cane + Hidden Fantasy Blade","Twin-form Weapon","Modular Staff","Split-form Polearm","Blade-and-Focus Pair","Collapsible Fantasy Weapon","Weapon-and-Shield Pair","Modular Multi-form Weapon","Custom Hybrid / Transforming Weapon",
-  "Lantern + Spear","Fan + Dagger","Whip + Grimoire","Shield + Grimoire","Chain + Resonance Bell","Staff + Harp","Scythe + Talisman","Rapier + Prism Focus","Thread Spool + Ribbon Blade","Cane + Lantern","Umbrella + Grimoire","Book + Chain-Blade","Bow + Chakram","Paired Blades + Shared Focus","Mirror-Shard Blade + Floating Sigils","Guitar + Echo Projector","Grimoire + Bell","Segmented Staff + Chain","Prism Shield + Beam Focus","Twin Lanterns + Chain","Modular Crescent Polearm","Returning Disc + Sword","Custom Relic Hybrid"
- ],
- "Focus / Conduit":[
-  "Arcane Focus","Catalyst","Talisman Set","Grimoire","Resonance Bell","Ritual Instrument","Mechanical Conduit","E.G.O.-independent Device",
-  "Memory Lantern","Mirror Prism","Ink-Sealed Grimoire","Astral Orrery","Echo Chamber Reliquary","Gilded Astrolabe","Threaded Sigil Loom","Mnemonic Hourglass","Pale Glass Reliquary","Whispering Mask","Choral Bell Array","Liminal Compass","Candle of Lost Names","Paper Seal Deck","Clockwork Orison","Dreamcatcher Mandala","Voidglass Lens","Archive Key Relic","Frosted Memory Vessel","Constellation Globe","Shifting Tarot Archive","Resonance Monolith","Silent Music Box","Mirror-Well Vial","Cinderglass Reliquary"
- ],
- "Thrown / Returning":[
-  "Returning Crescent Disc","Twin Orbiting Chakrams","Resonance Ringblade","Astral Discus","Sealed Sigil Coin","Guided Lantern Shard","Echoing Throwing Star","Prism Boomerang","Mirrored Returning Blade","Orbiting Bell Rings","Starglass Javelin","Whisperwind Disc","Rune-Cut Ring","Memory-Trace Darts","Tethered Crescent","Harmonic Disc Array"
- ],
- "Summoned / Construct":[
-  "Spectral Blade Manifestation","Floating Rune Array","Living Ink Familiar","Mirror-Shard Sentinel","Bound Paper Crane Swarm","Clockwork Wisp","Astral Chain Construct","Memory Echo Companion","Prism Ward Assembly","Constellation Bow Construct","Lantern Wraith","Chorus of Glass Orbs","Inkbound Guardian","Pale Star Familiar","Votive Bell Swarm","Tideglass Shield Construct","Mnemonic Double","Shifting Sigil Mantle"
- ]
+ "Melee":["Fists","Knuckle Guards","Cestus","Gauntlets","Tonfa","Baton","Short Sword","Longsword","Greatsword","Rapier","Saber","Katana","Paired Blades","Dagger","Ceremonial Knife","Spear","Lance","Halberd","Glaive","Polearm","Quarterstaff","Warhammer","Mace","Flail","Battle Axe","Great Axe","Scythe","Shield","Umbrella","Cane","Combat Fan","Chain-Blade (fantasy)","Whip (fantasy)","Flexible Ribbon-Blade (fantasy)","Twin Staffs","Trident","Hooked Staff","Folding Blade (fantasy)","Guitar with Enhanced Strings (fantasy melee instrument)","Resonance String Guitar","Blade-Fan","Segmented Ribbon Saber","Bell-Hammer","Grimoire Gauntlet"],
+ "Ranged":["Longbow","Shortbow","Recurve Bow","Composite Bow (fictional setting)","Crossbow","Hand Crossbow","Sidearm","Revolver-style Sidearm","Longarm","Scatter-type Firearm","Rapid-fire Firearm","Precision Firearm","Energy Firearm","Arcane Firearm","Handheld Energy Projector","Fictional Payload Launcher"],
+ "Unarmed":["Fists","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style"],
+ "Hybrid / Transforming":["Blade + Firearm (transforming fantasy weapon)","Sword + Sidearm (fictional hybrid)","Greatsword + Energy Projector","Dagger + Arcane Focus","Bayonet-form Transforming Blade","Scythe + Spear","Halberd + Staff","Whip + Sword","Segmented Chain-Blade + Focus","Shield + Energy Cannon","Shield + Blade","Gauntlet + Blade","Gauntlet + Focus","Bow + Sword","Crossbow + Staff (fictional hybrid)","Guitar + Resonance Blade","Musical Instrument + Weapon (fantasy hybrid)","Grimoire + Staff","Book + Blade","Umbrella + Rapier","Cane + Hidden Fantasy Blade","Twin-form Weapon","Modular Staff","Split-form Polearm","Blade-and-Focus Pair","Collapsible Fantasy Weapon","Weapon-and-Shield Pair","Modular Multi-form Weapon","Custom Hybrid / Transforming Weapon"],
+ "Focus / Conduit":["Arcane Focus","Catalyst","Talisman Set","Grimoire","Resonance Bell","Ritual Instrument","Mechanical Conduit","E.G.O.-independent Device"]
 };
 const BOW_AMMO=["Plain Arrow (fictional profile)","Ember Arrow","Frost Arrow","Thunder Arrow","Gale Arrow","Binding Arrow","Resonance Arrow","Light Arrow","Echo Arrow","Dream Arrow","Signal Arrow","Status-inflicting Arrow","Custom Fictional Arrow"];
 const GUN_AMMO={
@@ -1140,16 +1117,14 @@ const GUN_AMMO={
  "energy":["Energy Cell","Ember Cell","Frost Cell","Thunder Cell","Light Cell","Resonance Cell","Custom Fictional Cell"],
  "payload":["Sealed Utility Payload","Signal Payload","Binding Payload","Smoke-like Fictional Veil Payload","Resonance Payload","Custom Fictional Payload"]
 };
-
 function readWeaponDraft(){
  const val=id=>document.getElementById("weapon-"+id)?.value||"";
  return {style:val("style"),weapon:val("type"),ammoType:val("ammo-type"),ammo:val("ammo"),custom:val("custom")};
 }
 function renderWeaponCustomizer(saved){
  const initial=saved.value&&typeof saved.value==="object"?saved.value:{};
- const preferredStyle=window.ueeReadPreference?.("defaultWeaponStyle","Melee")||"Melee";
  const panel=document.createElement("div");panel.className="loadout-customizer archive-reveal weapon-customizer";
- const note=document.createElement("p");note.className="loadout-note";note.textContent="NON-E.G.O. EQUIPMENT · SEARCH THE EXPANDED CATALOGUE, CHOOSE A STYLE, THEN BUILD A PERSONAL LOADOUT. ALL SPECIAL EFFECTS ARE FICTIONAL.";
+ const note=document.createElement("p");note.className="loadout-note";note.textContent="NON-E.G.O. EQUIPMENT · CHOOSE A STYLE, THEN BUILD A PERSONAL LOADOUT. RANGED AMMUNITION IS PURELY FICTIONAL.";
  panel.append(note);
  const fields=document.createElement("div");fields.className="loadout-fields weapon-fields";
  function addSelect(id,label,options,value){
@@ -1160,12 +1135,7 @@ function renderWeaponCustomizer(saved){
   if(value&&options.includes(value))select.value=value;
   wrap.append(lab,select);fields.append(wrap);return select;
  }
- const style=addSelect("style","FIGHTING STYLE",WEAPON_STYLE_OPTIONS,initial.style||preferredStyle);
- const searchWrap=document.createElement("div");searchWrap.className="loadout-field weapon-search-field";
- const searchLabel=document.createElement("label");searchLabel.htmlFor="weapon-search";searchLabel.textContent="SEARCH WEAPON CATALOGUE";
- const search=document.createElement("input");search.id="weapon-search";search.type="search";search.maxLength=80;search.placeholder="Type a name, form, or keyword…";search.autocomplete="off";
- const resultCount=document.createElement("small");resultCount.className="weapon-search-count";resultCount.setAttribute("aria-live","polite");
- searchWrap.append(searchLabel,search,resultCount);fields.append(searchWrap);
+ const style=addSelect("style","FIGHTING STYLE",WEAPON_STYLE_OPTIONS,initial.style||"Melee");
  const typeWrap=document.createElement("div");typeWrap.className="loadout-field";
  const typeLabel=document.createElement("label");typeLabel.htmlFor="weapon-type";typeLabel.textContent="WEAPON / IMPLEMENT";
  const type=document.createElement("select");type.id="weapon-type";typeWrap.append(typeLabel,type);fields.append(typeWrap);
@@ -1179,26 +1149,10 @@ function renderWeaponCustomizer(saved){
  const customLabel=document.createElement("label");customLabel.htmlFor="weapon-custom";customLabel.textContent="CUSTOM DETAILS (OPTIONAL)";
  const custom=document.createElement("input");custom.id="weapon-custom";custom.type="text";custom.maxLength=240;custom.placeholder="Name, appearance, or fictional special property";
  custom.value=initial.custom||"";customWrap.append(customLabel,custom);fields.append(customWrap);
- function fill(select,items,value){
-  select.innerHTML="";
-  const normalized=items.map(item=>typeof item==="string"?{value:item,label:item}:item);
-  normalized.forEach(item=>{const opt=document.createElement("option");opt.value=item.value;opt.textContent=item.label;if(item.disabled)opt.disabled=true;select.append(opt);});
-  if(value&&normalized.some(item=>item.value===value))select.value=value;
-  else if(normalized.length)select.value=normalized[0].value;
- }
- let selectedWeapon=initial.weapon||"";
+ function fill(select,items,value){select.innerHTML="";items.forEach(item=>{const opt=document.createElement("option");opt.value=item;opt.textContent=item;select.append(opt);});if(value&&items.includes(value))select.value=value;}
  function updateType(){
-  const styleValue=style.value,items=WEAPON_CATALOGUE[styleValue]||[];
-  if(selectedWeapon&&!items.includes(selectedWeapon))selectedWeapon="";
-  const query=search.value.trim().toLowerCase();
-  const matches=items.filter(item=>!query||item.toLowerCase().includes(query));
-  const filtered=matches.slice();
-  if(selectedWeapon&&!matches.includes(selectedWeapon))filtered.unshift({value:selectedWeapon,label:selectedWeapon+" · CURRENT SELECTION"});
-  if(!filtered.length)filtered.push({value:"",label:"NO MATCHES · TRY ANOTHER SEARCH",disabled:true});
-  fill(type,filtered,selectedWeapon);
-  if(!selectedWeapon&&type.value)selectedWeapon=type.value;
-  resultCount.textContent=matches.length+" MATCH"+(matches.length===1?"":"ES")+" IN "+styleValue.toUpperCase();
-  updateAmmo();
+  const styleValue=style.value;const items=WEAPON_CATALOGUE[styleValue]||[];
+  fill(type,items,initial.weapon);updateAmmo();
  }
  function updateAmmo(){
   const styleValue=style.value,weaponValue=type.value;
@@ -1212,11 +1166,10 @@ function renderWeaponCustomizer(saved){
   const options=isBow?BOW_AMMO:weaponValue.includes("Revolver")?GUN_AMMO.revolver:weaponValue.includes("Scatter")?GUN_AMMO.scatter:weaponValue.includes("Energy")||weaponValue.includes("Arcane")?GUN_AMMO.energy:weaponValue.includes("Launcher")?GUN_AMMO.payload:weaponValue.includes("Longarm")||weaponValue.includes("Precision")?GUN_AMMO.long:weaponValue.includes("Rapid")?GUN_AMMO.rapid:GUN_AMMO.compact;
   fill(ammo,options,initial.ammo);
  }
- style.addEventListener("change",()=>{selectedWeapon="";search.value="";initial.weapon="";initial.ammo="";initial.ammoType="";updateType();});
- search.addEventListener("input",updateType);
- type.addEventListener("change",()=>{selectedWeapon=type.value;initial.weapon=selectedWeapon;initial.ammo="";initial.ammoType="";updateAmmo();});
+ style.addEventListener("change",()=>{initial.weapon="";initial.ammo="";initial.ammoType="";updateType();});
+ type.addEventListener("change",()=>{initial.ammo="";initial.ammoType="";updateAmmo();});
  updateType();panel.append(fields);
- const hint=document.createElement("p");hint.className="weapon-loadout-hint";hint.textContent="The expanded catalogue includes melee, ranged, unarmed, hybrid, focus, thrown, and summoned designs. Search within the selected style; custom details can describe a unique name, visual motif, or fictional property.";
+ const hint=document.createElement("p");hint.className="weapon-loadout-hint";hint.textContent="Melee includes close-range weapon families and fists. Ranged includes bows and fictional firearm archetypes; ammunition choices are invented for this setting and only describe the character's loadout.";
  panel.append(hint);$("choice-list").append(panel);
  $("next-button").classList.remove("hidden");$("next-button").innerHTML="SAVE WEAPON LOADOUT <span>→</span>";$("custom-wrap").classList.add("hidden");
 }
@@ -1545,8 +1498,7 @@ function randomizeAll(mode=creationMode){
   if(q.customizer){
    const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
    if(q.weaponCustomizer){
-    const style=pick(WEAPON_STYLE_OPTIONS),weapon=pick(WEAPON_CATALOGUE[style]||["Custom Hybrid / Transforming Weapon"]);
-    answers[q.id]={choice:"Weapon loadout",value:{style,weapon,ammoType:"",ammo:"",custom:""},custom:""};continue;
+    answers[q.id]={choice:"Not specified",value:{},custom:""};continue;
    }
    const egoPath=egoPathOf(values().ego_status),isLcorp=egoPath==="lobotomy",synergyPool=getSynergyAbnormalities(values().ego_status);
    if(egoPath==="sinner"){answers[q.id]={choice:"Abnormality E.G.O.",value:{sinner_ego:pick(SINNER_EGO_WEAPON_CATALOGUE)},custom:""};continue;}
