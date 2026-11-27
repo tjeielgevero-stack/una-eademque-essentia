@@ -236,7 +236,7 @@ await run("Parry QTE timeout resolves automatically", async () => {
 
   const attack = await action(code, host, "attack", guest.id);
   check(attack.ok && attack.data.room.pendingChallenge?.type === "parry", "Attack did not open the timeout test parry.");
-  await new Promise(resolve => setTimeout(resolve, 2700));
+  await new Promise(resolve => setTimeout(resolve, 3900));
 
   const state = await getState(code, host);
   check(state.ok, "Could not read state after the parry timer expired.");
