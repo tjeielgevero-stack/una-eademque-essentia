@@ -1,6 +1,6 @@
 # Una Eademque Essentia — Project Moon Character Archive
 
-An unofficial, community-made Project Moon character and Mirror World variant builder. The v1.0.0 super-massive release expands the creator, weapon catalogue, personalization, accessibility, and archive workflows.
+An unofficial, community-made Project Moon character and Mirror World variant builder. The v1.0.0 super-massive release expands the creator, personalization, accessibility, and archive workflows.
 
 ## Character creation
 - Simple, Advanced, Complex, and one-page Laziness creation modes.
@@ -8,16 +8,10 @@ An unofficial, community-made Project Moon character and Mirror World variant bu
 - Expanded personality, upbringing, reputation, professional specialty, and fictional combat-approach choices.
 - Saved character archive with search across names, titles, and dossier text, creation-mode filters, and sorting.
 
-## Fictional weapon catalogue
-- Seven fighting styles: Melee, Ranged, Unarmed, Hybrid / Transforming, Focus / Conduit, Thrown / Returning, and Summoned / Construct.
-- A substantially expanded catalogue of original fantasy weapon and implement concepts.
-- Searchable weapon selector with custom naming and fictional details.
-- Optional fictional ammunition profiles for supported ranged archetypes.
-
 ## Personalization and settings
 - Custom accent color, local background image, original ambient soundtrack, interface sounds, and 20 optional visual effects.
 - Accessibility and performance controls: reduce motion, low-performance mode, high contrast, larger text, and compact layout.
-- Creator preferences: show or hide question hints, confirm before deletion, remember the last creation mode, and choose a default weapon style.
+- Creator preferences: show or hide question hints, confirm before deletion, remember the last creation mode, and choose how saved records are sorted.
 - Archive preferences include default sorting. Personal settings and saved characters remain on the user's device.
 
 ## Multiplayer
@@ -27,7 +21,7 @@ An unofficial, community-made Project Moon character and Mirror World variant bu
 ## Files
 - `index.html` — page structure, creator screens, archive, and Settings.
 - `style.css` — responsive design, personalization, accessibility, and visual effects.
-- `script.js` — creator flow, weapon catalogue, dossier formatter, archive, and preference storage.
+- `script.js` — creator flow, dossier formatter, archive, and preference storage.
 - `multiplayer.js` — multiplayer interface.
 - `multiplayer/src/index.js` — Cloudflare Worker game logic.
 - `multiplayer/smoke-test.mjs` — multiplayer integration smoke tests.
