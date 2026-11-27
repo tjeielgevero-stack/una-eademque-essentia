@@ -102,7 +102,7 @@
     <button type="button" data-desktop-nav="multiplayer"><span>⌁</span> Multiplayer Arena</button>
     <button type="button" data-desktop-nav="settings"><span>⚙</span> Settings</button>
   </nav>
-  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.1.0</small></div>
+  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.2.0</small></div>
 </aside>
 <header id="desktop-workspace-topbar" hidden>
   <div><p id="desktop-workspace-kicker">MIRROR WORLD ARCHIVE</p><h2 id="desktop-workspace-title">OVERVIEW</h2></div>
@@ -603,6 +603,9 @@
       </section>
       <p class="simulator-disclaimer">This is a lighthearted, fictional OC simulator. Outcomes are randomized for entertainment and do not represent canon power rankings.</p>
     </section>
+    <section id="desktop-workspace-placeholder" class="screen hidden desktop-workspace-placeholder">
+      <div class="desktop-module-empty"><span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP</p><h2 id="desktop-placeholder-title">ARCHIVE MODULE</h2><p id="desktop-placeholder-copy">This module is ready in the desktop workspace.</p><span class="desktop-module-rule"></span><small>SELECT ANOTHER MODULE FROM THE LEFT NAVIGATION.</small></div>
+    </section>
   </main>
 
   <section class="desktop-download-section" id="desktop-download" aria-labelledby="desktop-download-title">
@@ -783,6 +786,9 @@
           document.getElementById("home-screen")?.classList.add("desktop-archive-view");
           document.querySelector(".oc-archive")?.scrollIntoView({ behavior: "auto", block: "start" });
         } else if (action === "lore") {
+          showOnlyScreen("desktop-workspace-placeholder");
+          document.getElementById("desktop-placeholder-title").textContent = "THE LORE BOOK";
+          document.getElementById("desktop-placeholder-copy").textContent = "The reference encyclopedia is open in its own archive panel.";
           document.getElementById("lore-book-open")?.click();
         } else if (action === "simulator") {
           document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
@@ -791,6 +797,9 @@
           document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
           document.getElementById("open-multiplayer-button")?.click();
         } else if (action === "settings") {
+          showOnlyScreen("desktop-workspace-placeholder");
+          document.getElementById("desktop-placeholder-title").textContent = "ARCHIVE SETTINGS";
+          document.getElementById("desktop-placeholder-copy").textContent = "Personalize the desktop archive's appearance, sound, and visual effects.";
           document.getElementById("settings-open")?.click();
         }
       }
