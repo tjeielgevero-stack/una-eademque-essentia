@@ -167,7 +167,11 @@ await run("1v1 battle, turn validation, defending, E.G.O., leave handling, and l
     const guardedAttack = await action(code, host, "attack", guest.id);
     check(guardedAttack.ok && guardedAttack.data.room.pendingChallenge?.type === "parry", "Attack against a guarding player did not open a parry QTE.");
     const guardedChallenge = guardedAttack.data.room.pendingChallenge;
-    const wrongDirection = guardedChallenge.prompt === "UP" ? "DOWN" : "UP";
+    check(guardedChallenge.prompt === null, "The attacker was incorrectly shown the defender's parry direction.");
+    const guestGuardView = await getState(code, guest);
+    const defenderPrompt = guestGuardView.data.room.pendingChallenge?.prompt;
+    check(!!defenderPrompt, "The defender did not receive the private prompt for the failed-parry test.");
+    const wrongDirection = defenderPrompt === "UP" ? "DOWN" : "UP";
     const failedParry = await action(code, guest, "parry", undefined, { challengeId: guardedChallenge.id, input: wrongDirection });
     check(failedParry.ok && failedParry.data.parried === false, "Incorrect parry input was not resolved as a failed parry.");
     const guestAfterGuardedAttack = failedParry.data.room.players.find(player => player.id === guest.id);
