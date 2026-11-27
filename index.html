@@ -81,6 +81,9 @@
       <button class="desktop-dashboard-card" data-desktop-action="about" type="button">
         <span class="desktop-dashboard-index">09 / PROJECT FILE</span><strong>About U.E.E.</strong><small>Read the project note, credits, and community information.</small><b>READ THE NOTE →</b>
       </button>
+      <button class="desktop-dashboard-card" data-desktop-action="observatory" type="button">
+        <span class="desktop-dashboard-index">10 / ANALYSIS</span><strong>Mirror Observatory</strong><small>Compare saved variants and export complete character dossiers.</small><b>OPEN OBSERVATORY →</b>
+      </button>
     </div>
     <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>U.E.E. / DESKTOP</span></div>
     <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
@@ -753,7 +756,8 @@
         settings: ["SETTINGS", "ARCHIVE CONFIGURATION"],
         "quick-create": ["QUICK CREATION", "NEW CHARACTER RECORD"],
         effects: ["EFFECTS STUDIO", "VISUAL AND AUDIO CONFIGURATION"],
-        about: ["ABOUT U.E.E.", "PROJECT INFORMATION"]
+        about: ["ABOUT U.E.E.", "PROJECT INFORMATION"],
+        observatory: ["MIRROR OBSERVATORY", "VARIANT ANALYSIS & DOSSIER EXPORT"]
       };
 
       function setActiveNav(action) {
@@ -821,11 +825,31 @@
           if (action === "effects") document.querySelector('[data-settings-tab="effects"]')?.click();
         } else if (action === "quick-create") {
           document.getElementById("begin-button")?.click();
-        } else if (action === "about") {
+        } else if (action === "observatory") {
           showOnlyScreen("desktop-workspace-placeholder");
-          document.getElementById("desktop-placeholder-title").textContent = "ABOUT U.E.E.";
-          document.getElementById("desktop-placeholder-copy").textContent = "Project information and community details.";
-          document.getElementById("info-open")?.click();
+          const panel=document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
+          if(!panel)return;
+          panel.classList.add("desktop-observatory");
+          panel.innerHTML=`<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP EXCLUSIVE</p><h2>MIRROR OBSERVATORY</h2><p class="desktop-observatory-intro">Compare saved Mirror World identities and preserve your archive outside the application.</p><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / VARIANT COMPARISON</p><h3>Compare two records</h3><label for="observatory-left">FIRST VARIANT</label><select id="observatory-left"></select><label for="observatory-right">SECOND VARIANT</label><select id="observatory-right"></select><button type="button" class="primary-button" id="observatory-compare">COMPARE RECORDS ↗</button><div id="observatory-result" class="desktop-observatory-result" aria-live="polite">Select two saved characters to begin.</div></section><section class="desktop-observatory-card"><p class="eyebrow">02 / DOSSIER ARCHIVE</p><h3>Export your records</h3><p>Generate one text file containing every saved character dossier. Your local records remain unchanged.</p><strong id="observatory-count" class="desktop-observatory-count">0 RECORDS FOUND</strong><button type="button" class="primary-button" id="observatory-export">EXPORT ALL DOSSIERS ↗</button><p class="desktop-observatory-note">Export is processed locally; no character data is uploaded.</p></section></div><button type="button" class="secondary-button" id="observatory-back">RETURN TO OVERVIEW</button>`;
+          const records=typeof readOcArchive==="function"?readOcArchive():[];
+          const left=panel.querySelector("#observatory-left"),right=panel.querySelector("#observatory-right"),result=panel.querySelector("#observatory-result");
+          records.forEach((record,index)=>{for(const select of [left,right]){const option=document.createElement("option");option.value=String(index);option.textContent=(record.name||"Unnamed Variant")+" · "+String(record.mode||"simple").toUpperCase();select.append(option);}});
+          if(records.length>1)right.selectedIndex=1;
+          panel.querySelector("#observatory-count").textContent=records.length+" RECORD"+(records.length===1?"":"S")+" FOUND";
+          panel.querySelector("#observatory-compare").addEventListener("click",()=>{
+            const a=records[left.selectedIndex],b=records[right.selectedIndex];
+            if(!a||!b){result.textContent="Save at least two characters to compare them.";return;}
+            if(a===b){result.textContent="Choose two different records.";return;}
+            const fields=record=>({name:record.name||"Unnamed Variant",title:record.answers?.title?.value||record.answers?.epithet?.value||"Not specified",origin:record.answers?.origin_type?.value||"Not specified",affiliation:record.answers?.association?.value||record.answers?.syndicate?.value||record.answers?.workshop?.value||"Not specified",grade:record.answers?.fixer_grade?.value||record.answers?.finger_rank?.value||"Not specified"});
+            const A=fields(a),B=fields(b);result.replaceChildren();
+            [["IDENTITY",A.name,B.name],["TITLE",A.title,B.title],["ORIGIN",A.origin,B.origin],["AFFILIATION",A.affiliation,B.affiliation],["GRADE / POSITION",A.grade,B.grade]].forEach(values=>{const row=document.createElement("div");row.className="desktop-observatory-diff";values.forEach(value=>{const cell=document.createElement("span");cell.textContent=value;row.append(cell);});result.append(row);});
+          });
+          panel.querySelector("#observatory-export").addEventListener("click",()=>{
+            if(!records.length){result.textContent="There are no saved records to export yet.";return;}
+            const contents=records.map(record=>typeof formatCharacterDossier==="function"?formatCharacterDossier(record.name,record.mode,record.answers):JSON.stringify(record.answers,null,2)).join("\\n\\n"+"═".repeat(48)+"\\n\\n");
+            const url=URL.createObjectURL(new Blob([contents],{type:"text/plain;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download="UEE-character-dossiers.txt";link.click();URL.revokeObjectURL(url);
+          });
+          panel.querySelector("#observatory-back").addEventListener("click",showDashboard);
         }
       }
       dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
