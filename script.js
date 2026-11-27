@@ -286,6 +286,67 @@ const $=id=>document.getElementById(id);
  document.addEventListener("pointerout",event=>{if(!event.relatedTarget)root.classList.remove("screenquake-hovering","effects-pointer-paused");});
  updateWarningStatus();
 })();
+// Local accessibility, performance, and creator workflow preferences.
+(function setupInterfacePreferences(){
+ const storageKey="uee_interface_preferences_v1";
+ const defaults={reduceMotion:false,lowPerformance:false,highContrast:false,largeText:false,compactLayout:false,showHints:true,confirmDelete:true,rememberMode:true,defaultWeaponStyle:"Melee",archiveSort:"recent",lastCreationMode:"simple"};
+ const validStyles=["Melee","Ranged","Unarmed","Hybrid / Transforming","Focus / Conduit","Thrown / Returning","Summoned / Construct"];
+ const validModes=["simple","advanced","complex","laziness"];
+ let saved={...defaults};
+ try{
+  const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
+  if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved={...saved,...parsed};
+ }catch{}
+ if(!validStyles.includes(saved.defaultWeaponStyle))saved.defaultWeaponStyle=defaults.defaultWeaponStyle;
+ if(!["recent","name","oldest"].includes(saved.archiveSort))saved.archiveSort=defaults.archiveSort;
+ if(!validModes.includes(saved.lastCreationMode))saved.lastCreationMode=defaults.lastCreationMode;
+ const controls=[...document.querySelectorAll("[data-interface-pref]")],root=document.documentElement;
+ function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}}
+ function read(key,fallback){return saved[key]===undefined?fallback:saved[key];}
+ function apply(){
+  root.classList.toggle("pref-reduce-motion",saved.reduceMotion===true);
+  root.classList.toggle("pref-low-performance",saved.lowPerformance===true);
+  root.classList.toggle("pref-high-contrast",saved.highContrast===true);
+  root.classList.toggle("pref-large-text",saved.largeText===true);
+  root.classList.toggle("pref-compact-layout",saved.compactLayout===true);
+  root.classList.toggle("pref-hide-hints",saved.showHints===false);
+  controls.forEach(control=>{
+   const value=saved[control.dataset.interfacePref];
+   if(control.type==="checkbox")control.checked=value===true;
+   else if(value!==undefined)control.value=String(value);
+  });
+ }
+ window.ueeReadPreference=read;
+ window.ueeSavePreference=(key,value)=>{
+  if(key==="lastCreationMode"&&saved.rememberMode!==true)return;
+  saved[key]=value;persist();apply();
+ };
+ controls.forEach(control=>control.addEventListener("change",()=>{
+  const key=control.dataset.interfacePref;
+  saved[key]=control.type==="checkbox"?control.checked:control.value;
+  persist();apply();
+ }));
+ $("interface-preferences-reset")?.addEventListener("click",()=>{
+  saved={...defaults};persist();apply();window.ueeMarkLastMode?.();
+ });
+ window.ueeMarkLastMode=()=>{
+  const mode=saved.lastCreationMode;
+  const ids={simple:"mode-simple",advanced:"mode-advanced",complex:"mode-complex",laziness:"mode-laziness"};
+  Object.values(ids).forEach(id=>{
+   const button=$(id);if(!button)return;
+   button.classList.remove("mode-last-used");
+   button.querySelector(".mode-last-used-label")?.remove();
+  });
+  if(saved.rememberMode!==true)return;
+  const button=$(ids[mode]);if(!button)return;
+  button.classList.add("mode-last-used");
+  const label=document.createElement("span");label.className="mode-last-used-label";label.textContent="LAST USED";
+  button.insertBefore(label,button.firstElementChild?.nextSibling||null);
+ };
+ apply();
+ $("begin-button")?.addEventListener("click",()=>requestAnimationFrame(()=>window.ueeMarkLastMode?.()));
+})();
+
 // Show the community disclaimer once per browser tab session.
 (function setupWelcomeNotice(){
  const overlay=$("welcome-notice"),button=$("notice-continue");
@@ -596,19 +657,64 @@ function formatCharacterDossier(name,mode,answersSource){
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
  const rows=readOcArchive();
- const isSephrus=r=>normalizeSephrusCharacterName(r.name)==="Sephrus Aztiluth";
- const general=rows.filter(r=>!isSephrus(r)),sephrus=rows.filter(isSephrus);
- // Repair older locally saved alias records so they remain visible in the dedicated archive.
- let migrated=false;
- sephrus.forEach(r=>{if(r.name!=="Sephrus Aztiluth"){r.name="Sephrus Aztiluth";migrated=true;}});
- if(migrated)writeOcArchive(rows);
- $("oc-count").textContent=rows.length+" SAVED";list.innerHTML="";sephrusList.innerHTML="";
+ const search=String($("oc-archive-search")?.value||"").trim().toLowerCase();
+ const mode=$("oc-archive-mode")?.value||"all";
+ const sort=$("oc-archive-sort")?.value||window.ueeReadPreference?.("archiveSort","recent")||"recent";
+ const titleOf=r=>r.answers?.title?.value||r.answers?.epithet?.value||r.answers?.color_title?.value||r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";
+ const filtered=rows.filter(r=>{
+  const recordMode=r.mode||"simple";
+  if(mode!=="all"&&recordMode!==mode)return false;
+  if(!search)return true;
+  const haystack=[r.name,titleOf(r),r.profileSummary].join(" ").toLowerCase();
+  return haystack.includes(search);
+ });
+ filtered.sort((a,b)=>{
+  if(sort==="name")return String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"});
+  const aTime=new Date(a.updatedAt||0).getTime(),bTime=new Date(b.updatedAt||0).getTime();
+  return sort==="oldest"?aTime-bTime:bTime-aTime;
+ });
+ const isFiltered=!!search||mode!=="all";
+ $("oc-count").textContent=isFiltered?filtered.length+" MATCHES / "+rows.length+" SAVED":rows.length+" SAVED";
+ list.innerHTML="";sephrusList.innerHTML="";
+ const general=filtered.filter(r=>normalizeSephrusCharacterName(r.name)!=="Sephrus Aztiluth");
+ const sephrus=filtered.filter(r=>normalizeSephrusCharacterName(r.name)==="Sephrus Aztiluth");
  if(sephrusSection)sephrusSection.hidden=sephrus.length===0;
  function draw(target,items,isSpecial){
-  if(!items.length){const p=document.createElement("p");p.className="oc-empty";p.textContent=isSpecial?"NO SEPHRUS VARIANTS RECORDED YET.":"NO CHARACTER RECORDS YET.";target.append(p);return;}
-  items.slice().reverse().forEach(r=>{const card=document.createElement("article");card.className="oc-history-card";const info=document.createElement("div");info.className="oc-history-info";const name=document.createElement("strong");const recordTitle=r.answers?.title?.value||r.answers?.epithet?.value||r.answers?.color_title?.value||r.answers?.generated_title?.value||r.answers?.generated_title?.custom||"The Same Essence";name.textContent=isSpecial?"Sephrus Aztiluth ("+recordTitle+")":(r.name||"Unnamed Variant");const meta=document.createElement("small");meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":r.mode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();info.append(name,meta);const actions=document.createElement("div");actions.className="oc-history-actions";const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";del.onclick=()=>{if(!confirm("Delete "+(r.name||"this character")+" from this device?"))return;writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();};actions.append(edit,del);card.append(info,actions);target.append(card);});}
+  if(!items.length){
+   const p=document.createElement("p");p.className="oc-empty";
+   p.textContent=isFiltered?"NO MATCHING RECORDS. TRY CHANGING OR CLEARING YOUR FILTERS.":isSpecial?"NO SEPHRUS VARIANTS RECORDED YET.":"NO CHARACTER RECORDS YET.";
+   target.append(p);return;
+  }
+  items.forEach(r=>{
+   const card=document.createElement("article");card.className="oc-history-card";
+   const info=document.createElement("div");info.className="oc-history-info";
+   const name=document.createElement("strong");
+   name.textContent=isSpecial?"Sephrus Aztiluth ("+titleOf(r)+")":(r.name||"Unnamed Variant");
+   const meta=document.createElement("small");
+   meta.textContent=(r.mode==="complex"?"COMPLEX":r.mode==="advanced"?"ADVANCED":r.mode==="laziness"?"LAZINESS":"SIMPLE")+" CREATION · UPDATED "+new Date(r.updatedAt||Date.now()).toLocaleDateString();
+   info.append(name,meta);
+   const actions=document.createElement("div");actions.className="oc-history-actions";
+   const edit=document.createElement("button");edit.type="button";edit.className="secondary-button";edit.textContent="CUSTOMIZE";edit.onclick=()=>loadOcRecord(r.id);
+   const del=document.createElement("button");del.type="button";del.className="text-button";del.textContent="DELETE";
+   del.onclick=()=>{
+    const confirmDelete=window.ueeReadPreference?.("confirmDelete",true)!==false;
+    if(confirmDelete&&!confirm("Delete "+(r.name||"this character")+" from this device?"))return;
+    writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();
+   };
+   actions.append(edit,del);card.append(info,actions);target.append(card);
+  });
+ }
  draw(list,general,false);draw(sephrusList,sephrus,true);
 }
+(function setupOcArchiveControls(){
+ const search=$("oc-archive-search"),mode=$("oc-archive-mode"),sort=$("oc-archive-sort"),clear=$("oc-archive-clear");
+ if(!search||!mode||!sort)return;
+ sort.value=window.ueeReadPreference?.("archiveSort","recent")||"recent";
+ search.addEventListener("input",renderOcHistory);
+ mode.addEventListener("change",renderOcHistory);
+ sort.addEventListener("change",()=>{window.ueeSavePreference?.("archiveSort",sort.value);renderOcHistory();});
+ clear?.addEventListener("click",()=>{search.value="";mode.value="all";sort.value=window.ueeReadPreference?.("archiveSort","recent")||"recent";renderOcHistory();search.focus();});
+})();
 function saveCurrentOc(){const rows=readOcArchive();const copied=JSON.parse(JSON.stringify(answers));characterName=normalizeSephrusCharacterName(characterName);const r={id:editingOcId||("oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8)),name:characterName,mode:creationMode,answers:copied,profileSummary:formatCharacterDossier(characterName,creationMode,copied),updatedAt:new Date().toISOString()};const i=rows.findIndex(x=>x.id===r.id);if(i<0)rows.push(r);else rows[i]=r;editingOcId=r.id;writeOcArchive(rows);renderOcHistory();}
 function loadOcRecord(id){const r=readOcArchive().find(x=>x.id===id);if(!r)return;resetSephrusSecretState();editingOcId=r.id;characterName=r.name||"";creationMode=r.mode==="complex"?"complex":r.mode==="advanced"?"advanced":r.mode==="laziness"?"laziness":"simple";answers=r.answers&&typeof r.answers==="object"?JSON.parse(JSON.stringify(r.answers)):{};if(!answers.race)answers.race={choice:"Human",value:"Human",custom:""};syncRaceSelector(profileAnswerText(answers.race.value)||"Human");index=0;$("character-name").value=characterName;render();screen("picker");}
 // Expanded Simple Creation choices. These additions are intentionally broad, optional,
@@ -1410,6 +1516,7 @@ function randomizedWriting(q){if(q.id==="complex_43"){const status=values().comp
 
 function randomizeAll(mode=creationMode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
+ window.ueeSavePreference?.("lastCreationMode",creationMode);
  answers={race:selectedRaceAnswer()};index=0;editingOcId=null;
  characterName=randomCharacterName();$("character-name").value=characterName;
  for(const q of activeQuestions()){
