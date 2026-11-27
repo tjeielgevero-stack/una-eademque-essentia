@@ -711,7 +711,13 @@ function renderOcHistory(){
     if(confirmDelete&&!confirm("Delete "+(r.name||"this character")+" from this device?"))return;
     writeOcArchive(readOcArchive().filter(x=>x.id!==r.id));renderOcHistory();
    };
-   actions.append(edit,del);card.append(info,actions);target.append(card);
+   const copy=document.createElement("button");copy.type="button";copy.className="text-button";copy.textContent="COPY DOSSIER";
+   copy.onclick=async()=>{
+    const dossier=r.profileSummary||formatCharacterDossier(r.name||"Unnamed Variant",r.mode,r.answers||{});
+    try{await navigator.clipboard.writeText(dossier);copy.textContent="COPIED";copy.disabled=true;window.setTimeout(()=>{copy.textContent="COPY DOSSIER";copy.disabled=false;},1400);}
+    catch{copy.textContent="COPY UNAVAILABLE";window.setTimeout(()=>{copy.textContent="COPY DOSSIER";},1600);}
+   };
+   actions.append(edit,copy,del);card.append(info,actions);target.append(card);
   });
  }
  draw(list,general,false);draw(sephrusList,sephrus,true);
@@ -1575,6 +1581,7 @@ $("character-race")?.addEventListener("change",()=>{const custom=$("custom-race"
 function launchSelectedMode(){resetSephrusSecretState();answers={race:selectedRaceAnswer()};editingOcId=null;index=0;characterName="";$("character-name").value="";$("name-validation").textContent="";screen("name");$("character-name").focus();}
 function beginSelectedMode(mode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
+ window.ueeSavePreference?.("lastCreationMode",creationMode);
  answers={};editingOcId=null;index=0;
  if(creationMode==="laziness"){launchSelectedMode();return;}
  const dlg=$("randomize-confirm-dialog");
