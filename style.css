@@ -2535,3 +2535,47 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
  .desktop-observatory-grid { grid-template-columns:1fr; }
  .desktop-observatory-diff { grid-template-columns:1fr; gap:4px; }
 }
+
+
+/* Desktop v0.8.2 — low-cost rendering profile.
+   Preserve the visual identity while avoiding continuous background repaints. */
+.tauri-app body { background-attachment: scroll !important; }
+.tauri-app .visual-effects-layer { display: none !important; }
+.tauri-app .hero:before,
+.tauri-app .archive-seal,
+.tauri-app .archive-seal:before,
+.tauri-app .archive-seal:after,
+.tauri-app .system-light,
+.tauri-app .feature-card:nth-child(n),
+.tauri-app .effect-particles .visual-effects-layer:before,
+.tauri-app .effect-scanlines .visual-effects-layer:after,
+.tauri-app .effect-glow .site-header .wordmark,
+.tauri-app .effect-glow .hero .eyebrow,
+.tauri-app .effect-glow .feature-card strong,
+.tauri-app .effect-glow .record-stamp,
+.tauri-app .effect-glow .result h2,
+.tauri-app .effect-glitch .wordmark,
+.tauri-app .effect-glitch .archive-system-bar,
+.tauri-app .effect-glitch .hero h1 span {
+  animation: none !important;
+}
+.tauri-app .feature-card,
+.tauri-app .archive-index,
+.tauri-app .desktop-observatory-card {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.tauri-app .feature-card,
+.tauri-app .choice,
+.tauri-app .loadout-field,
+.tauri-app .abno-entry-card {
+  transition-duration: .12s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tauri-app *, .tauri-app *::before, .tauri-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
