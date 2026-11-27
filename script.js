@@ -473,28 +473,74 @@ function formatWeaponLoadout(value){
  if(!value||typeof value!=="object")return "Not specified.";
  return [value.style,value.weapon,value.ammoType&&"Profile: "+value.ammoType,value.ammo&&"Ammo: "+value.ammo,value.custom].filter(Boolean).join(" · ")||"Not specified.";
 }
+function personalizeDossierText(value,characterName){
+ const text=String(value??""),name=String(characterName??"").trim();
+ if(!name)return text;
+ return text
+  .replace(/\\b(?:(?:this|the)\\s+)?(?:character\\s*(?:or|\\/)\\s*variant|variant\\s*(?:or|\\/)\\s*character)\\b/gi,name)
+  .replace(/\\b(?:this|the)\\s+(character|variant)(['’]s)?\\b/gi,(_,noun,possessive)=>name+(possessive?"'s":""));
+}
 function limitDossierOutput(sections,maxCharacters=9000){
- const weights=[.25,1,.65,1.15,1,1.35,1.2,1.55,.85,1.05,1.05,1.05,1.05,1.2,1.2,1.05,1.35,1.5,1.5,.95,.95,1.25];
- const separators=(sections.length-1)*2;
- const labels=sections.reduce((sum,line)=>sum+line.slice(0,line.indexOf(":")+2).length,0);
- const available=Math.max(0,maxCharacters-separators-labels);
- const weightTotal=weights.reduce((sum,value)=>sum+value,0);
- return sections.map((line,index)=>{
+ const weights={
+  "Name":.3,"Title":.8,"Race":.6,"Affiliation":1.1,"Grade":.9,
+  "Appearance":1.2,"Origin":1.0,"E.G.O":1.4,"E.G.O Type":.7,
+  "Ability 1":1.05,"Ability 2":1.05,"Ability 3":1.05,"Ability 4":1.05,
+  "Ultimate Ability 1":1.2,"Ultimate Ability 2":1.2,
+  "Passive Ability":1.05,"Passive Ability 2":1.25,
+  "Personality":1.2,"Backstory":1.4,"Likes":.8,"Dislikes":.8,"Overall":3.5
+ };
+ const parts=sections.map(line=>{
   const colon=line.indexOf(":");
-  if(colon<0)return line;
-  const heading=line.slice(0,colon+2),body=line.slice(colon+2).trim();
-  const budget=Math.max(24,Math.floor(available*(weights[index]||1)/weightTotal));
-  if(body.length<=budget)return heading+body;
-  let cut=budget-2;
-  const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut),body.lastIndexOf("; ",cut));
-  if(sentenceCut>budget*.52)cut=sentenceCut+1;
-  else{const wordCut=body.lastIndexOf(" ",cut);if(wordCut>budget*.7)cut=wordCut;}
-  return heading+body.slice(0,cut).trimEnd()+"…";
+  return colon<0?{heading:"",body:line,label:""}:{
+   heading:line.slice(0,colon+2),body:line.slice(colon+2).trim(),label:line.slice(0,colon)
+  };
+ });
+ const overhead=parts.reduce((sum,part)=>sum+part.heading.length,0)+Math.max(0,parts.length-1)*2;
+ const available=Math.max(0,maxCharacters-overhead);
+ const totalBody=parts.reduce((sum,part)=>sum+part.body.length,0);
+ if(totalBody<=available)return parts.map(part=>part.heading+part.body).join("\n\n");
+
+ // Weighted water-filling redistributes space left unused by short sections.
+ const allocations=parts.map(()=>0);
+ let active=parts.map((part,index)=>part.body.length?index:-1).filter(index=>index>=0);
+ let remaining=available;
+ while(active.length&&remaining>0){
+  const weightTotal=active.reduce((sum,index)=>sum+(weights[parts[index].label]||1),0);
+  const capped=active.filter(index=>parts[index].body.length<=remaining*(weights[parts[index].label]||1)/weightTotal);
+  if(capped.length){
+   capped.forEach(index=>{allocations[index]=parts[index].body.length;remaining-=parts[index].body.length;});
+   active=active.filter(index=>!capped.includes(index));
+   continue;
+  }
+  let assigned=0;
+  active.forEach((index,position)=>{
+   const weight=weights[parts[index].label]||1;
+   const share=position===active.length-1?remaining-assigned:Math.floor(remaining*weight/weightTotal);
+   allocations[index]=Math.min(parts[index].body.length,Math.max(0,share));
+   assigned+=allocations[index];
+  });
+  remaining-=assigned;
+  break;
+ }
+ return parts.map((part,index)=>{
+  const body=part.body,budget=allocations[index];
+  if(body.length<=budget)return part.heading+body;
+  if(budget<=0)return part.heading;
+  let cut=Math.min(body.length,budget);
+  const sentenceCut=Math.max(body.lastIndexOf(". ",cut),body.lastIndexOf("! ",cut),body.lastIndexOf("? ",cut));
+  if(sentenceCut>=Math.floor(cut*.55))cut=sentenceCut+1;
+  else{
+   const wordCut=body.lastIndexOf(" ",cut);
+   if(wordCut>cut*.75)cut=wordCut;
+  }
+  let shortened=body.slice(0,cut).trimEnd();
+  if(shortened&&!/[.!?]$/.test(shortened))shortened=shortened.replace(/[;,\\s]+$/,"")+".";
+  return part.heading+shortened;
  }).join("\n\n");
 }
-
 function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
+ const displayName=String(name||"").trim();
  const notSet="Not specified.",isLazy=mode==="laziness";
  const field=label=>isLazy?labelled(label):"";
  const title=field("Title")||labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
@@ -544,7 +590,8 @@ function formatCharacterDossier(name,mode,answersSource){
   ...(isSephrusAztiluth?[["Passive Ability 2",passive2]]:[]),
   ["Personality",personality],["Backstory",backstory],["Likes",likes],["Dislikes",dislikes],["Overall",overall]
  ];
- return limitDossierOutput(sections.map(([label,value])=>label+": "+value),9000);
+ const personalizedSections=sections.map(([label,value])=>[label,personalizeDossierText(value,displayName)]);
+ return limitDossierOutput(personalizedSections.map(([label,value])=>label+": "+value),9000);
 }
 function renderOcHistory(){
  const list=$("oc-history-list"),sephrusList=$("sephrus-oc-history-list"),sephrusSection=$("sephrus-oc-section");if(!list||!sephrusList)return;
