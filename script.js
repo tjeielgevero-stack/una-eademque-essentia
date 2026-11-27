@@ -315,6 +315,9 @@ const $=id=>document.getElementById(id);
    if(control.type==="checkbox")control.checked=value===true;
    else if(value!==undefined)control.value=String(value);
   });
+  const archiveSort=$("oc-archive-sort");
+  if(archiveSort&&saved.archiveSort)archiveSort.value=saved.archiveSort;
+  window.ueeRefreshOcArchive?.();
  }
  window.ueeReadPreference=read;
  window.ueeSavePreference=(key,value)=>{
@@ -713,6 +716,7 @@ function renderOcHistory(){
  }
  draw(list,general,false);draw(sephrusList,sephrus,true);
 }
+window.ueeRefreshOcArchive=renderOcHistory;
 (function setupOcArchiveControls(){
  const search=$("oc-archive-search"),mode=$("oc-archive-mode"),sort=$("oc-archive-sort"),clear=$("oc-archive-clear");
  if(!search||!mode||!sort)return;
@@ -1102,7 +1106,7 @@ const WEAPON_CATALOGUE={
   "Starfall Bow","Mirror-Shard Bow","Resonance Longbow","Glyphstring Crossbow","Constellation Crossbow","Frostglass Arc-Bow","Echo Lantern Projector","Prism Lens Projector","Sigil Arc Projector","Spectral Flarecaster","Clockwork Sparrowcaster","Runic Harp Projector","Moonwell Beamcaster","Starlit Threadcaster","Veilglass Sightline Caster","Mnemonic Light Projector","Chorus Bell Projector","Shardsong Bow","Whispering Beacon Launcher"
  ],
  "Unarmed":[
-  "Fists","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style",
+  "Barehanded Combat Style","Boxing-inspired Style","Wrestling-inspired Style","Kick-focused Style","Grappling Style","Open-hand Style","Footwork-focused Style","Improvised Unarmed Style",
   "Mirror-Step Style","Resonance Palm Style","Flowing Current Style","Crescendo Footwork","Counterweight Style","Aerial Spiral Style","Stillwater Guard Style","Echoing Form Style","E.G.O.-Attuned Unarmed Style","Deflection and Redirection Style","Dance-Like Movement Style","Improvised Acrobatics Style"
  ],
  "Hybrid / Transforming":[
