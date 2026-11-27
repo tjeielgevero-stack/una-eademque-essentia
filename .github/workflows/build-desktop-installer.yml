@@ -41,6 +41,12 @@ jobs:
         working-directory: src-tauri
         run: cargo tauri icon ../app-icon.svg
 
+      - name: Prepare frontend bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Get-ChildItem -Force | Where-Object { $_.Name -notin @('src-tauri', '.git', '.github', 'dist') } | Copy-Item -Destination dist -Recurse -Force
+
       - name: Build and publish draft release
         uses: tauri-apps/tauri-action@v0
         env:
