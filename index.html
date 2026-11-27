@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <link rel="stylesheet" href="style.css?v=20261127-installchoice1">
+  <link rel="stylesheet" href="style.css?v=20261127-race1">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -438,6 +438,16 @@
         <p class="eyebrow">CREATION CONFIGURATION / 01</p>
         <h2 id="mode-title">Choose Your Creation Mode.</h2>
         <p class="mode-description">Choose your creation path first. After selecting a mode, choose whether to generate the whole character or enter a name and build it yourself.</p>
+        <section class="race-selection" aria-labelledby="race-selection-title">
+          <div class="race-selection-heading"><span class="eyebrow">IDENTITY REGISTRATION / 00</span><h3 id="race-selection-title">Choose Your Race.</h3><p>This choice applies to every creation mode and is included in the final character dossier.</p></div>
+          <label for="character-race">CHARACTER RACE</label>
+          <select id="character-race" class="race-select">
+            <option value="Human">Human</option>
+            <option value="Bloodfiend">Bloodfiend</option>
+            <option value="Other">Other</option>
+          </select>
+          <input id="custom-race" class="race-custom-input" type="text" maxlength="100" placeholder="Enter the character's race..." aria-label="Custom character race" hidden>
+        </section>
         <div class="creation-mode-grid">
           <button id="mode-simple" class="creation-mode-card" type="button">
             <span class="mode-card-number">01 / ORIGINAL PATH</span>
@@ -590,7 +600,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261127-lore1"></script>
+  <script src="script.js?v=20261127-race1"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
   <script src="lore-book.js?v=20261127-lore1"></script>
   <script>
