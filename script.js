@@ -506,7 +506,7 @@ function formatCharacterDossier(name,mode,answersSource){
  const a=answersSource||{},f=profileFieldsFromAnswers(a),{get,first,combine,labelled}=f;
  const notSet="Not specified.",isLazy=mode==="laziness";
  const field=label=>isLazy?labelled(label):"";
- const title=field("Title")||labelled("Title")||first("title","epithet","color_title","generated_title","generated_title_description")||notSet;
+ const title=field("Title")||labelled("Title")||first("title","epithet","color_title","generated_title")||notSet;
  const race=field("Race")||labelled("Race")||first("race","species","complex_race","generated_race")||"Human";
  const occupation=first("occupation","complex_occupation");
  const affiliation=field("Affiliation")||labelled("Affiliation")||first("generated_affiliation")||combine("affiliation","association","office","syndicate","workshop","wing_role","head_role","complex_head_role")||occupation||notSet;
