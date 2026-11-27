@@ -477,8 +477,8 @@ function personalizeDossierText(value,characterName){
  const text=String(value??""),name=String(characterName??"").trim();
  if(!name)return text;
  return text
-  .replace(/\\b(?:(?:this|the)\\s+)?(?:character\\s*(?:or|\\/)\\s*variant|variant\\s*(?:or|\\/)\\s*character)\\b/gi,name)
-  .replace(/\\b(?:this|the)\\s+(character|variant)(['’]s)?\\b/gi,(_,noun,possessive)=>name+(possessive?"'s":""));
+  .replace(/\b(?:(?:this|the)\s+)?(?:character\s*(?:or|\/)\s*variant|variant\s*(?:or|\/)\s*character)\b/gi,name)
+  .replace(/\b(?:this|the)\s+(character|variant)(['’]s)?\b/gi,(_,noun,possessive)=>name+(possessive?"'s":""));
 }
 function limitDossierOutput(sections,maxCharacters=9000){
  const weights={
@@ -534,7 +534,7 @@ function limitDossierOutput(sections,maxCharacters=9000){
    if(wordCut>cut*.75)cut=wordCut;
   }
   let shortened=body.slice(0,cut).trimEnd();
-  if(shortened&&!/[.!?]$/.test(shortened))shortened=shortened.replace(/[;,\\s]+$/,"")+".";
+  if(shortened&&!/[.!?]$/.test(shortened))shortened=shortened.replace(/[;,\s]+$/,"")+".";
   return part.heading+shortened;
  }).join("\n\n");
 }
