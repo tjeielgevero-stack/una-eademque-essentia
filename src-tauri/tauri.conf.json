@@ -39,7 +39,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "untrusted comment: minisign public key: E335D2BA5A667289\nRWSJcmZautI14wyKrriwLyRpT740VZ60yv1OwvhNjYDxDwA67tNC4G8M\n",
+      "pubkey": "RWSJcmZautI14wyKrriwLyRpT740VZ60yv1OwvhNjYDxDwA67tNC4G8M",
       "endpoints": [
         "https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/latest/download/latest.json"
       ],
