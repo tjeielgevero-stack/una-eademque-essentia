@@ -14,7 +14,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
-  <script>if (window.__TAURI_INTERNALS__) document.documentElement.classList.add("tauri-app");</script>
+  <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
   <link rel="stylesheet" href="style.css?v=20261127-desktop-shell2">
 </head>
 <body>
@@ -71,6 +71,15 @@
       </button>
       <button class="desktop-dashboard-card" data-desktop-action="settings" type="button">
         <span class="desktop-dashboard-index">06 / PREFERENCES</span><strong>Settings</strong><small>Adjust the archive's appearance and visual effects.</small><b>CONFIGURE →</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="quick-create" type="button">
+        <span class="desktop-dashboard-index">07 / QUICK ACCESS</span><strong>Quick Creation</strong><small>Jump straight into the character creation modes and start a new record.</small><b>START A RECORD ↗</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="effects" type="button">
+        <span class="desktop-dashboard-index">08 / PERSONALIZATION</span><strong>Effects Studio</strong><small>Fine-tune the archive's atmosphere, animations, music, and interface sounds.</small><b>OPEN EFFECTS →</b>
+      </button>
+      <button class="desktop-dashboard-card" data-desktop-action="about" type="button">
+        <span class="desktop-dashboard-index">09 / PROJECT FILE</span><strong>About U.E.E.</strong><small>Read the project note, credits, and community information.</small><b>READ THE NOTE →</b>
       </button>
     </div>
     <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>U.E.E. / DESKTOP</span></div>
@@ -713,7 +722,10 @@
 
   <script id="desktop-dashboard-controller">
     (() => {
-      if (!window.__TAURI_INTERNALS__) return;
+      const isDesktopRuntime = Boolean(window.__TAURI_INTERNALS__) ||
+        window.location.protocol === "tauri:" ||
+        /tauri\.localhost$/i.test(window.location.hostname);
+      if (!isDesktopRuntime) return;
       const root = document.documentElement;
       const dashboard = document.getElementById("desktop-dashboard");
       const sidebar = document.getElementById("desktop-sidebar");
@@ -738,7 +750,10 @@
         lore: ["LORE ENCYCLOPEDIA", "PROJECT MOON REFERENCE"],
         simulator: ["FIGHTING SIMULATOR", "MIRROR MATCH ENGINE"],
         multiplayer: ["MULTIPLAYER ARENA", "NETWORKED MIRROR WORLD"],
-        settings: ["SETTINGS", "ARCHIVE CONFIGURATION"]
+        settings: ["SETTINGS", "ARCHIVE CONFIGURATION"],
+        "quick-create": ["QUICK CREATION", "NEW CHARACTER RECORD"],
+        effects: ["EFFECTS STUDIO", "VISUAL AND AUDIO CONFIGURATION"],
+        about: ["ABOUT U.E.E.", "PROJECT INFORMATION"]
       };
 
       function setActiveNav(action) {
@@ -757,6 +772,7 @@
         setActiveNav("home");
         window.scrollTo({ top: 0, behavior: "auto" });
       }
+      window.ueeDesktopShowDashboard = showDashboard;
       function showWorkspace(action) {
         if (action !== "archive") document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
         const [heading, subheading] = views[action] || views.home;
@@ -797,11 +813,19 @@
         } else if (action === "multiplayer") {
           document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
           document.getElementById("open-multiplayer-button")?.click();
-        } else if (action === "settings") {
+        } else if (action === "settings" || action === "effects") {
           showOnlyScreen("desktop-workspace-placeholder");
-          document.getElementById("desktop-placeholder-title").textContent = "ARCHIVE SETTINGS";
-          document.getElementById("desktop-placeholder-copy").textContent = "Personalize the desktop archive's appearance, sound, and visual effects.";
+          document.getElementById("desktop-placeholder-title").textContent = action === "effects" ? "EFFECTS STUDIO" : "ARCHIVE SETTINGS";
+          document.getElementById("desktop-placeholder-copy").textContent = "Personalize the archive's appearance, sound, and visual effects.";
           document.getElementById("settings-open")?.click();
+          if (action === "effects") document.querySelector('[data-settings-tab="effects"]')?.click();
+        } else if (action === "quick-create") {
+          document.getElementById("begin-button")?.click();
+        } else if (action === "about") {
+          showOnlyScreen("desktop-workspace-placeholder");
+          document.getElementById("desktop-placeholder-title").textContent = "ABOUT U.E.E.";
+          document.getElementById("desktop-placeholder-copy").textContent = "Project information and community details.";
+          document.getElementById("info-open")?.click();
         }
       }
       dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
