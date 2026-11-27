@@ -2336,34 +2336,6 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 @media(max-width:650px){.lore-book-content{grid-template-columns:1fr}.lore-book-tabs{display:grid;grid-template-columns:1fr 1fr}.lore-book-tab{min-height:40px}.lore-book-header h2{font-size:32px}}
 
 /* Native desktop dashboard: only active inside the Tauri application. */
-#desktop-dashboard { display:none; }
-.tauri-app.desktop-dashboard-active .site-header,
-.tauri-app.desktop-dashboard-active main,
-.tauri-app.desktop-dashboard-active footer,
-.tauri-app.desktop-dashboard-active .ornament { display:none !important; }
-.tauri-app.desktop-dashboard-active #desktop-dashboard {
-  display:grid; position:relative; width:min(1060px,calc(100% - 64px)); min-height:100vh;
-  margin:0 auto; padding:34px 0 28px; align-content:start; gap:24px; color:#eee9e0;
-}
-.tauri-app .desktop-dashboard-top,.tauri-app .desktop-dashboard-footer {display:flex;justify-content:space-between;align-items:center;gap:16px;color:#928a7f;font:9px 'DM Mono',monospace;letter-spacing:.16em}
-.tauri-app .desktop-dashboard-status {display:flex;align-items:center;gap:9px}
-.tauri-app .desktop-dashboard-status i {width:6px;height:6px;border-radius:50%;background:#b6aa96;box-shadow:0 0 10px #b6aa96}
-.tauri-app .desktop-dashboard-hero {text-align:center;padding:10px 0 2px}
-.tauri-app .desktop-dashboard-emblem {width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 6px 18px #0009)}
-.tauri-app .desktop-dashboard-overline {margin:13px 0 8px;color:#b6a995;font:9px 'DM Mono',monospace;letter-spacing:.28em}
-.tauri-app .desktop-dashboard-hero h1 {margin:0;color:#eee8dd;font:500 clamp(34px,5vw,54px)/1.1 Georgia,serif;letter-spacing:.14em}
-.tauri-app .desktop-dashboard-hero p:last-child {margin:12px 0 0;color:#aaa198;font-size:17px}
-.tauri-app .desktop-dashboard-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
-.tauri-app .desktop-dashboard-card {display:flex;min-height:154px;flex-direction:column;align-items:flex-start;text-align:left;padding:19px 20px;border:1px solid #403a34;background:linear-gradient(145deg,#1c1a18,#111);color:#eee9e0;cursor:pointer;transition:border-color .18s,transform .18s,background .18s}
-.tauri-app .desktop-dashboard-card:hover {border-color:#b9ad9a;background:linear-gradient(145deg,#28231e,#151412);transform:translateY(-2px)}
-.tauri-app .desktop-dashboard-card-primary {border-color:#8e806d;background:linear-gradient(145deg,#29231c,#141210)}
-.tauri-app .desktop-dashboard-index {color:#a99d8b;font:9px 'DM Mono',monospace;letter-spacing:.16em}
-.tauri-app .desktop-dashboard-card strong {margin:12px 0 5px;font:500 23px Georgia,serif;letter-spacing:.025em}
-.tauri-app .desktop-dashboard-card small {color:#aaa198;font-size:14px;line-height:1.4}
-.tauri-app .desktop-dashboard-card b {margin-top:auto;padding-top:14px;color:#d0c4b2;font:9px 'DM Mono',monospace;letter-spacing:.12em}
-.tauri-app .desktop-dashboard-footer {padding-top:15px;border-top:1px solid #39342e}
-.tauri-app .desktop-dashboard-return {display:none}
-.tauri-app:not(.desktop-dashboard-active) .desktop-dashboard-return {display:inline-flex}
 .tauri-app #desktop-sephrus-gate {position:fixed;right:15px;bottom:12px;width:30px;height:30px;border:1px solid #5a5148;background:#111;color:#a99d8b;opacity:.18;cursor:pointer;font:24px/1 Georgia,serif;transition:opacity .2s,border-color .2s}
 .tauri-app #desktop-sephrus-gate:hover {opacity:.85;border-color:#b9ad9a}
 .tauri-app #desktop-sephrus-maker {position:fixed;right:54px;bottom:14px;padding:9px 13px;border:1px solid #8e806d;background:#1c1915;color:#e9dfd0;font:9px 'DM Mono',monospace;letter-spacing:.13em;cursor:pointer}
@@ -2377,19 +2349,6 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 .tauri-app .desktop-sephrus-actions {display:flex;justify-content:flex-end;gap:9px;margin-top:16px}
 .tauri-app .desktop-sephrus-actions button {padding:11px 14px;border:1px solid #63594d;background:#1b1916;color:#e9dfd0;font:9px 'DM Mono',monospace;letter-spacing:.1em;cursor:pointer}
 .tauri-app .desktop-sephrus-actions #desktop-sephrus-submit {background:#d8d1c6;color:#111;border-color:#d8d1c6}
-@media(max-width:760px) {
- .tauri-app.desktop-dashboard-active #desktop-dashboard {width:calc(100% - 32px);padding-top:22px}
- .tauri-app .desktop-dashboard-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
- .tauri-app .desktop-dashboard-card {min-height:145px;padding:15px}
- .tauri-app .desktop-dashboard-card strong {font-size:20px}
-}
-@media(max-width:520px) {
- .tauri-app .desktop-dashboard-top,.tauri-app .desktop-dashboard-footer {font-size:8px;letter-spacing:.08em}
- .tauri-app .desktop-dashboard-grid {grid-template-columns:1fr}
- .tauri-app .desktop-dashboard-card {min-height:125px}
-}
-
-
 /* Public website download section for the native Windows edition. */
 .desktop-download-section {
   display:flex; align-items:center; justify-content:space-between; gap:28px;
