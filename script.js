@@ -1534,6 +1534,7 @@ function randomizedWriting(q){if(q.id==="complex_43"){const status=values().comp
 function randomizeAll(mode=creationMode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
  window.ueeSavePreference?.("lastCreationMode",creationMode);
+ window.ueeMarkLastMode?.();
  answers={race:selectedRaceAnswer()};index=0;editingOcId=null;
  characterName=randomCharacterName();$("character-name").value=characterName;
  for(const q of activeQuestions()){
@@ -1543,6 +1544,10 @@ function randomizeAll(mode=creationMode){
   if(q.id==="ego_name"){const name=randomEgoName(values().ego_theme);answers[q.id]={choice:"Other / custom answer",value:name,custom:name};continue;}
   if(q.customizer){
    const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+   if(q.weaponCustomizer){
+    const style=pick(WEAPON_STYLE_OPTIONS),weapon=pick(WEAPON_CATALOGUE[style]||["Custom Hybrid / Transforming Weapon"]);
+    answers[q.id]={choice:"Weapon loadout",value:{style,weapon,ammoType:"",ammo:"",custom:""},custom:""};continue;
+   }
    const egoPath=egoPathOf(values().ego_status),isLcorp=egoPath==="lobotomy",synergyPool=getSynergyAbnormalities(values().ego_status);
    if(egoPath==="sinner"){answers[q.id]={choice:"Abnormality E.G.O.",value:{sinner_ego:pick(SINNER_EGO_WEAPON_CATALOGUE)},custom:""};continue;}
    answers[q.id]={choice:"Custom E.G.O. loadout",value:{synergy:pick(synergyPool),suit:isLcorp?pick(EGO_SUIT_CATALOGUE):"",category4:pick(isLcorp?L_CORP_EGO_WEAPON_CATALOGUE:DERIVED_EGO_WEAPON_CATALOGUE),gift:isLcorp?pick(EGO_GIFT_CATALOGUE):""},custom:""};continue;
@@ -1582,6 +1587,7 @@ function launchSelectedMode(){resetSephrusSecretState();answers={race:selectedRa
 function beginSelectedMode(mode){
  creationMode=mode==="complex"?"complex":mode==="advanced"?"advanced":mode==="laziness"?"laziness":"simple";
  window.ueeSavePreference?.("lastCreationMode",creationMode);
+ window.ueeMarkLastMode?.();
  answers={};editingOcId=null;index=0;
  if(creationMode==="laziness"){launchSelectedMode();return;}
  const dlg=$("randomize-confirm-dialog");
