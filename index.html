@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261128-desktop072">
+  <link rel="stylesheet" href="style.css?v=20261128-desktop080">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -716,224 +716,62 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop072", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop080", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
     }
   </script>
 
-  <script id="desktop-dashboard-controller">
-    (() => {
-      const isDesktopRuntime = Boolean(window.__TAURI_INTERNALS__) ||
-        window.location.protocol === "tauri:" ||
-        /tauri\.localhost$/i.test(window.location.hostname);
-      if (!isDesktopRuntime) return;
-      const root = document.documentElement;
-      const dashboard = document.getElementById("desktop-dashboard");
-      const sidebar = document.getElementById("desktop-sidebar");
-      const topbar = document.getElementById("desktop-workspace-topbar");
-      const title = document.getElementById("desktop-workspace-title");
-      const kicker = document.getElementById("desktop-workspace-kicker");
-      const gate = document.getElementById("desktop-sephrus-gate");
-      const prompt = document.getElementById("desktop-sephrus-prompt");
-      const answer = document.getElementById("desktop-sephrus-answer");
-      const feedback = document.getElementById("desktop-sephrus-feedback");
-      if (!dashboard || !sidebar || !topbar) return;
-
-      root.classList.add("tauri-app", "desktop-dashboard-active");
-      dashboard.hidden = false;
-      sidebar.hidden = true;
-      topbar.hidden = true;
-
-      const views = {
-        home: ["OVERVIEW", "MIRROR WORLD ARCHIVE"],
-        create: ["CHARACTER CREATION", "IDENTITY REGISTRATION"],
-        archive: ["CHARACTER ARCHIVE", "LOCAL RECORDS"],
-        lore: ["LORE ENCYCLOPEDIA", "PROJECT MOON REFERENCE"],
-        simulator: ["FIGHTING SIMULATOR", "MIRROR MATCH ENGINE"],
-        multiplayer: ["MULTIPLAYER ARENA", "NETWORKED MIRROR WORLD"],
-        settings: ["SETTINGS", "ARCHIVE CONFIGURATION"],
-        "quick-create": ["QUICK CREATION", "NEW CHARACTER RECORD"],
-        effects: ["EFFECTS STUDIO", "VISUAL AND AUDIO CONFIGURATION"],
-        about: ["ABOUT U.E.E.", "PROJECT INFORMATION"],
-        observatory: ["MIRROR OBSERVATORY", "VARIANT ANALYSIS & DOSSIER EXPORT"]
-      };
-
-      function setActiveNav(action) {
-        sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
-          button.classList.toggle("is-active", button.dataset.desktopNav === action);
-        });
-      }
-      function hideAllScreens() {
-        document.querySelectorAll(".screen").forEach(node => node.classList.add("hidden"));
-        document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
-      }
-      function refreshDashboardStats() {
-        const count = document.getElementById("desktop-dashboard-record-count");
-        if (!count) return;
-        const records = typeof readOcArchive === "function" ? readOcArchive() : [];
-        count.textContent = String(records.length);
-      }
-      function showDashboard() {
-        hideAllScreens();
-        refreshDashboardStats();
-        root.classList.add("desktop-dashboard-active");
-        root.classList.remove("desktop-workspace-active");
-        root.dataset.desktopView = "home";
-        dashboard.hidden = false;
-        sidebar.hidden = true;
-        topbar.hidden = true;
-        setActiveNav("home");
-        window.scrollTo({ top: 0, behavior: "auto" });
-      }
-      window.ueeDesktopShowDashboard = showDashboard;
-      refreshDashboardStats();
-      function showWorkspace(action) {
-        if (action !== "archive") document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
-        const [heading, subheading] = views[action] || views.home;
-        root.classList.remove("desktop-dashboard-active");
-        root.classList.add("desktop-workspace-active");
-        root.dataset.desktopView = action;
-        dashboard.hidden = true;
-        sidebar.hidden = false;
-        topbar.hidden = false;
-        title.textContent = heading;
-        kicker.textContent = subheading;
-        setActiveNav(action);
-        window.scrollTo({ top: 0, behavior: "auto" });
-      }
-      function showOnlyScreen(id) {
-        hideAllScreens();
-        const target = document.getElementById(id);
-        if (target) target.classList.remove("hidden");
-        else console.warn("Desktop workspace target not found:", id);
-      }
-      function resetWorkspacePanel(titleText, copyText) {
-        const panel = document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
-        if (!panel) return null;
-        panel.classList.remove("desktop-observatory");
-        panel.innerHTML = `<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP</p><h2 id="desktop-placeholder-title">${titleText}</h2><p id="desktop-placeholder-copy">${copyText}</p><span class="desktop-module-rule"></span><small>SELECT ANOTHER MODULE FROM THE LEFT NAVIGATION.</small>`;
-        return panel;
-      }
-      function openAction(action) {
-        if (action === "home") { showDashboard(); return; }
-        showWorkspace(action);
-        if (action === "create" || action === "quick-create") {
-          showOnlyScreen("mode-screen");
-          document.getElementById("begin-button")?.click();
-        } else if (action === "archive") {
-          document.body.classList.remove("simulator-entered");
-          showOnlyScreen("home-screen");
-          document.getElementById("home-screen")?.classList.add("desktop-archive-view");
-          document.querySelector(".oc-archive")?.scrollIntoView({ behavior: "auto", block: "start" });
-        } else if (action === "lore") {
-          showOnlyScreen("desktop-workspace-placeholder");
-          resetWorkspacePanel("THE LORE BOOK", "The reference encyclopedia is open in its own archive panel.");
-          document.getElementById("lore-book-open")?.click();
-        } else if (action === "simulator") {
-          showOnlyScreen("simulator-screen");
-          document.getElementById("open-simulator-button")?.click();
-        } else if (action === "multiplayer") {
-          showOnlyScreen("multiplayer-screen");
-          document.getElementById("open-multiplayer-button")?.click();
-        } else if (action === "settings" || action === "effects") {
-          showOnlyScreen("desktop-workspace-placeholder");
-          resetWorkspacePanel(action === "effects" ? "EFFECTS STUDIO" : "ARCHIVE SETTINGS", "Personalize the archive's appearance, sound, and visual effects.");
-          document.getElementById("settings-open")?.click();
-          if (action === "effects") document.querySelector('[data-settings-tab="effects"]')?.click();
-        } else if (action === "about") {
-          showOnlyScreen("desktop-workspace-placeholder");
-          const panel = document.querySelector("#desktop-workspace-placeholder .desktop-module-empty");
-          if (panel) {
-            panel.classList.remove("desktop-observatory");
-            panel.innerHTML = `<span class="desktop-module-emblem">ⓘ</span><p class="eyebrow">PROJECT FILE / DESKTOP EDITION</p><h2>ABOUT U.E.E.</h2><p>Una Eademque Essentia is a Mirror World archive for creating, preserving, and exploring alternate character identities. Every variant may live a different life, yet each remains connected by one shared essence.</p><div class="desktop-module-rule"></div><p>Created as an unofficial fan project. Character records are stored locally on this device unless a feature explicitly uses the multiplayer service.</p><small>UNA EADEMQUE ESSENTIA · ONE AND THE SAME ESSENCE</small>`;
-          }
-        } else if (action === "observatory") {
-          showOnlyScreen("desktop-workspace-placeholder");
-          const panel=resetWorkspacePanel("MIRROR OBSERVATORY", "Compare saved Mirror World identities and preserve your archive outside the application.");
-          if(!panel)return;
-          panel.classList.add("desktop-observatory");
-          panel.innerHTML=`<span class="desktop-module-emblem">✦</span><p class="eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP EXCLUSIVE</p><h2>MIRROR OBSERVATORY</h2><p class="desktop-observatory-intro">Compare saved Mirror World identities and preserve your archive outside the application.</p><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / VARIANT COMPARISON</p><h3>Compare two records</h3><label for="observatory-left">FIRST VARIANT</label><select id="observatory-left"></select><label for="observatory-right">SECOND VARIANT</label><select id="observatory-right"></select><button type="button" class="primary-button" id="observatory-compare">COMPARE RECORDS ↗</button><div id="observatory-result" class="desktop-observatory-result" aria-live="polite">Select two saved characters to begin.</div></section><section class="desktop-observatory-card"><p class="eyebrow">02 / DOSSIER ARCHIVE</p><h3>Export your records</h3><p>Generate one text file containing every saved character dossier. Your local records remain unchanged.</p><strong id="observatory-count" class="desktop-observatory-count">0 RECORDS FOUND</strong><button type="button" class="primary-button" id="observatory-export">EXPORT ALL DOSSIERS ↗</button><p class="desktop-observatory-note">Export is processed locally; no character data is uploaded.</p></section><section class="desktop-observatory-card"><p class="eyebrow">03 / ARCHIVE INSIGHTS</p><h3>Mirror World index</h3><p id="observatory-insights">Archive statistics will appear here.</p></section></div><button type="button" class="secondary-button" id="observatory-back">RETURN TO OVERVIEW</button>`;
-          const records=typeof readOcArchive==="function"?readOcArchive():[];
-          const left=panel.querySelector("#observatory-left"),right=panel.querySelector("#observatory-right"),result=panel.querySelector("#observatory-result");
-          records.forEach((record,index)=>{for(const select of [left,right]){const option=document.createElement("option");option.value=String(index);option.textContent=(record.name||"Unnamed Variant")+" · "+String(record.mode||"simple").toUpperCase();select.append(option);}});
-          if(records.length>1)right.selectedIndex=1;
-          panel.querySelector("#observatory-count").textContent=records.length+" RECORD"+(records.length===1?"":"S")+" FOUND";
-          const origins=records.map(record=>record.answers?.origin_type?.value||"Unspecified");
-          const originCounts=origins.reduce((counts,origin)=>{counts[origin]=(counts[origin]||0)+1;return counts;},{});
-          const modes=new Set(records.map(record=>record.mode||"simple"));
-          const leadingOrigin=Object.entries(originCounts).sort((a,b)=>b[1]-a[1])[0];
-          panel.querySelector("#observatory-insights").textContent=records.length
-            ? origins.length+" indexed records · "+Object.keys(originCounts).length+" recorded origins · "+modes.size+" creation modes · Most common origin: "+(leadingOrigin?leadingOrigin[0]+" ("+leadingOrigin[1]+")":"none")
-            : "No saved records yet. Create a character to begin building your Mirror World index.";
-          panel.querySelector("#observatory-compare").addEventListener("click",()=>{
-            const a=records[left.selectedIndex],b=records[right.selectedIndex];
-            if(!a||!b){result.textContent="Save at least two characters to compare them.";return;}
-            if(a===b){result.textContent="Choose two different records.";return;}
-            const fields=record=>({name:record.name||"Unnamed Variant",title:record.answers?.title?.value||record.answers?.epithet?.value||"Not specified",origin:record.answers?.origin_type?.value||"Not specified",affiliation:record.answers?.association?.value||record.answers?.syndicate?.value||record.answers?.workshop?.value||"Not specified",grade:record.answers?.fixer_grade?.value||record.answers?.finger_rank?.value||"Not specified"});
-            const A=fields(a),B=fields(b);result.replaceChildren();
-            [["IDENTITY",A.name,B.name],["TITLE",A.title,B.title],["ORIGIN",A.origin,B.origin],["AFFILIATION",A.affiliation,B.affiliation],["GRADE / POSITION",A.grade,B.grade]].forEach(values=>{const row=document.createElement("div");row.className="desktop-observatory-diff";values.forEach(value=>{const cell=document.createElement("span");cell.textContent=value;row.append(cell);});result.append(row);});
-          });
-          panel.querySelector("#observatory-export").addEventListener("click",()=>{
-            if(!records.length){result.textContent="There are no saved records to export yet.";return;}
-            const contents=records.map(record=>typeof formatCharacterDossier==="function"?formatCharacterDossier(record.name,record.mode,record.answers):JSON.stringify(record.answers,null,2)).join("\n\n"+"═".repeat(48)+"\n\n");
-            const url=URL.createObjectURL(new Blob([contents],{type:"text/plain;charset=utf-8"})),link=document.createElement("a");link.href=url;link.download="UEE-character-dossiers.txt";link.click();URL.revokeObjectURL(url);
-          });
-          panel.querySelector("#observatory-back").addEventListener("click",showDashboard);
-        }
-      }
-      dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
-        button.addEventListener("click", () => openAction(button.dataset.desktopAction));
-      });
-      sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
-        button.addEventListener("click", () => openAction(button.dataset.desktopNav));
-      });
-      document.getElementById("desktop-workspace-home")?.addEventListener("click", showDashboard);
-
-      const returnButton = document.createElement("button");
-      returnButton.type = "button";
-      returnButton.id = "desktop-dashboard-return";
-      returnButton.className = "settings-open desktop-dashboard-return";
-      returnButton.textContent = "OVERVIEW";
-      returnButton.addEventListener("click", showDashboard);
-      document.querySelector(".header-tools")?.prepend(returnButton);
-
-      gate?.addEventListener("click", () => {
-        feedback.textContent = "";
-        answer.value = "";
-        prompt.showModal();
-        answer.focus();
-      });
-      document.getElementById("desktop-sephrus-cancel")?.addEventListener("click", () => prompt.close());
-      document.getElementById("desktop-sephrus-form")?.addEventListener("submit", event => {
-        event.preventDefault();
-        if (answer.value === "Sephrus Aztiluth") {
-          document.getElementById("desktop-sephrus-maker").hidden = false;
-          feedback.textContent = "ACCESS GRANTED.";
-          prompt.close();
-        } else {
-          feedback.textContent = "IDENTITY NOT RECOGNIZED.";
-          answer.select();
-        }
-      });
-      document.getElementById("desktop-sephrus-maker")?.addEventListener("click", () => {
-        showWorkspace("create");
-        document.getElementById("begin-button")?.click();
-        document.getElementById("mode-laziness")?.click();
-        const name = document.getElementById("character-name");
-        if (name) {
-          name.value = "Sephrus Aztiluth";
-          name.focus();
-        }
-      });
-      document.addEventListener("click", event => {
-        if (event.target.closest("#mode-back, #home-button, #simulator-back-button, #mp-back, #restart-button")) {
-          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
-          if (root.classList.contains("desktop-workspace-active")) showDashboard();
-        }
-      });
-    })();
+  <script id="desktop-website-home-controller">
+  (() => {
+    const desktop=Boolean(window.__TAURI_INTERNALS__)||location.protocol==="tauri:"||/tauri\.localhost$/i.test(location.hostname);
+    if(!desktop)return;
+    const root=document.documentElement;root.classList.add("tauri-app","desktop-website-active");root.classList.remove("desktop-dashboard-active","desktop-workspace-active");
+    const dashboard=document.getElementById("desktop-dashboard");if(dashboard)dashboard.hidden=true;
+    const sidebar=document.getElementById("desktop-sidebar");if(sidebar)sidebar.hidden=true;
+    const topbar=document.getElementById("desktop-workspace-topbar");if(topbar)topbar.hidden=true;
+    const gate=document.getElementById("desktop-sephrus-gate"),maker=document.getElementById("desktop-sephrus-maker");
+    if(gate)document.body.append(gate);if(maker)document.body.append(maker);
+    const tools=document.createElement("button");tools.type="button";tools.id="desktop-tools-open";tools.className="settings-open desktop-tools-open";tools.textContent="MIRROR OBSERVATORY";
+    document.querySelector(".header-tools")?.insertBefore(tools,document.getElementById("settings-open"));
+    document.getElementById("app-install-button")?.classList.add("hidden");
+    const placeholder=document.getElementById("desktop-workspace-placeholder");
+    const hide=()=>document.querySelectorAll("main .screen").forEach(x=>x.classList.add("hidden"));
+    const home=()=>{hide();document.getElementById("home-screen")?.classList.remove("hidden","desktop-archive-view");root.dataset.desktopView="home";tools.setAttribute("aria-pressed","false");scrollTo(0,0);};
+    const records=()=>typeof window.readOcArchive==="function"?window.readOcArchive():[];
+    const val=(r,keys)=>{for(const k of keys){const x=r.answers?.[k];if(x){const v=x.value??x.custom??"";const t=typeof window.profileAnswerText==="function"?window.profileAnswerText(v):String(v);if(String(t).trim())return String(t).trim();}}return "";};
+    const title=r=>val(r,["title","epithet","color_title","generated_title"])||"Untitled variant";
+    function observatory(){
+      if(!placeholder)return;hide();placeholder.classList.remove("hidden");root.dataset.desktopView="observatory";tools.setAttribute("aria-pressed","true");
+      const panel=placeholder.querySelector(".desktop-module-empty");if(!panel)return;
+      panel.className="desktop-module-empty desktop-observatory desktop-observatory-v2";
+      panel.innerHTML='<header class="desktop-observatory-header"><div><p class="eyebrow">U.E.E. / DESKTOP MAJOR UPDATE 0.8.0</p><h2>MIRROR OBSERVATORY</h2><p>Archive preservation, variant analysis, and record integrity.</p></div><button id="uee-home" class="secondary-button">BACK TO MAIN PAGE ↗</button></header><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / PRESERVATION</p><h3>Backup &amp; Restore</h3><p>Export a complete archive backup. Merge skips matching record IDs; Replace requires confirmation.</p><button id="uee-backup" class="primary-button">DOWNLOAD BACKUP ↗</button><select id="uee-restore-mode"><option value="merge">MERGE INTO LOCAL ARCHIVE</option><option value="replace">REPLACE LOCAL ARCHIVE</option></select><input id="uee-file" type="file" accept=".json,application/json" hidden><button id="uee-restore" class="secondary-button">RESTORE FROM JSON</button><p id="uee-backup-status" role="status">Backups remain local unless you choose where to save them.</p></section><section class="desktop-observatory-card"><p class="eyebrow">02 / ANALYSIS</p><h3>Variant Comparison</h3><label for="uee-left">FIRST VARIANT</label><select id="uee-left"></select><label for="uee-right">SECOND VARIANT</label><select id="uee-right"></select><button id="uee-compare" class="primary-button">COMPARE RECORDS ↗</button><div id="uee-compare-result"></div></section><section class="desktop-observatory-card"><p class="eyebrow">03 / DOSSIERS</p><h3>Bulk Dossier Export</h3><strong id="uee-count"></strong><button id="uee-export" class="primary-button">EXPORT ALL DOSSIERS ↗</button><p>Uses the shared U.E.E. dossier format; processed locally.</p></section><section class="desktop-observatory-card"><p class="eyebrow">04 / INTEGRITY</p><h3>Record Health Check</h3><button id="uee-scan" class="secondary-button">SCAN ARCHIVE</button><button id="uee-repair" class="secondary-button" disabled>REPAIR RECORD IDS</button><p id="uee-scan-result" role="status">No scan has been run.</p></section><section class="desktop-observatory-card"><p class="eyebrow">05 / INDEX</p><h3>Archive Insights</h3><div id="uee-insights"></div></section><section class="desktop-observatory-card"><p class="eyebrow">06 / FINDER</p><h3>Search Your Archive</h3><input id="uee-search" type="search" placeholder="Search name, title, origin, affiliation..."><div id="uee-results"></div></section></div>';
+      const rows=records(),left=panel.querySelector("#uee-left"),right=panel.querySelector("#uee-right");
+      rows.forEach(r=>[left,right].forEach(s=>{const o=document.createElement("option");o.value=String(r.id);o.textContent=(r.name||"Unnamed")+" — "+title(r);s.append(o);}));if(rows.length>1)right.selectedIndex=1;
+      panel.querySelector("#uee-count").textContent=rows.length+" RECORDS FOUND";
+      const counts={mode:{},origin:{},race:{}};
+      rows.forEach(r=>{const m=String(r.mode||"simple").toUpperCase(),o=val(r,["origin_type","district"])||"Unspecified",q=val(r,["race","species"])||"Unspecified";counts.mode[m]=(counts.mode[m]||0)+1;counts.origin[o]=(counts.origin[o]||0)+1;counts.race[q]=(counts.race[q]||0)+1;});
+      const top=o=>Object.entries(o).sort((x,y)=>y[1]-x[1])[0]?.[0]||"—";
+      [["TOTAL RECORDS",rows.length],["UNIQUE ORIGINS",Object.keys(counts.origin).length],["CREATION MODES",Object.keys(counts.mode).length],["MOST COMMON ORIGIN",top(counts.origin)],["MOST COMMON RACE",top(counts.race)]].forEach(pair=>{const d=document.createElement("p");d.textContent=pair[0]+" · "+pair[1];panel.querySelector("#uee-insights").append(d);});
+      panel.querySelector("#uee-compare").onclick=()=>{const x=rows.find(r=>String(r.id)===left.value),y=rows.find(r=>String(r.id)===right.value),out=panel.querySelector("#uee-compare-result");out.replaceChildren();if(!x||!y||x.id===y.id){out.textContent="Choose two different records.";return;}[["IDENTITY",r=>r.name],["TITLE",title],["RACE",r=>val(r,["race","species"])],["ORIGIN",r=>val(r,["origin_type","district"])],["AFFILIATION",r=>val(r,["association","syndicate","workshop","occupation"])],["GRADE",r=>val(r,["fixer_grade","finger_rank","syndicate_hierarchy"])],["E.G.O.",r=>val(r,["ego_name","ego_status"])],["PERSONALITY",r=>val(r,["personality","generated_personality"])]].forEach(([k,get])=>{const d=document.createElement("div");d.className="desktop-observatory-diff";[k,get(x)||"—",get(y)||"—"].forEach(v=>{const s=document.createElement("span");s.textContent=v;d.append(s);});out.append(d);});};
+      panel.querySelector("#uee-backup").onclick=()=>{const data={format:"uee-archive-backup",version:1,exportedAt:new Date().toISOString(),records:records()},u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"})),link=document.createElement("a");link.href=u;link.download="UEE-archive-backup-"+new Date().toISOString().slice(0,10)+".json";link.click();URL.revokeObjectURL(u);panel.querySelector("#uee-backup-status").textContent=data.records.length+" records exported.";};
+      const file=panel.querySelector("#uee-file");panel.querySelector("#uee-restore").onclick=()=>file.click();
+      file.onchange=()=>{const f=file.files?.[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{const p=JSON.parse(String(reader.result||"")),incoming=Array.isArray(p)?p:(p?.format==="uee-archive-backup"&&Array.isArray(p.records)?p.records:null);if(!incoming)throw Error("Unrecognized U.E.E. backup.");const clean=[],ids=new Set();let invalid=0;incoming.forEach(item=>{if(!item||typeof item!=="object"||!item.answers||typeof item.answers!=="object"||Array.isArray(item.answers)){invalid++;return;}const r=JSON.parse(JSON.stringify(item));let id=typeof r.id==="string"?r.id.trim():"";if(id&&ids.has(id)){invalid++;return;}if(!id)id="oc_import_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);while(ids.has(id))id+="_x";ids.add(id);r.id=id;r.name=String(r.name||"Imported variant");r.mode=["simple","advanced","complex","laziness"].includes(r.mode)?r.mode:"simple";r.updatedAt=String(r.updatedAt||new Date().toISOString());clean.push(r);});if(!clean.length)throw Error("No valid character records found.");let result,statusMessage;if(panel.querySelector("#uee-restore-mode").value==="replace"){if(!confirm("Replace the entire local archive with "+clean.length+" imported records?"))return;result=clean;statusMessage=result.length+" records restored; "+invalid+" invalid or duplicate records skipped.";}else{const old=records(),known=new Set(old.map(r=>String(r.id))),added=clean.filter(r=>!known.has(String(r.id)));result=old.concat(added);statusMessage=added.length+" added; "+(clean.length-added.length)+" matching IDs skipped; "+invalid+" invalid or duplicate records skipped.";}window.writeOcArchive?.(result);file.value="";observatory();placeholder.querySelector("#uee-backup-status").textContent=statusMessage;}catch(e){panel.querySelector("#uee-backup-status").textContent=e.message||"Restore failed.";}};reader.onerror=()=>panel.querySelector("#uee-backup-status").textContent="Could not read that file.";reader.readAsText(f);};
+      panel.querySelector("#uee-export").onclick=()=>{const all=records();if(!all.length)return;const txt=all.map(r=>window.formatCharacterDossier?.(r.name,r.mode,r.answers)||JSON.stringify(r.answers,null,2)).join("\n\n"+"═".repeat(48)+"\n\n"),u=URL.createObjectURL(new Blob([txt],{type:"text/plain;charset=utf-8"})),link=document.createElement("a");link.href=u;link.download="UEE-character-dossiers.txt";link.click();URL.revokeObjectURL(u);};
+      let issues=0;panel.querySelector("#uee-scan").onclick=()=>{const seen=new Set();let dup=0,missing=0,bad=0;rows.forEach(r=>{if(!r||!r.answers||typeof r.answers!=="object"){bad++;return;}if(!r.id)missing++;else if(seen.has(String(r.id)))dup++;else seen.add(String(r.id));});issues=dup+missing+bad;panel.querySelector("#uee-scan-result").textContent=rows.length+" checked · "+dup+" duplicate IDs · "+missing+" missing IDs · "+bad+" incomplete.";panel.querySelector("#uee-repair").disabled=issues===0||bad>0;};
+      panel.querySelector("#uee-repair").onclick=()=>{const seen=new Set();let n=0;rows.forEach(r=>{let id=String(r.id||"").trim();if(!id||seen.has(id)){id="oc_repaired_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);r.id=id;n++;}seen.add(id);});window.writeOcArchive?.(rows);panel.querySelector("#uee-scan-result").textContent=n+" IDs repaired. Run the scan again.";panel.querySelector("#uee-repair").disabled=true;};
+      const search=panel.querySelector("#uee-search"),results=panel.querySelector("#uee-results");const draw=()=>{const q=search.value.toLowerCase().trim();results.replaceChildren();const found=rows.filter(r=>[r.name,title(r),val(r,["origin_type","district"]),val(r,["association","syndicate","occupation"])].join(" ").toLowerCase().includes(q));if(!found.length){results.textContent="No matching records.";return;}found.slice().reverse().forEach(r=>{const row=document.createElement("div");row.className="desktop-observatory-record-row";const name=document.createElement("span");name.textContent=(r.name||"Unnamed")+" · "+title(r);const btn=document.createElement("button");btn.type="button";btn.textContent="OPEN";btn.onclick=()=>window.loadOcRecord?.(r.id);row.append(name,btn);results.append(row);});};search.oninput=draw;draw();
+      panel.querySelector("#uee-home").onclick=home;
+    }
+    tools.addEventListener("click",observatory);
+    document.getElementById("desktop-sephrus-gate")?.addEventListener("click",()=>{const d=document.getElementById("desktop-sephrus-prompt"),i=document.getElementById("desktop-sephrus-answer");if(!d||!i)return;document.getElementById("desktop-sephrus-feedback").textContent="";i.value="";d.showModal();i.focus();});
+    document.getElementById("desktop-sephrus-cancel")?.addEventListener("click",()=>document.getElementById("desktop-sephrus-prompt")?.close());
+    document.getElementById("desktop-sephrus-form")?.addEventListener("submit",e=>{e.preventDefault();const i=document.getElementById("desktop-sephrus-answer"),f=document.getElementById("desktop-sephrus-feedback");if(i.value==="Sephrus Aztiluth"){document.getElementById("desktop-sephrus-maker").hidden=false;f.textContent="ACCESS GRANTED.";document.getElementById("desktop-sephrus-prompt").close();}else{f.textContent="IDENTITY NOT RECOGNIZED.";i.select();}});
+    maker?.addEventListener("click",()=>{home();document.getElementById("begin-button")?.click();document.getElementById("mode-laziness")?.click();const n=document.getElementById("character-name");if(n){n.value="Sephrus Aztiluth";n.focus();}});
+    document.addEventListener("click",()=>{if(!document.getElementById("home-screen")?.classList.contains("hidden"))tools.setAttribute("aria-pressed","false");});
+    window.ueeDesktopShowHome=home;
+  })();
   </script>
 
 </body>
