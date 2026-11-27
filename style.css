@@ -2553,7 +2553,7 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 }
 
 
-/* DESKTOP v0.6.0 — independent archive home */
+/* DESKTOP v0.7.2 — independent archive home */
 .tauri-app.desktop-dashboard-active #desktop-dashboard {
   width:min(1120px,calc(100% - 64px));
   gap:26px;
@@ -2610,10 +2610,3 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
   .tauri-app .desktop-dashboard-section-heading {align-items:start;flex-direction:column}
   .tauri-app .desktop-dashboard-metrics {gap:18px}
 }
-
-/* Desktop navigation correction: the landing dashboard is not part of the app flow. */
-.tauri-app #desktop-dashboard { display:none!important; }
-.tauri-app.desktop-workspace-active #desktop-sidebar { display:flex; }
-.tauri-app.desktop-workspace-active #desktop-workspace-topbar { display:flex; }
-.tauri-app #desktop-sephrus-gate { position:fixed; right:18px; bottom:18px; z-index:60; }
-.tauri-app #desktop-sephrus-maker { position:fixed; right:18px; bottom:58px; z-index:60; }
