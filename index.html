@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261128-desktop082">
+  <link rel="stylesheet" href="style.css?v=20261128-desktop090">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -41,6 +41,64 @@
     </div>
   </div>
   <div class="ornament ornament-top" aria-hidden="true">✦ ───────────────────────── ✦</div>
+
+  <section id="desktop-dashboard" aria-label="Una Eademque Essentia desktop dashboard" hidden>
+    <div class="desktop-dashboard-top">
+      <span class="desktop-dashboard-kicker">U.E.E. / DESKTOP ARCHIVE SYSTEM · 0.9.0</span>
+      <span class="desktop-dashboard-status"><i></i> LOCAL ARCHIVE ONLINE</span>
+    </div>
+    <section class="desktop-dashboard-hero">
+      <div class="desktop-dashboard-hero-copy">
+        <p class="desktop-dashboard-overline">UNA EADEMQUE ESSENTIA / DESKTOP EDITION</p>
+        <h1>ONE AND THE<br><span>SAME ESSENCE.</span></h1>
+        <p class="desktop-dashboard-intro">Infinite worlds. Different circumstances. Every identity preserved in one place. Your local Mirror World archive begins here.</p>
+        <div class="desktop-dashboard-hero-actions">
+          <button class="desktop-dashboard-action-primary" data-desktop-action="create" type="button">CREATE A CHARACTER <span>↗</span></button>
+          <button class="desktop-dashboard-action-secondary" data-desktop-action="archive" type="button">OPEN MY ARCHIVE <span>→</span></button>
+        </div>
+        <div class="desktop-dashboard-metrics" aria-label="Local archive statistics">
+          <div><strong id="desktop-dashboard-record-count">0</strong><span>LOCAL RECORDS</span></div>
+          <div><strong id="desktop-dashboard-origin-count">0</strong><span>RECORDED ORIGINS</span></div>
+          <div><strong id="desktop-dashboard-mode-count">0</strong><span>CREATION PATHS</span></div>
+        </div>
+      </div>
+      <div class="desktop-dashboard-hero-art" aria-hidden="true">
+        <div class="desktop-dashboard-orbit desktop-dashboard-orbit-one"></div>
+        <div class="desktop-dashboard-orbit desktop-dashboard-orbit-two"></div>
+        <div class="desktop-dashboard-orbit desktop-dashboard-orbit-three"></div>
+        <img src="./app-icon.svg" alt="" class="desktop-dashboard-emblem">
+        <span>U.E.E.</span>
+      </div>
+    </section>
+    <section class="desktop-dashboard-recent" aria-labelledby="desktop-dashboard-recent-title">
+      <div class="desktop-dashboard-section-heading">
+        <div><p>LOCAL RECORDS / 01</p><h2 id="desktop-dashboard-recent-title">RECENTLY UPDATED</h2></div>
+        <button type="button" data-desktop-action="archive">VIEW FULL ARCHIVE ↗</button>
+      </div>
+      <div id="desktop-dashboard-recent-list" class="desktop-dashboard-recent-list" aria-live="polite">
+        <p class="desktop-dashboard-empty">No saved records yet. Create your first character to begin the archive.</p>
+      </div>
+    </section>
+    <section class="desktop-dashboard-modules" aria-labelledby="desktop-dashboard-modules-title">
+      <div class="desktop-dashboard-section-heading">
+        <div><p>ARCHIVE DIRECTORY / 02</p><h2 id="desktop-dashboard-modules-title">EXPLORE THE SYSTEMS</h2></div>
+        <span>SELECT A MODULE TO CONTINUE</span>
+      </div>
+      <div class="desktop-dashboard-grid">
+        <button class="desktop-dashboard-card" data-desktop-action="lore" type="button"><span class="desktop-dashboard-index">01 / REFERENCE</span><strong>Lore Encyclopedia</strong><small>Search the City, its organizations, and the worlds of Project Moon.</small><b>OPEN ENCYCLOPEDIA →</b></button>
+        <button class="desktop-dashboard-card" data-desktop-action="simulator" type="button"><span class="desktop-dashboard-index">02 / SIMULATION</span><strong>Fighting Simulator</strong><small>Run fictional matchups between characters saved in your local archive.</small><b>ENTER SIMULATOR →</b></button>
+        <button class="desktop-dashboard-card" data-desktop-action="multiplayer" type="button"><span class="desktop-dashboard-index">03 / NETWORK</span><strong>Multiplayer Arena</strong><small>Create or join a shared room and play with other archive users.</small><b>OPEN ARENA →</b></button>
+        <button class="desktop-dashboard-card" data-desktop-action="settings" type="button"><span class="desktop-dashboard-index">04 / CONFIGURATION</span><strong>Archive Settings</strong><small>Adjust appearance, sound, accessibility, and visual effects.</small><b>CONFIGURE →</b></button>
+        <button class="desktop-dashboard-card" data-desktop-action="observatory" type="button"><span class="desktop-dashboard-index">05 / ANALYSIS</span><strong>Mirror Observatory</strong><small>Back up, restore, compare, search, and inspect your character records.</small><b>OPEN OBSERVATORY →</b></button>
+        <button class="desktop-dashboard-card" data-desktop-action="about" type="button"><span class="desktop-dashboard-index">06 / PROJECT FILE</span><strong>About U.E.E.</strong><small>Read the project note and learn how the desktop archive works.</small><b>READ THE NOTE →</b></button>
+      </div>
+    </section>
+    <section class="desktop-dashboard-release" aria-label="Desktop update notes">
+      <div><p class="desktop-dashboard-index">DESKTOP MAJOR UPDATE / 0.9.0</p><h2>THE ARCHIVE HAS ITS OWN HOME AGAIN.</h2></div>
+      <p>A dedicated desktop launch center, module navigation, live local archive statistics, recent-record access, and a unified route into the desktop tools. The website landing page remains separate.</p>
+    </section>
+    <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>UNA EADEMQUE ESSENTIA / DESKTOP</span></div>
+  </section>
 
   <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
   <button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER <span>↗</span></button>
@@ -72,7 +130,7 @@
     <button type="button" data-desktop-nav="observatory"><span>✦</span> Mirror Observatory</button>
     <button type="button" data-desktop-nav="about"><span>ⓘ</span> About U.E.E.</button>
   </nav>
-  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.7.2</small></div>
+  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.9.0</small></div>
 </aside>
 <header id="desktop-workspace-topbar" hidden>
   <div><p id="desktop-workspace-kicker">MIRROR WORLD ARCHIVE</p><h2 id="desktop-workspace-title">OVERVIEW</h2></div>
@@ -673,37 +731,242 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop082", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop090", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
     }
   </script>
 
-  <script id="desktop-website-home-controller">
+  <script id="desktop-dashboard-controller">
   (() => {
-    const desktop=Boolean(window.__TAURI_INTERNALS__)||location.protocol==="tauri:"||/tauri\.localhost$/i.test(location.hostname);
-    if(!desktop)return;
-    const root=document.documentElement;root.classList.add("tauri-app","desktop-website-active");root.classList.remove("desktop-dashboard-active","desktop-workspace-active");
-    
-    const sidebar=document.getElementById("desktop-sidebar");if(sidebar)sidebar.hidden=true;
-    const topbar=document.getElementById("desktop-workspace-topbar");if(topbar)topbar.hidden=true;
-    const gate=document.getElementById("desktop-sephrus-gate"),maker=document.getElementById("desktop-sephrus-maker");
-    if(gate)document.body.append(gate);if(maker)document.body.append(maker);
-    const tools=document.createElement("button");tools.type="button";tools.id="desktop-tools-open";tools.className="settings-open desktop-tools-open";tools.textContent="MIRROR OBSERVATORY";
-    document.querySelector(".header-tools")?.insertBefore(tools,document.getElementById("settings-open"));
-    document.getElementById("app-install-button")?.classList.add("hidden");
-    const placeholder=document.getElementById("desktop-workspace-placeholder");
-    const hide=()=>document.querySelectorAll("main .screen").forEach(x=>x.classList.add("hidden"));
-    const home=()=>{hide();document.getElementById("home-screen")?.classList.remove("hidden","desktop-archive-view");root.dataset.desktopView="home";tools.setAttribute("aria-pressed","false");scrollTo(0,0);};
-    const records=()=>typeof window.readOcArchive==="function"?window.readOcArchive():[];
-    const val=(r,keys)=>{for(const k of keys){const x=r.answers?.[k];if(x){const v=x.value??x.custom??"";const t=typeof window.profileAnswerText==="function"?window.profileAnswerText(v):String(v);if(String(t).trim())return String(t).trim();}}return "";};
-    const title=r=>val(r,["title","epithet","color_title","generated_title"])||"Untitled variant";
-    function observatory(){
-      if(!placeholder)return;hide();placeholder.classList.remove("hidden");root.dataset.desktopView="observatory";tools.setAttribute("aria-pressed","true");
+    const isDesktopRuntime = Boolean(window.__TAURI_INTERNALS__) ||
+      window.location.protocol === "tauri:" ||
+      /tauri\\.localhost$/i.test(window.location.hostname);
+    if (!isDesktopRuntime) return;
+
+    const root = document.documentElement;
+    const dashboard = document.getElementById("desktop-dashboard");
+    const sidebar = document.getElementById("desktop-sidebar");
+    const topbar = document.getElementById("desktop-workspace-topbar");
+    const title = document.getElementById("desktop-workspace-title");
+    const kicker = document.getElementById("desktop-workspace-kicker");
+    const placeholder = document.getElementById("desktop-workspace-placeholder");
+    const gate = document.getElementById("desktop-sephrus-gate");
+    const maker = document.getElementById("desktop-sephrus-maker");
+    const prompt = document.getElementById("desktop-sephrus-prompt");
+    const answer = document.getElementById("desktop-sephrus-answer");
+    const feedback = document.getElementById("desktop-sephrus-feedback");
+
+    if (!dashboard || !sidebar || !topbar || !placeholder) {
+      console.warn("Desktop workspace could not initialize: required layout elements are missing.");
+      return;
+    }
+
+    root.classList.add("tauri-app", "desktop-dashboard-active");
+    root.classList.remove("desktop-website-active", "desktop-workspace-active");
+    dashboard.hidden = false;
+    sidebar.hidden = true;
+    topbar.hidden = true;
+
+    const views = {
+      home: ["OVERVIEW", "MIRROR WORLD ARCHIVE"],
+      create: ["CHARACTER CREATION", "IDENTITY REGISTRATION"],
+      archive: ["CHARACTER ARCHIVE", "LOCAL RECORDS"],
+      lore: ["LORE ENCYCLOPEDIA", "PROJECT MOON REFERENCE"],
+      simulator: ["FIGHTING SIMULATOR", "MIRROR MATCH ENGINE"],
+      multiplayer: ["MULTIPLAYER ARENA", "NETWORKED MIRROR WORLD"],
+      settings: ["SETTINGS", "ARCHIVE CONFIGURATION"],
+      about: ["ABOUT U.E.E.", "PROJECT INFORMATION"],
+      observatory: ["MIRROR OBSERVATORY", "VARIANT ANALYSIS & DOSSIER EXPORT"]
+    };
+
+    const readRecords = () => typeof window.readOcArchive === "function" ? window.readOcArchive() : [];
+    const readValue = (record, keys) => {
+      for (const key of keys) {
+        const item = record?.answers?.[key];
+        if (!item) continue;
+        const value = item.value ?? item.custom ?? "";
+        const text = typeof window.profileAnswerText === "function" ? window.profileAnswerText(value) : String(value);
+        if (String(text).trim()) return String(text).trim();
+      }
+      return "";
+    };
+    const recordTitle = record => readValue(record, ["title", "epithet", "color_title", "generated_title"]) || "The Same Essence";
+
+    function setActiveNav(action) {
+      sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
+        button.classList.toggle("is-active", button.dataset.desktopNav === action);
+      });
+    }
+
+    function hideAllScreens() {
+      document.querySelectorAll("main .screen").forEach(node => node.classList.add("hidden"));
+      document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+    }
+
+    function refreshDashboard() {
+      const rows = readRecords();
+      const count = document.getElementById("desktop-dashboard-record-count");
+      const origins = document.getElementById("desktop-dashboard-origin-count");
+      const modes = document.getElementById("desktop-dashboard-mode-count");
+      const recent = document.getElementById("desktop-dashboard-recent-list");
+      if (count) count.textContent = String(rows.length);
+
+      const originSet = new Set(rows.map(record => readValue(record, ["origin_type", "district", "upbringing"])).filter(Boolean));
+      const modeSet = new Set(rows.map(record => String(record.mode || "simple")));
+      if (origins) origins.textContent = String(originSet.size);
+      if (modes) modes.textContent = String(modeSet.size);
+      if (!recent) return;
+
+      recent.replaceChildren();
+      if (!rows.length) {
+        const empty = document.createElement("p");
+        empty.className = "desktop-dashboard-empty";
+        empty.textContent = "No saved records yet. Create your first character to begin the archive.";
+        recent.append(empty);
+        return;
+      }
+
+      const latest = rows.slice().sort((a, b) => {
+        const timeA = Date.parse(a.updatedAt || a.createdAt || "") || 0;
+        const timeB = Date.parse(b.updatedAt || b.createdAt || "") || 0;
+        return timeB - timeA;
+      }).slice(0, 4);
+
+      latest.forEach(record => {
+        const row = document.createElement("article");
+        row.className = "desktop-dashboard-recent-row";
+        const identity = document.createElement("div");
+        identity.className = "desktop-dashboard-recent-identity";
+        const name = document.createElement("strong");
+        name.textContent = record.name || "Unnamed Variant";
+        const meta = document.createElement("small");
+        const mode = String(record.mode || "simple").toUpperCase();
+        const origin = readValue(record, ["origin_type", "district", "upbringing"]);
+        meta.textContent = mode + " CREATION" + (origin ? " · " + origin : "");
+        identity.append(name, meta);
+
+        const open = document.createElement("button");
+        open.type = "button";
+        open.className = "desktop-dashboard-recent-open";
+        open.textContent = "OPEN RECORD ↗";
+        open.addEventListener("click", () => {
+          showWorkspace("create");
+          if (typeof window.loadOcRecord === "function") window.loadOcRecord(record.id);
+        });
+        row.append(identity, open);
+        recent.append(row);
+      });
+    }
+
+    function showDashboard() {
+      hideAllScreens();
+      refreshDashboard();
+      root.classList.add("desktop-dashboard-active");
+      root.classList.remove("desktop-workspace-active");
+      root.dataset.desktopView = "home";
+      dashboard.hidden = false;
+      sidebar.hidden = true;
+      topbar.hidden = true;
+      setActiveNav("home");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+    window.ueeDesktopShowDashboard = showDashboard;
+    window.ueeDesktopShowHome = showDashboard;
+
+    function showWorkspace(action) {
+      const [heading, subheading] = views[action] || views.home;
+      root.classList.remove("desktop-dashboard-active");
+      root.classList.add("desktop-workspace-active");
+      root.dataset.desktopView = action;
+      dashboard.hidden = true;
+      sidebar.hidden = false;
+      topbar.hidden = false;
+      title.textContent = heading;
+      kicker.textContent = subheading;
+      setActiveNav(action);
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+
+    function showOnlyScreen(id) {
+      hideAllScreens();
+      const target = document.getElementById(id);
+      if (target) target.classList.remove("hidden");
+      else console.warn("Desktop workspace target not found:", id);
+    }
+
+    function resetWorkspacePanel(titleText, copyText) {
+      const panel = placeholder.querySelector(".desktop-module-empty");
+      if (!panel) return null;
+      panel.className = "desktop-module-empty";
+      panel.replaceChildren();
+      const emblem = document.createElement("span");
+      emblem.className = "desktop-module-emblem";
+      emblem.textContent = "✦";
+      const label = document.createElement("p");
+      label.className = "eyebrow";
+      label.textContent = "UNA EADEMQUE ESSENTIA / DESKTOP";
+      const heading = document.createElement("h2");
+      heading.textContent = titleText;
+      const copy = document.createElement("p");
+      copy.textContent = copyText;
+      const rule = document.createElement("span");
+      rule.className = "desktop-module-rule";
+      const foot = document.createElement("small");
+      foot.textContent = "USE THE LEFT NAVIGATION TO OPEN ANOTHER MODULE.";
+      panel.append(emblem, label, heading, copy, rule, foot);
+      return panel;
+    }
+
+    function openAction(action) {
+      if (action === "home") { showDashboard(); return; }
+      showWorkspace(action);
+
+      if (action === "create") {
+        showOnlyScreen("mode-screen");
+        document.getElementById("begin-button")?.click();
+      } else if (action === "archive") {
+        document.body.classList.remove("simulator-entered");
+        showOnlyScreen("home-screen");
+        document.getElementById("home-screen")?.classList.add("desktop-archive-view");
+        window.renderOcHistory?.();
+        document.querySelector(".oc-archive")?.scrollIntoView({ behavior: "auto", block: "start" });
+      } else if (action === "lore") {
+        showOnlyScreen("desktop-workspace-placeholder");
+        resetWorkspacePanel("THE LORE BOOK", "The reference encyclopedia is open in its own desktop archive panel.");
+        document.getElementById("lore-book-open")?.click();
+      } else if (action === "simulator") {
+        showOnlyScreen("simulator-screen");
+        document.getElementById("open-simulator-button")?.click();
+      } else if (action === "multiplayer") {
+        showOnlyScreen("multiplayer-screen");
+        document.getElementById("open-multiplayer-button")?.click();
+      } else if (action === "settings") {
+        showOnlyScreen("desktop-workspace-placeholder");
+        resetWorkspacePanel("ARCHIVE SETTINGS", "Personalize the desktop archive's appearance, sound, accessibility, and visual effects.");
+        document.getElementById("settings-open")?.click();
+      } else if (action === "about") {
+        showOnlyScreen("desktop-workspace-placeholder");
+        const panel = resetWorkspacePanel("ABOUT U.E.E.", "Una Eademque Essentia is a Mirror World archive for creating, preserving, and exploring alternate character identities.");
+        if (panel) {
+          const extra = document.createElement("p");
+          extra.textContent = "Every variant may live a different life, yet each remains connected by one shared essence. Character records are stored locally on this device unless a feature explicitly uses the multiplayer service.";
+          panel.append(extra);
+          const footer = document.createElement("small");
+          footer.textContent = "UNOFFICIAL FAN-MADE PROJECT · ONE AND THE SAME ESSENCE";
+          panel.append(footer);
+        }
+      } else if (action === "observatory") {
+        observatory();
+      }
+    }
+
+        function observatory(){
+      if(!placeholder)return;showWorkspace("observatory");showOnlyScreen("desktop-workspace-placeholder");
       const panel=placeholder.querySelector(".desktop-module-empty");if(!panel)return;
       panel.className="desktop-module-empty desktop-observatory desktop-observatory-v2";
-      panel.innerHTML='<header class="desktop-observatory-header"><div><p class="eyebrow">U.E.E. / DESKTOP MAJOR UPDATE 0.8.0</p><h2>MIRROR OBSERVATORY</h2><p>Archive preservation, variant analysis, and record integrity.</p></div><button id="uee-home" class="secondary-button">BACK TO MAIN PAGE ↗</button></header><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / PRESERVATION</p><h3>Backup &amp; Restore</h3><p>Export a complete archive backup. Merge skips matching record IDs; Replace requires confirmation.</p><button id="uee-backup" class="primary-button">DOWNLOAD BACKUP ↗</button><select id="uee-restore-mode"><option value="merge">MERGE INTO LOCAL ARCHIVE</option><option value="replace">REPLACE LOCAL ARCHIVE</option></select><input id="uee-file" type="file" accept=".json,application/json" hidden><button id="uee-restore" class="secondary-button">RESTORE FROM JSON</button><p id="uee-backup-status" role="status">Backups remain local unless you choose where to save them.</p></section><section class="desktop-observatory-card"><p class="eyebrow">02 / ANALYSIS</p><h3>Variant Comparison</h3><label for="uee-left">FIRST VARIANT</label><select id="uee-left"></select><label for="uee-right">SECOND VARIANT</label><select id="uee-right"></select><button id="uee-compare" class="primary-button">COMPARE RECORDS ↗</button><div id="uee-compare-result"></div></section><section class="desktop-observatory-card"><p class="eyebrow">03 / DOSSIERS</p><h3>Bulk Dossier Export</h3><strong id="uee-count"></strong><button id="uee-export" class="primary-button">EXPORT ALL DOSSIERS ↗</button><p>Uses the shared U.E.E. dossier format; processed locally.</p></section><section class="desktop-observatory-card"><p class="eyebrow">04 / INTEGRITY</p><h3>Record Health Check</h3><button id="uee-scan" class="secondary-button">SCAN ARCHIVE</button><button id="uee-repair" class="secondary-button" disabled>REPAIR RECORD IDS</button><p id="uee-scan-result" role="status">No scan has been run.</p></section><section class="desktop-observatory-card"><p class="eyebrow">05 / INDEX</p><h3>Archive Insights</h3><div id="uee-insights"></div></section><section class="desktop-observatory-card"><p class="eyebrow">06 / FINDER</p><h3>Search Your Archive</h3><input id="uee-search" type="search" placeholder="Search name, title, origin, affiliation..."><div id="uee-results"></div></section></div>';
+      panel.innerHTML='<header class="desktop-observatory-header"><div><p class="eyebrow">U.E.E. / DESKTOP MAJOR UPDATE 0.9.0</p><h2>MIRROR OBSERVATORY</h2><p>Archive preservation, variant analysis, and record integrity.</p></div><button id="uee-home" class="secondary-button">BACK TO DASHBOARD ↗</button></header><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / PRESERVATION</p><h3>Backup &amp; Restore</h3><p>Export a complete archive backup. Merge skips matching record IDs; Replace requires confirmation.</p><button id="uee-backup" class="primary-button">DOWNLOAD BACKUP ↗</button><select id="uee-restore-mode"><option value="merge">MERGE INTO LOCAL ARCHIVE</option><option value="replace">REPLACE LOCAL ARCHIVE</option></select><input id="uee-file" type="file" accept=".json,application/json" hidden><button id="uee-restore" class="secondary-button">RESTORE FROM JSON</button><p id="uee-backup-status" role="status">Backups remain local unless you choose where to save them.</p></section><section class="desktop-observatory-card"><p class="eyebrow">02 / ANALYSIS</p><h3>Variant Comparison</h3><label for="uee-left">FIRST VARIANT</label><select id="uee-left"></select><label for="uee-right">SECOND VARIANT</label><select id="uee-right"></select><button id="uee-compare" class="primary-button">COMPARE RECORDS ↗</button><div id="uee-compare-result"></div></section><section class="desktop-observatory-card"><p class="eyebrow">03 / DOSSIERS</p><h3>Bulk Dossier Export</h3><strong id="uee-count"></strong><button id="uee-export" class="primary-button">EXPORT ALL DOSSIERS ↗</button><p>Uses the shared U.E.E. dossier format; processed locally.</p></section><section class="desktop-observatory-card"><p class="eyebrow">04 / INTEGRITY</p><h3>Record Health Check</h3><button id="uee-scan" class="secondary-button">SCAN ARCHIVE</button><button id="uee-repair" class="secondary-button" disabled>REPAIR RECORD IDS</button><p id="uee-scan-result" role="status">No scan has been run.</p></section><section class="desktop-observatory-card"><p class="eyebrow">05 / INDEX</p><h3>Archive Insights</h3><div id="uee-insights"></div></section><section class="desktop-observatory-card"><p class="eyebrow">06 / FINDER</p><h3>Search Your Archive</h3><input id="uee-search" type="search" placeholder="Search name, title, origin, affiliation..."><div id="uee-results"></div></section></div>';
       const rows=records(),left=panel.querySelector("#uee-left"),right=panel.querySelector("#uee-right");
       rows.forEach(r=>[left,right].forEach(s=>{const o=document.createElement("option");o.value=String(r.id);o.textContent=(r.name||"Unnamed")+" — "+title(r);s.append(o);}));if(rows.length>1)right.selectedIndex=1;
       panel.querySelector("#uee-count").textContent=rows.length+" RECORDS FOUND";
@@ -719,17 +982,48 @@
       let issues=0;panel.querySelector("#uee-scan").onclick=()=>{const seen=new Set();let dup=0,missing=0,bad=0;rows.forEach(r=>{if(!r||!r.answers||typeof r.answers!=="object"){bad++;return;}if(!r.id)missing++;else if(seen.has(String(r.id)))dup++;else seen.add(String(r.id));});issues=dup+missing+bad;panel.querySelector("#uee-scan-result").textContent=rows.length+" checked · "+dup+" duplicate IDs · "+missing+" missing IDs · "+bad+" incomplete.";panel.querySelector("#uee-repair").disabled=issues===0||bad>0;};
       panel.querySelector("#uee-repair").onclick=()=>{const seen=new Set();let n=0;rows.forEach(r=>{let id=String(r.id||"").trim();if(!id||seen.has(id)){id="oc_repaired_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);r.id=id;n++;}seen.add(id);});window.writeOcArchive?.(rows);panel.querySelector("#uee-scan-result").textContent=n+" IDs repaired. Run the scan again.";panel.querySelector("#uee-repair").disabled=true;};
       const search=panel.querySelector("#uee-search"),results=panel.querySelector("#uee-results");const draw=()=>{const q=search.value.toLowerCase().trim();results.replaceChildren();const found=rows.filter(r=>[r.name,title(r),val(r,["origin_type","district"]),val(r,["association","syndicate","occupation"])].join(" ").toLowerCase().includes(q));if(!found.length){results.textContent="No matching records.";return;}found.slice().reverse().forEach(r=>{const row=document.createElement("div");row.className="desktop-observatory-record-row";const name=document.createElement("span");name.textContent=(r.name||"Unnamed")+" · "+title(r);const btn=document.createElement("button");btn.type="button";btn.textContent="OPEN";btn.onclick=()=>window.loadOcRecord?.(r.id);row.append(name,btn);results.append(row);});};search.oninput=draw;draw();
-      panel.querySelector("#uee-home").onclick=home;
+      panel.querySelector("#uee-home").onclick=showDashboard;
     }
-    tools.addEventListener("click",observatory);
-    document.getElementById("desktop-sephrus-gate")?.addEventListener("click",()=>{const d=document.getElementById("desktop-sephrus-prompt"),i=document.getElementById("desktop-sephrus-answer");if(!d||!i)return;document.getElementById("desktop-sephrus-feedback").textContent="";i.value="";d.showModal();i.focus();});
-    document.getElementById("desktop-sephrus-cancel")?.addEventListener("click",()=>document.getElementById("desktop-sephrus-prompt")?.close());
-    document.getElementById("desktop-sephrus-form")?.addEventListener("submit",e=>{e.preventDefault();const i=document.getElementById("desktop-sephrus-answer"),f=document.getElementById("desktop-sephrus-feedback");if(i.value==="Sephrus Aztiluth"){document.getElementById("desktop-sephrus-maker").hidden=false;f.textContent="ACCESS GRANTED.";document.getElementById("desktop-sephrus-prompt").close();}else{f.textContent="IDENTITY NOT RECOGNIZED.";i.select();}});
-    maker?.addEventListener("click",()=>{home();document.getElementById("begin-button")?.click();document.getElementById("mode-laziness")?.click();const n=document.getElementById("character-name");if(n){n.value="Sephrus Aztiluth";n.focus();}});
-    document.addEventListener("click",()=>{if(!document.getElementById("home-screen")?.classList.contains("hidden"))tools.setAttribute("aria-pressed","false");});
-    window.ueeDesktopShowHome=home;
-    window.ueeDesktopShowDashboard=home;
-    home();
+
+    dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
+      button.addEventListener("click", () => openAction(button.dataset.desktopAction));
+    });
+    sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
+      button.addEventListener("click", () => openAction(button.dataset.desktopNav));
+    });
+    document.getElementById("desktop-workspace-home")?.addEventListener("click", showDashboard);
+
+    gate?.addEventListener("click", () => {
+      if (!prompt || !answer || !feedback) return;
+      feedback.textContent = "";
+      answer.value = "";
+      prompt.showModal();
+      answer.focus();
+    });
+    document.getElementById("desktop-sephrus-cancel")?.addEventListener("click", () => prompt?.close());
+    document.getElementById("desktop-sephrus-form")?.addEventListener("submit", event => {
+      event.preventDefault();
+      if (answer?.value === "Sephrus Aztiluth") {
+        if (maker) maker.hidden = false;
+        if (feedback) feedback.textContent = "ACCESS GRANTED.";
+        prompt?.close();
+      } else {
+        if (feedback) feedback.textContent = "IDENTITY NOT RECOGNIZED.";
+        answer?.select();
+      }
+    });
+    maker?.addEventListener("click", () => {
+      openAction("create");
+      document.getElementById("mode-laziness")?.click();
+      const name = document.getElementById("character-name");
+      if (name) { name.value = "Sephrus Aztiluth"; name.focus(); }
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("#mp-back")) showDashboard();
+    });
+
+    showDashboard();
   })();
   </script>
 
