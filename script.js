@@ -765,7 +765,7 @@ function setAnswer(q,choice,value,custom=""){
  answers[q.id]={choice,value,custom};
  pruneHiddenAnswers();
 }
-function screen(n){const desktop=document.documentElement.classList.contains("tauri-app");if(desktop){const archive=document.getElementById("home-screen");if(n==="home")archive?.classList.add("desktop-archive-view");else archive?.classList.remove("desktop-archive-view");}["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");if(n==="home"&&!desktop)applyEssentiaMainTitle();window.scrollTo({top:0,behavior:"smooth"});}
+function screen(n){const desktop=document.documentElement.classList.contains("tauri-app");if(desktop&&n==="home"&&typeof window.ueeDesktopShowDashboard==="function"){window.ueeDesktopShowDashboard();return;}if(desktop){const archive=document.getElementById("home-screen");if(n==="home")archive?.classList.add("desktop-archive-view");else archive?.classList.remove("desktop-archive-view");}["home-screen","name-screen","mode-screen","picker-screen","result-screen","simulator-screen"].forEach(id=>$(id).classList.add("hidden"));const active=$(`${n}-screen`);active.classList.remove("hidden","screen-enter");void active.offsetWidth;active.classList.add("screen-enter");if(n==="home"&&!desktop)applyEssentiaMainTitle();window.scrollTo({top:0,behavior:"smooth"});}
 function resetSephrusSecretState(){sephrusBrokenClickCount=0;sephrusEscapeRunning=false;}
 const ESSENTIA_TITLE_STORAGE_KEY="uee_essentia_title_unlocked_v1";
 function applyEssentiaMainTitle(){
