@@ -2527,3 +2527,27 @@ body{background-image:linear-gradient(rgba(5,5,7,.34),rgba(5,5,7,.44)),var(--use
 .tauri-app .desktop-module-empty p:not(.eyebrow) {color:#aaa198;font-size:13px;line-height:1.7}
 .tauri-app .desktop-module-rule {display:block;width:70px;height:1px;margin:26px auto;background:#74624b}
 .tauri-app .desktop-module-empty small {color:#847a6e;font:8px 'DM Mono',monospace;letter-spacing:.14em}
+
+
+/* DESKTOP v0.5.0 — Mirror Observatory */
+.desktop-observatory { width:min(1050px,100%); text-align:left; }
+.desktop-observatory > h2 { text-align:center; }
+.desktop-observatory-intro { max-width:680px; margin:0 auto 28px; text-align:center; color:var(--muted); font-size:18px; line-height:1.5; }
+.desktop-observatory-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:25px 0; }
+.desktop-observatory-card { min-width:0; padding:22px; border:1px solid rgba(190,176,153,.24); background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(0,0,0,.22)); text-align:left; }
+.desktop-observatory-card h3 { margin:8px 0 17px; color:#e8e0d4; font:500 27px 'Cormorant Garamond',serif; }
+.desktop-observatory-card > p:not(.eyebrow) { color:var(--muted); font-size:16px; line-height:1.5; }
+.desktop-observatory-card label { margin:16px 0 7px; }
+.desktop-observatory-card select { width:100%; padding:12px; color:var(--text); background:#111; border:1px solid var(--line); font:13px 'DM Mono',monospace; }
+.desktop-observatory-card .primary-button { width:100%; margin-top:17px; }
+.desktop-observatory-count { display:block; margin:22px 0 5px; color:#d9d2c7; font:11px 'DM Mono',monospace; letter-spacing:.13em; }
+.desktop-observatory-note { font:9px 'DM Mono',monospace; color:var(--faint)!important; }
+.desktop-observatory-result { margin-top:17px; padding:12px; border:1px solid rgba(190,176,153,.18); color:var(--muted); font-size:14px; text-align:left; }
+.desktop-observatory-diff { display:grid; grid-template-columns:.8fr 1fr 1fr; gap:9px; padding:10px 0; border-bottom:1px solid rgba(190,176,153,.15); }
+.desktop-observatory-diff span { overflow-wrap:anywhere; }
+.desktop-observatory-diff span:first-child { color:#b5aa9b; font:9px 'DM Mono',monospace; letter-spacing:.08em; }
+#observatory-back { display:block; margin:24px auto 0; }
+@media(max-width:760px) {
+ .desktop-observatory-grid { grid-template-columns:1fr; }
+ .desktop-observatory-diff { grid-template-columns:1fr; gap:4px; }
+}
