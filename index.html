@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261128-desktop080">
+  <link rel="stylesheet" href="style.css?v=20261128-desktop081">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -42,51 +42,8 @@
   </div>
   <div class="ornament ornament-top" aria-hidden="true">✦ ───────────────────────── ✦</div>
 
-  <section id="desktop-dashboard" aria-label="Una Eademque Essentia desktop dashboard" hidden>
-    <div class="desktop-dashboard-top">
-      <span class="desktop-dashboard-kicker">U.E.E. / LOCAL MIRROR WORLD ARCHIVE</span>
-      <span class="desktop-dashboard-status"><i></i> DESKTOP ARCHIVE ONLINE</span>
-    </div>
-    <section class="desktop-dashboard-hero">
-      <div class="desktop-dashboard-hero-copy">
-        <p class="desktop-dashboard-overline">UNA EADEMQUE ESSENTIA</p>
-        <h1>ONE AND THE<br><span>SAME ESSENCE.</span></h1>
-        <p class="desktop-dashboard-intro">Infinite worlds. Different circumstances. Every identity preserved in one archive.</p>
-        <div class="desktop-dashboard-hero-actions">
-          <button class="desktop-dashboard-action-primary" data-desktop-action="create" type="button">CREATE A CHARACTER <span>↗</span></button>
-          <button class="desktop-dashboard-action-secondary" data-desktop-action="archive" type="button">OPEN MY ARCHIVE <span>→</span></button>
-        </div>
-        <div class="desktop-dashboard-metrics">
-          <div><strong id="desktop-dashboard-record-count">0</strong><span>LOCAL RECORDS</span></div>
-          <div><strong>∞</strong><span>MIRROR WORLDS</span></div>
-          <div><strong>01</strong><span>SHARED ESSENCE</span></div>
-        </div>
-      </div>
-      <div class="desktop-dashboard-hero-art" aria-hidden="true">
-        <div class="desktop-dashboard-orbit desktop-dashboard-orbit-one"></div>
-        <div class="desktop-dashboard-orbit desktop-dashboard-orbit-two"></div>
-        <img src="./app-icon.svg" alt="" class="desktop-dashboard-emblem">
-        <span>U.E.E.</span>
-      </div>
-    </section>
-    <section class="desktop-dashboard-modules" aria-labelledby="desktop-dashboard-modules-title">
-      <div class="desktop-dashboard-section-heading">
-        <div><p>ARCHIVE DIRECTORY / 01</p><h2 id="desktop-dashboard-modules-title">EXPLORE THE ARCHIVE</h2></div>
-        <span>SELECT A MODULE TO CONTINUE</span>
-      </div>
-      <div class="desktop-dashboard-grid">
-        <button class="desktop-dashboard-card" data-desktop-action="lore" type="button"><span class="desktop-dashboard-index">01 / REFERENCE</span><strong>Lore Encyclopedia</strong><small>Explore the City, its organizations, and the worlds of Project Moon.</small><b>OPEN ENCYCLOPEDIA →</b></button>
-        <button class="desktop-dashboard-card" data-desktop-action="simulator" type="button"><span class="desktop-dashboard-index">02 / SIMULATION</span><strong>Fighting Simulator</strong><small>Run fictional matchups between characters in your local archive.</small><b>ENTER SIMULATOR →</b></button>
-        <button class="desktop-dashboard-card" data-desktop-action="multiplayer" type="button"><span class="desktop-dashboard-index">03 / NETWORK</span><strong>Multiplayer Arena</strong><small>Create or join a shared room and play with other archive users.</small><b>OPEN ARENA →</b></button>
-        <button class="desktop-dashboard-card" data-desktop-action="settings" type="button"><span class="desktop-dashboard-index">04 / CONFIGURATION</span><strong>Archive Settings</strong><small>Adjust appearance, sound, accessibility, and interface effects.</small><b>CONFIGURE →</b></button>
-        <button class="desktop-dashboard-card" data-desktop-action="observatory" type="button"><span class="desktop-dashboard-index">05 / ANALYSIS</span><strong>Mirror Observatory</strong><small>Compare saved variants, inspect archive insights, and export dossiers.</small><b>OPEN OBSERVATORY →</b></button>
-        <button class="desktop-dashboard-card" data-desktop-action="about" type="button"><span class="desktop-dashboard-index">06 / PROJECT FILE</span><strong>About U.E.E.</strong><small>Read the project note and learn how the local archive works.</small><b>READ THE NOTE →</b></button>
-      </div>
-    </section>
-    <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>UNA EADEMQUE ESSENTIA / DESKTOP</span></div>
-    <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
-    <button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER <span>↗</span></button>
-  </section>
+  <button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
+  <button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER <span>↗</span></button>
   <dialog id="desktop-sephrus-prompt" class="desktop-sephrus-prompt" aria-labelledby="desktop-sephrus-title">
     <form method="dialog" class="desktop-sephrus-panel" id="desktop-sephrus-form">
       <p class="desktop-dashboard-kicker">RESTRICTED ARCHIVE ACCESS</p>
@@ -716,7 +673,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop080", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261128-desktop081", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
@@ -728,7 +685,7 @@
     const desktop=Boolean(window.__TAURI_INTERNALS__)||location.protocol==="tauri:"||/tauri\.localhost$/i.test(location.hostname);
     if(!desktop)return;
     const root=document.documentElement;root.classList.add("tauri-app","desktop-website-active");root.classList.remove("desktop-dashboard-active","desktop-workspace-active");
-    const dashboard=document.getElementById("desktop-dashboard");if(dashboard)dashboard.hidden=true;
+    
     const sidebar=document.getElementById("desktop-sidebar");if(sidebar)sidebar.hidden=true;
     const topbar=document.getElementById("desktop-workspace-topbar");if(topbar)topbar.hidden=true;
     const gate=document.getElementById("desktop-sephrus-gate"),maker=document.getElementById("desktop-sephrus-maker");
