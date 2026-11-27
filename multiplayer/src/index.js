@@ -504,7 +504,7 @@ export class RoomHub extends DurableObject {
       return json({ room: this.publicState(player.id), parried: true });
     }
     challenge.prompt = challenge.sequence[challenge.step];
-    challenge.windowMs = 1500;
+    challenge.windowMs = 2000;
     challenge.expiresAt = Date.now() + challenge.windowMs;
     this.addLog("system", "Parry chain advanced: " + challenge.step + "/" + challenge.totalSteps + ".");
     await this.saveAndBroadcast("parry-step");
@@ -600,7 +600,7 @@ export class RoomHub extends DurableObject {
       this.addLog("system", player.name + " manifests " + (player.character.egoName || "their E.G.O.") + ".");
     }
     const damage = type === "ego" ? 21 + Math.floor(Math.random() * 8) : 12 + Math.floor(Math.random() * 7);
-    const windowMs = 1500;
+    const windowMs = 2300;
     const sequence = Array.from({ length: 3 }, () => ["UP", "DOWN", "LEFT", "RIGHT"][Math.floor(Math.random() * 4)]);
     this.room.pendingChallenge = {
       id: crypto.randomUUID(), type: "parry", attackerId: player.id,
