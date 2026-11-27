@@ -90,6 +90,25 @@
     </form>
   </dialog>
 
+  <aside id="desktop-sidebar" aria-label="Desktop navigation" hidden>
+  <div class="desktop-sidebar-brand"><img src="./app-icon.svg" alt=""><span>UNA EADEMQUE<br>ESSENTIA</span></div>
+  <div class="desktop-sidebar-caption">ARCHIVE NAVIGATION</div>
+  <nav class="desktop-sidebar-nav">
+    <button type="button" data-desktop-nav="home" class="is-active"><span>⌂</span> Overview</button>
+    <button type="button" data-desktop-nav="create"><span>✧</span> Character Creation</button>
+    <button type="button" data-desktop-nav="archive"><span>▤</span> Character Archive</button>
+    <button type="button" data-desktop-nav="lore"><span>◈</span> Lore Encyclopedia</button>
+    <button type="button" data-desktop-nav="simulator"><span>⚔</span> Fighting Simulator</button>
+    <button type="button" data-desktop-nav="multiplayer"><span>⌁</span> Multiplayer Arena</button>
+    <button type="button" data-desktop-nav="settings"><span>⚙</span> Settings</button>
+  </nav>
+  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.1.0</small></div>
+</aside>
+<header id="desktop-workspace-topbar" hidden>
+  <div><p id="desktop-workspace-kicker">MIRROR WORLD ARCHIVE</p><h2 id="desktop-workspace-title">OVERVIEW</h2></div>
+  <button type="button" id="desktop-workspace-home">BACK TO OVERVIEW ↗</button>
+</header>
+
   <header class="site-header">
     <a class="wordmark" href="./" aria-label="Project Moon Variant Builder home">PROJECT MOON VARIANT BUILDER</a>
     <div class="header-tools">
@@ -693,43 +712,101 @@
       if (!window.__TAURI_INTERNALS__) return;
       const root = document.documentElement;
       const dashboard = document.getElementById("desktop-dashboard");
+      const sidebar = document.getElementById("desktop-sidebar");
+      const topbar = document.getElementById("desktop-workspace-topbar");
+      const title = document.getElementById("desktop-workspace-title");
+      const kicker = document.getElementById("desktop-workspace-kicker");
       const gate = document.getElementById("desktop-sephrus-gate");
       const prompt = document.getElementById("desktop-sephrus-prompt");
       const answer = document.getElementById("desktop-sephrus-answer");
       const feedback = document.getElementById("desktop-sephrus-feedback");
-      if (!dashboard) return;
+      if (!dashboard || !sidebar || !topbar) return;
+
       root.classList.add("tauri-app", "desktop-dashboard-active");
       dashboard.hidden = false;
+      sidebar.hidden = true;
+      topbar.hidden = true;
+
+      const views = {
+        home: ["OVERVIEW", "MIRROR WORLD ARCHIVE"],
+        create: ["CHARACTER CREATION", "IDENTITY REGISTRATION"],
+        archive: ["CHARACTER ARCHIVE", "LOCAL RECORDS"],
+        lore: ["LORE ENCYCLOPEDIA", "PROJECT MOON REFERENCE"],
+        simulator: ["FIGHTING SIMULATOR", "MIRROR MATCH ENGINE"],
+        multiplayer: ["MULTIPLAYER ARENA", "NETWORKED MIRROR WORLD"],
+        settings: ["SETTINGS", "ARCHIVE CONFIGURATION"]
+      };
+
+      function setActiveNav(action) {
+        sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
+          button.classList.toggle("is-active", button.dataset.desktopNav === action);
+        });
+      }
+      function showDashboard() {
+        root.classList.add("desktop-dashboard-active");
+        root.classList.remove("desktop-workspace-active");
+        root.dataset.desktopView = "home";
+        dashboard.hidden = false;
+        sidebar.hidden = true;
+        topbar.hidden = true;
+        setActiveNav("home");
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+      function showWorkspace(action) {
+        const [heading, subheading] = views[action] || views.home;
+        root.classList.remove("desktop-dashboard-active");
+        root.classList.add("desktop-workspace-active");
+        root.dataset.desktopView = action;
+        dashboard.hidden = true;
+        sidebar.hidden = false;
+        topbar.hidden = false;
+        title.textContent = heading;
+        kicker.textContent = subheading;
+        setActiveNav(action);
+        window.scrollTo({ top: 0, behavior: "auto" });
+      }
+      function showOnlyScreen(id) {
+        document.querySelectorAll("main > .screen").forEach(node => node.classList.add("hidden"));
+        const target = document.getElementById(id);
+        if (target) target.classList.remove("hidden");
+      }
+      function openAction(action) {
+        if (action === "home") { showDashboard(); return; }
+        showWorkspace(action);
+        if (action === "create") {
+          document.getElementById("begin-button")?.click();
+        } else if (action === "archive") {
+          document.body.classList.remove("simulator-entered");
+          showOnlyScreen("home-screen");
+          document.getElementById("home-screen")?.classList.add("desktop-archive-view");
+          document.querySelector(".oc-archive")?.scrollIntoView({ behavior: "auto", block: "start" });
+        } else if (action === "lore") {
+          document.getElementById("lore-book-open")?.click();
+        } else if (action === "simulator") {
+          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+          document.getElementById("open-simulator-button")?.click();
+        } else if (action === "multiplayer") {
+          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+          document.getElementById("open-multiplayer-button")?.click();
+        } else if (action === "settings") {
+          document.getElementById("settings-open")?.click();
+        }
+      }
+      dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
+        button.addEventListener("click", () => openAction(button.dataset.desktopAction));
+      });
+      sidebar.querySelectorAll("[data-desktop-nav]").forEach(button => {
+        button.addEventListener("click", () => openAction(button.dataset.desktopNav));
+      });
+      document.getElementById("desktop-workspace-home")?.addEventListener("click", showDashboard);
 
       const returnButton = document.createElement("button");
       returnButton.type = "button";
       returnButton.id = "desktop-dashboard-return";
       returnButton.className = "settings-open desktop-dashboard-return";
-      returnButton.textContent = "DASHBOARD";
+      returnButton.textContent = "OVERVIEW";
       returnButton.addEventListener("click", showDashboard);
       document.querySelector(".header-tools")?.prepend(returnButton);
-
-      function showDashboard() {
-        root.classList.add("desktop-dashboard-active");
-        dashboard.hidden = false;
-        window.scrollTo({ top: 0, behavior: "auto" });
-      }
-      function showApplication() {
-        root.classList.remove("desktop-dashboard-active");
-        dashboard.hidden = true;
-      }
-      function openAction(action) {
-        showApplication();
-        if (action === "create") document.getElementById("begin-button")?.click();
-        if (action === "archive") { document.getElementById("home-button")?.click(); document.getElementById("simulator-back-button")?.click(); document.getElementById("oc-archive-title")?.scrollIntoView({ behavior: "smooth", block: "start" }); }
-        if (action === "lore") document.getElementById("lore-book-open")?.click();
-        if (action === "simulator") document.getElementById("open-simulator-button")?.click();
-        if (action === "multiplayer") document.getElementById("open-multiplayer-button")?.click();
-        if (action === "settings") document.getElementById("settings-open")?.click();
-      }
-      dashboard.querySelectorAll("[data-desktop-action]").forEach(button => {
-        button.addEventListener("click", () => openAction(button.dataset.desktopAction));
-      });
 
       gate?.addEventListener("click", () => {
         feedback.textContent = "";
@@ -750,13 +827,19 @@
         }
       });
       document.getElementById("desktop-sephrus-maker")?.addEventListener("click", () => {
-        showApplication();
+        showWorkspace("create");
         document.getElementById("begin-button")?.click();
         document.getElementById("mode-laziness")?.click();
         const name = document.getElementById("character-name");
         if (name) {
           name.value = "Sephrus Aztiluth";
           name.focus();
+        }
+      });
+      document.addEventListener("click", event => {
+        if (event.target.closest("#mode-back, #simulator-back-button, #mp-back, #restart-button")) {
+          document.getElementById("home-screen")?.classList.remove("desktop-archive-view");
+          if (root.classList.contains("desktop-workspace-active")) showWorkspace("home");
         }
       });
     })();
