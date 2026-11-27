@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261127-desktop07">
+  <link rel="stylesheet" href="style.css?v=20261127-desktop071">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -115,7 +115,7 @@
     <button type="button" data-desktop-nav="observatory"><span>✦</span> Mirror Observatory</button>
     <button type="button" data-desktop-nav="about"><span>ⓘ</span> About U.E.E.</button>
   </nav>
-  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.7.0</small></div>
+  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.7.1</small></div>
 </aside>
 <header id="desktop-workspace-topbar" hidden>
   <div><p id="desktop-workspace-kicker">MIRROR WORLD ARCHIVE</p><h2 id="desktop-workspace-title">OVERVIEW</h2></div>
@@ -144,7 +144,7 @@
         <p>Choose how you want to access the archive.</p>
       </div>
       <div class="app-install-choice-options">
-        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.7.0/Una.Eademque.Essentia_0.7.0_x64-setup.exe" target="_blank" rel="noopener noreferrer">
+        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.7.1/Una.Eademque.Essentia_0.7.1_x64-setup.exe" target="_blank" rel="noopener noreferrer">
           <span class="app-install-option-icon" aria-hidden="true">▣</span>
           <span><strong>DESKTOP APP</strong><small>Windows installer · Dedicated desktop experience</small></span>
           <span class="app-install-option-arrow" aria-hidden="true">↗</span>
@@ -626,9 +626,9 @@
       <p class="eyebrow">NATIVE WINDOWS APPLICATION</p>
       <h2 id="desktop-download-title">TAKE THE ARCHIVE <span>WITH YOU.</span></h2>
       <p>Prefer a dedicated desktop experience? Download the native Windows edition and explore the archive in its own desktop dashboard.</p>
-      <p class="desktop-download-status" role="status">WINDOWS INSTALLER AVAILABLE · VERSION 0.7.0</p>
+      <p class="desktop-download-status" role="status">WINDOWS INSTALLER AVAILABLE · VERSION 0.7.1</p>
     </div>
-    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.7.0/Una.Eademque.Essentia_0.7.0_x64-setup.exe" target="_blank" rel="noopener noreferrer">DOWNLOAD WINDOWS INSTALLER <span>↗</span></a>
+    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.7.1/Una.Eademque.Essentia_0.7.1_x64-setup.exe" target="_blank" rel="noopener noreferrer">DOWNLOAD WINDOWS INSTALLER <span>↗</span></a>
   </section>
   <footer>
     <span>PROJECT MOON CHARACTER ARCHIVE</span>
@@ -636,7 +636,7 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261127-desktop07"></script>
+  <script src="script.js?v=20261127-desktop071"></script>
   <script src="multiplayer.js?v=20261126-wasd-passives1"></script>
   <script src="lore-book.js?v=20261127-lore1"></script>
   <script>
@@ -935,8 +935,25 @@
           name.focus();
         }
       });
-      // Back controls now use their own screen flow. Never force a landing page.
-      openAction("create");
+      // Start in the archive workspace. Avoid triggering the website creation
+      // button during desktop boot; that button belongs to the shared web flow.
+      try {
+        openAction("archive");
+      } catch (error) {
+        console.error("Desktop workspace startup failed; restoring archive view.", error);
+        root.classList.add("tauri-app", "desktop-workspace-active");
+        dashboard.hidden = true;
+        sidebar.hidden = false;
+        topbar.hidden = false;
+        document.querySelectorAll(".screen").forEach(node => node.classList.add("hidden"));
+        const archive = document.getElementById("home-screen");
+        if (archive) {
+          archive.classList.remove("hidden");
+          archive.classList.add("desktop-archive-view");
+        }
+        title.textContent = "CHARACTER ARCHIVE";
+        kicker.textContent = "LOCAL RECORDS";
+      }
     })();
   </script>
 
