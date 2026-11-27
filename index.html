@@ -742,7 +742,7 @@
   (() => {
     const isDesktopRuntime = Boolean(window.__TAURI_INTERNALS__) ||
       window.location.protocol === "tauri:" ||
-      /tauri\\.localhost$/i.test(window.location.hostname);
+      /tauri\.localhost$/i.test(window.location.hostname);
     if (!isDesktopRuntime) return;
 
     const root = document.documentElement;
@@ -764,7 +764,7 @@
     }
 
     root.classList.add("tauri-app", "desktop-dashboard-active");
-    root.classList.remove("desktop-website-active", "desktop-workspace-active");
+    root.classList.remove("desktop-workspace-active");
     dashboard.hidden = false;
     sidebar.hidden = true;
     topbar.hidden = true;
