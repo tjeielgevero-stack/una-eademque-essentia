@@ -112,7 +112,7 @@
         <p>Choose how you want to access the archive.</p>
       </div>
       <div class="app-install-choice-options">
-        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases" target="_blank" rel="noopener noreferrer">
+        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.1.0/Una.Eademque.Essentia_0.1.0_x64-setup.exe" target="_blank" rel="noopener noreferrer">
           <span class="app-install-option-icon" aria-hidden="true">▣</span>
           <span><strong>DESKTOP APP</strong><small>Windows installer · Dedicated desktop experience</small></span>
           <span class="app-install-option-arrow" aria-hidden="true">↗</span>
@@ -590,10 +590,10 @@
     <div class="desktop-download-copy">
       <p class="eyebrow">NATIVE WINDOWS APPLICATION</p>
       <h2 id="desktop-download-title">TAKE THE ARCHIVE <span>WITH YOU.</span></h2>
-      <p>Prefer a dedicated desktop experience? Una Eademque Essentia is getting a native Windows edition with its own dashboard.</p>
-      <p class="desktop-download-status" role="status">THE WINDOWS INSTALLER IS CURRENTLY BEING PREPARED.</p>
+      <p>Prefer a dedicated desktop experience? Download the native Windows edition and explore the archive in its own desktop dashboard.</p>
+      <p class="desktop-download-status" role="status">WINDOWS INSTALLER AVAILABLE · VERSION 0.1.0</p>
     </div>
-    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases" target="_blank" rel="noopener noreferrer">VIEW DESKTOP RELEASES <span>↗</span></a>
+    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v0.1.0/Una.Eademque.Essentia_0.1.0_x64-setup.exe" target="_blank" rel="noopener noreferrer">DOWNLOAD WINDOWS INSTALLER <span>↗</span></a>
   </section>
   <footer>
     <span>PROJECT MOON CHARACTER ARCHIVE</span>
@@ -681,7 +681,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261127-download1", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261127-desktop-release1", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
