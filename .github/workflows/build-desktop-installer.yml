@@ -2,15 +2,19 @@ name: Build UEE Desktop Installer
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "desktop/**"
+      - "src-tauri/**"
+      - ".github/workflows/build-desktop-installer.yml"
   push:
     branches: [main]
     paths:
       - "src-tauri/**"
+      - "desktop/**"
       - "app-icon.svg"
-      - "index.html"
       - "style.css"
-      - "script.js"
-      - "data.js"
       - "multiplayer.js"
       - "lore-book.js"
       - ".github/workflows/build-desktop-installer.yml"
@@ -23,7 +27,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate-desktop:
+    name: Validate U.E.E Rebuilt frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check desktop JavaScript syntax
+        run: |
+          node --check desktop/app.js
+          node --check desktop/modules/legacy-ui.js
+          node --check desktop/modules/simulator.js
+          node --check desktop/vendor/multiplayer.js
+          node --check desktop/vendor/lore-book.js
+
+      - name: Run desktop structure smoke checks
+        run: node desktop/smoke-test.mjs
+
   build-windows:
+    if: github.event_name != 'pull_request'
+    needs: validate-desktop
     name: Build Windows installer
     runs-on: windows-latest
     timeout-minutes: 45
@@ -44,10 +73,21 @@ jobs:
       - name: Prepare frontend bundle
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Get-ChildItem -Force | Where-Object { $_.Name -notin @('src-tauri', '.git', '.github', 'dist') } | Copy-Item -Destination dist -Recurse -Force
+          New-Item -ItemType Directory -Force -Path desktop/vendor, desktop/assets | Out-Null
+          Copy-Item style.css desktop/vendor/legacy.css -Force
+          Copy-Item multiplayer.js desktop/vendor/multiplayer.js -Force
+          Copy-Item lore-book.js desktop/vendor/lore-book.js -Force
+          Copy-Item app-icon.svg desktop/assets/app-icon.svg -Force
+          if (!(Test-Path desktop/index.html)) { throw "Dedicated desktop entry point is missing." }
+          node --check desktop/app.js
+          node --check desktop/modules/legacy-ui.js
+          node --check desktop/modules/simulator.js
+          node --check desktop/vendor/multiplayer.js
+          node --check desktop/vendor/lore-book.js
+          node desktop/smoke-test.mjs
 
       - name: Build and publish draft release
+        if: github.event_name != 'pull_request'
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,11 +96,11 @@ jobs:
         with:
           projectPath: src-tauri
           tagName: desktop-v__VERSION__
-          releaseName: "Una Eademque Essentia Desktop v__VERSION__"
+          releaseName: "U.E.E Rebuilt Desktop v__VERSION__"
           releaseBody: |
-            Windows installer for Una Eademque Essentia.
+            U.E.E Rebuilt — dedicated desktop application.
 
-            This is an automated desktop build. Please report bugs through the repository.
+            Major desktop rebuild with a separate desktop entry point, a new Character Creator and Archive, and preserved Settings, Effects, Lore Book, Mirror Arena, Multiplayer, Mirror Observatory, and hidden desktop gate.
           includeUpdaterJson: true
           releaseDraft: true
           prerelease: false
