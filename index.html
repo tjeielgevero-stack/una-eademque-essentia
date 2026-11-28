@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="./app-icon.svg">
   <link rel="apple-touch-icon" href="./app-icon.svg">
   <script>if (window.__TAURI_INTERNALS__ || window.location.protocol === "tauri:" || /tauri\.localhost$/i.test(window.location.hostname)) document.documentElement.classList.add("tauri-app");</script>
-  <link rel="stylesheet" href="style.css?v=20261128-v100">
+  <link rel="stylesheet" href="style.css?v=20261128-v101">
 </head>
 <body>
   <div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true">
@@ -44,7 +44,7 @@
 
   <section id="desktop-dashboard" aria-label="Una Eademque Essentia desktop dashboard" hidden>
     <div class="desktop-dashboard-top">
-      <span class="desktop-dashboard-kicker">U.E.E. / DESKTOP ARCHIVE SYSTEM · 0.9.0</span>
+      <span class="desktop-dashboard-kicker">U.E.E. / DESKTOP ARCHIVE SYSTEM · 1.0.0</span>
       <span class="desktop-dashboard-status"><i></i> LOCAL ARCHIVE ONLINE</span>
     </div>
     <section class="desktop-dashboard-hero">
@@ -94,7 +94,7 @@
       </div>
     </section>
     <section class="desktop-dashboard-release" aria-label="Desktop update notes">
-      <div><p class="desktop-dashboard-index">DESKTOP MAJOR UPDATE / 0.9.0</p><h2>THE ARCHIVE HAS ITS OWN HOME AGAIN.</h2></div>
+      <div><p class="desktop-dashboard-index">DESKTOP MAJOR UPDATE / 1.0.0</p><h2>THE ARCHIVE HAS ITS OWN HOME AGAIN.</h2></div>
       <p>A dedicated desktop launch center, module navigation, live local archive statistics, recent-record access, and a unified route into the desktop tools. The website landing page remains separate.</p>
     </section>
     <div class="desktop-dashboard-footer"><span>UNOFFICIAL FAN-MADE PROJECT</span><span>UNA EADEMQUE ESSENTIA / DESKTOP</span></div>
@@ -130,7 +130,7 @@
     <button type="button" data-desktop-nav="observatory"><span>✦</span> Mirror Observatory</button>
     <button type="button" data-desktop-nav="about"><span>ⓘ</span> About U.E.E.</button>
   </nav>
-  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 0.9.0</small></div>
+  <div class="desktop-sidebar-bottom"><span class="desktop-sidebar-indicator"></span><span>LOCAL ARCHIVE ONLINE</span><small>DESKTOP EDITION · 1.0.0</small></div>
 </aside>
 <header id="desktop-workspace-topbar" hidden>
   <div><p id="desktop-workspace-kicker">MIRROR WORLD ARCHIVE</p><h2 id="desktop-workspace-title">OVERVIEW</h2></div>
@@ -482,28 +482,27 @@
       </div>
       <div class="hero-details"><span>INFINITE MIRROR WORLDS</span><span>✦</span><span>ONE SHARED ESSENCE</span></div>
       <section class="update-log" aria-labelledby="update-log-title">
-        <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 001</p><h2 id="update-log-title">SUPER-MASSIVE UPDATE 1.0.0</h2></div><span class="update-log-version">VERSION 1.0.0</span></div>
-        <p class="update-log-intro">A milestone release focused on a larger creative catalogue, faster workflows, accessibility, performance, and more reliable multiplayer.</p>
-        <ul class="update-log-list">
-          <li><strong>Shared race selection</strong><span>Choose Human, Bloodfiend, or a custom race before entering any creation mode. The selection is included in the completed character dossier.</span></li>
-          <li><strong>Project Moon Lore Book</strong><span>Added a searchable encyclopedia covering the City, Lobotomy Corporation, Library of Ruina, and Limbus Company, with spoiler guidance and reference links.</span></li>
-          
-          <li><strong>One-page OC creation</strong><span>Added Laziness mode for writing or pasting a complete character dossier in a single question.</span></li>
-          <li><strong>Standardized character dossiers</strong><span>Restored blank-line spacing between every section, added the second passive field, and ensured Personality is populated.</span></li>
-          <li><strong>Streamlined combat setup</strong><span>Simple and Advanced now use generated abilities with a compact multi-select for status effects; Complex retains custom ability descriptions.</span></li>
-          <li><strong>Background and cache reliability</strong><span>Corrected offline asset caching so updated scripts and styles are refreshed, and improved image loading and saved-background recovery.</span></li>
-          <li><strong>Custom background fix</strong><span>Improved image saving, restoring, and display, with a live accent-lit dropzone indicator.</span></li>
-          <li><strong>Personal weapon loadouts</strong><span>Choose melee, ranged, unarmed, hybrid, or focus-based fighting styles, with fictional ammunition profiles where applicable.</span></li>
-          <li><strong>Improved INFO panel</strong><span>A refreshed creator note with project information and a way to share suggestions.</span></li>
-          <li><strong>More visual customization</strong><span>Personalize the archive's accent color, effects, and now its background image.</span></li>
-          <li><strong>Installable app support</strong><span>Add the archive to a supported device's home screen and keep the app shell available offline.</span></li>
-          <li><strong>Creator choice expansion</strong><span>Added more personality traits, upbringing paths, professional specialties, reputations, and high-level fictional combat approaches.</span></li>
-          <li><strong>Archive search and organization</strong><span>Search saved names, titles, and dossier text; filter by creation mode; sort by latest update, oldest, or name.</span></li>
-          <li><strong>Accessibility and performance settings</strong><span>Added reduce motion, low-performance mode, high contrast, larger text, and compact layout controls.</span></li>
-          <li><strong>Creator workflow preferences</strong><span>Choose question hints, delete confirmations, remembered creation mode, and archive sorting.</span></li>
-          <li><strong>Multiplayer timing improvement</strong><span>Made parry prompts more forgiving and corrected automated tests to complete the full three-step sequence.</span></li>
-          <li><strong>Cache and installer refresh</strong><span>Updated offline cache versions and replaced outdated desktop download links with the v1.0.0 installer destination.</span></li>
-        </ul>
+        <div class="update-log-entry">
+          <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 002</p><h2 id="update-log-title">MINOR UPDATE 1.0.1</h2></div><span class="update-log-version">VERSION 1.0.1</span></div>
+          <p class="update-log-intro">A focused maintenance release correcting the archive's release history and ensuring updated pages replace stale offline copies.</p>
+          <ul class="update-log-list">
+            <li><strong>Corrected release heading</strong><span>Removed the incorrect legacy version label and obsolete update title; the current record now identifies this website patch as v1.0.1.</span></li>
+            <li><strong>Accurate release notes</strong><span>Replaced the mismatched summary with notes that describe the actual record and cache corrections.</span></li>
+            <li><strong>Reliable update refresh</strong><span>Advanced the service-worker cache and asset revisions so online visits refresh older copies of the archive.</span></li>
+          </ul>
+        </div>
+        <div class="update-log-entry">
+          <div class="update-log-heading"><div><p class="eyebrow">ARCHIVE CHANGE RECORD / 001</p><h2>SUPER-MASSIVE UPDATE 1.0.0</h2></div><span class="update-log-version">VERSION 1.0.0</span></div>
+          <p class="update-log-intro">The milestone release focused on faster creator workflows, accessibility, personalization, archive organization, and more reliable multiplayer.</p>
+          <ul class="update-log-list">
+            <li><strong>Shared race selection</strong><span>Choose Human, Bloodfiend, or a custom race before entering a creation mode, with the selection included in the completed dossier.</span></li>
+            <li><strong>Lore Book and one-page creation</strong><span>Added a searchable Project Moon reference and a single-question mode for writing or pasting a complete character dossier.</span></li>
+            <li><strong>Standardized dossiers</strong><span>Improved section spacing and consistency, including the second passive field and populated Personality section.</span></li>
+            <li><strong>Archive organization</strong><span>Added search, creation-mode filters, sorting, one-click filter clearing, and convenient dossier copying.</span></li>
+            <li><strong>Accessibility and personalization</strong><span>Added reduce motion, low-performance mode, high contrast, larger text, compact layout, and additional creator preferences.</span></li>
+            <li><strong>Reliability improvements</strong><span>Improved offline cache recovery and strengthened multiplayer timing and regression checks.</span></li>
+          </ul>
+        </div>
       </section>
       <section class="oc-archive" aria-labelledby="oc-archive-title"><div class="oc-archive-heading"><div><p class="eyebrow">LOCAL CHARACTER ARCHIVE</p><h2 id="oc-archive-title">YOUR OCs</h2></div><span id="oc-count" class="effects-count">0 SAVED</span></div><p class="oc-archive-note">Completed characters are saved on this device. Reopen a record to customize it, or remove it from your archive.</p>
         <div class="oc-archive-tools" role="search" aria-label="Search saved characters">
@@ -690,8 +689,8 @@
   </footer>
   <div class="ornament ornament-bottom" aria-hidden="true">✦ ───────────────────────── ✦</div>
   <script src="data.js"></script>
-  <script src="script.js?v=20261128-v100"></script>
-  <script src="multiplayer.js?v=20261128-v100"></script>
+  <script src="script.js?v=20261128-v101"></script>
+  <script src="multiplayer.js?v=20261128-v101"></script>
   <script src="lore-book.js?v=20261127-lore1"></script>
   <script>
     (() => {
@@ -770,7 +769,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js?v=20261128-v100", { updateViaCache: "none" }).catch(error => {
+        navigator.serviceWorker.register("./service-worker.js?v=20261128-v101", { updateViaCache: "none" }).catch(error => {
           console.warn("App offline support could not be registered:", error);
         });
       });
@@ -1005,7 +1004,7 @@
       if(!placeholder)return;showWorkspace("observatory");showOnlyScreen("desktop-workspace-placeholder");
       const panel=placeholder.querySelector(".desktop-module-empty");if(!panel)return;
       panel.className="desktop-module-empty desktop-observatory desktop-observatory-v2";
-      panel.innerHTML='<header class="desktop-observatory-header"><div><p class="eyebrow">U.E.E. / DESKTOP MAJOR UPDATE 0.9.0</p><h2>MIRROR OBSERVATORY</h2><p>Archive preservation, variant analysis, and record integrity.</p></div><button id="uee-home" class="secondary-button">BACK TO DASHBOARD ↗</button></header><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / PRESERVATION</p><h3>Backup &amp; Restore</h3><p>Export a complete archive backup. Merge skips matching record IDs; Replace requires confirmation.</p><button id="uee-backup" class="primary-button">DOWNLOAD BACKUP ↗</button><select id="uee-restore-mode"><option value="merge">MERGE INTO LOCAL ARCHIVE</option><option value="replace">REPLACE LOCAL ARCHIVE</option></select><input id="uee-file" type="file" accept=".json,application/json" hidden><button id="uee-restore" class="secondary-button">RESTORE FROM JSON</button><p id="uee-backup-status" role="status">Backups remain local unless you choose where to save them.</p></section><section class="desktop-observatory-card"><p class="eyebrow">02 / ANALYSIS</p><h3>Variant Comparison</h3><label for="uee-left">FIRST VARIANT</label><select id="uee-left"></select><label for="uee-right">SECOND VARIANT</label><select id="uee-right"></select><button id="uee-compare" class="primary-button">COMPARE RECORDS ↗</button><div id="uee-compare-result"></div></section><section class="desktop-observatory-card"><p class="eyebrow">03 / DOSSIERS</p><h3>Bulk Dossier Export</h3><strong id="uee-count"></strong><button id="uee-export" class="primary-button">EXPORT ALL DOSSIERS ↗</button><p>Uses the shared U.E.E. dossier format; processed locally.</p></section><section class="desktop-observatory-card"><p class="eyebrow">04 / INTEGRITY</p><h3>Record Health Check</h3><button id="uee-scan" class="secondary-button">SCAN ARCHIVE</button><button id="uee-repair" class="secondary-button" disabled>REPAIR RECORD IDS</button><p id="uee-scan-result" role="status">No scan has been run.</p></section><section class="desktop-observatory-card"><p class="eyebrow">05 / INDEX</p><h3>Archive Insights</h3><div id="uee-insights"></div></section><section class="desktop-observatory-card"><p class="eyebrow">06 / FINDER</p><h3>Search Your Archive</h3><input id="uee-search" type="search" placeholder="Search name, title, origin, affiliation..."><div id="uee-results"></div></section></div>';
+      panel.innerHTML='<header class="desktop-observatory-header"><div><p class="eyebrow">U.E.E. / DESKTOP MAJOR UPDATE 1.0.0</p><h2>MIRROR OBSERVATORY</h2><p>Archive preservation, variant analysis, and record integrity.</p></div><button id="uee-home" class="secondary-button">BACK TO DASHBOARD ↗</button></header><div class="desktop-observatory-grid"><section class="desktop-observatory-card"><p class="eyebrow">01 / PRESERVATION</p><h3>Backup &amp; Restore</h3><p>Export a complete archive backup. Merge skips matching record IDs; Replace requires confirmation.</p><button id="uee-backup" class="primary-button">DOWNLOAD BACKUP ↗</button><select id="uee-restore-mode"><option value="merge">MERGE INTO LOCAL ARCHIVE</option><option value="replace">REPLACE LOCAL ARCHIVE</option></select><input id="uee-file" type="file" accept=".json,application/json" hidden><button id="uee-restore" class="secondary-button">RESTORE FROM JSON</button><p id="uee-backup-status" role="status">Backups remain local unless you choose where to save them.</p></section><section class="desktop-observatory-card"><p class="eyebrow">02 / ANALYSIS</p><h3>Variant Comparison</h3><label for="uee-left">FIRST VARIANT</label><select id="uee-left"></select><label for="uee-right">SECOND VARIANT</label><select id="uee-right"></select><button id="uee-compare" class="primary-button">COMPARE RECORDS ↗</button><div id="uee-compare-result"></div></section><section class="desktop-observatory-card"><p class="eyebrow">03 / DOSSIERS</p><h3>Bulk Dossier Export</h3><strong id="uee-count"></strong><button id="uee-export" class="primary-button">EXPORT ALL DOSSIERS ↗</button><p>Uses the shared U.E.E. dossier format; processed locally.</p></section><section class="desktop-observatory-card"><p class="eyebrow">04 / INTEGRITY</p><h3>Record Health Check</h3><button id="uee-scan" class="secondary-button">SCAN ARCHIVE</button><button id="uee-repair" class="secondary-button" disabled>REPAIR RECORD IDS</button><p id="uee-scan-result" role="status">No scan has been run.</p></section><section class="desktop-observatory-card"><p class="eyebrow">05 / INDEX</p><h3>Archive Insights</h3><div id="uee-insights"></div></section><section class="desktop-observatory-card"><p class="eyebrow">06 / FINDER</p><h3>Search Your Archive</h3><input id="uee-search" type="search" placeholder="Search name, title, origin, affiliation..."><div id="uee-results"></div></section></div>';
       const rows=records(),left=panel.querySelector("#uee-left"),right=panel.querySelector("#uee-right");
       rows.forEach(r=>[left,right].forEach(s=>{const o=document.createElement("option");o.value=String(r.id);o.textContent=(r.name||"Unnamed")+" — "+title(r);s.append(o);}));if(rows.length>1)right.selectedIndex=1;
       panel.querySelector("#uee-count").textContent=rows.length+" RECORDS FOUND";
