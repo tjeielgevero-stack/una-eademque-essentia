@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en" data-theme="crimson">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101010"><meta name="color-scheme" content="dark">
+<meta name="application-name" content="U.E.E Rebuilt">
+<meta name="description" content="U.E.E Rebuilt — a dedicated desktop archive and character creation studio.">
+<title>U.E.E Rebuilt</title>
+<link rel="icon" type="image/svg+xml" href="./assets/app-icon.svg">
+<link rel="stylesheet" href="./vendor/legacy.css">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+<div id="visual-effects-layer" class="visual-effects-layer" aria-hidden="true"><span class="fx-layer fx-embers"></span><span class="fx-layer fx-rain"></span><span class="fx-layer fx-vignette"></span><span class="fx-layer fx-shimmer"></span><span class="fx-layer fx-impact"></span></div>
+<aside class="app-sidebar" aria-label="U.E.E Rebuilt navigation">
+  <a class="app-brand" href="#" data-view="home"><img src="./assets/app-icon.svg" alt=""><span><strong>U.E.E</strong><small>REBUILT / DESKTOP</small></span></a>
+  <div class="app-sidebar-caption">ARCHIVE WORKSPACE</div>
+  <nav class="app-nav">
+    <button class="app-nav-item is-active" data-view="home" type="button"><span>⌂</span>Overview</button>
+    <button class="app-nav-item" data-view="creator" type="button"><span>✧</span>Character Creator</button>
+    <button class="app-nav-item" data-view="archive" type="button"><span>▤</span>Character Archive</button>
+    <div class="app-nav-divider"></div>
+    <button class="app-nav-item" data-view="lore" type="button"><span>◈</span>Lore Book</button>
+    <button class="app-nav-item" data-view="simulator" type="button"><span>◇</span>Mirror Arena</button>
+    <button class="app-nav-item" data-view="multiplayer" type="button"><span>⌁</span>Multiplayer</button>
+    <button class="app-nav-item" data-view="observatory" type="button"><span>✦</span>Mirror Observatory</button>
+    <button class="app-nav-item" data-view="about" type="button"><span>ⓘ</span>About U.E.E.</button>
+  </nav>
+  <div class="app-sidebar-bottom"><span class="app-status-dot"></span><span>LOCAL ARCHIVE ONLINE</span><small>U.E.E REBUILT · 2.0.0</small></div>
+</aside>
+<div class="app-shell">
+<header class="app-topbar">
+  <div class="app-topbar-title"><p id="app-page-kicker">MIRROR WORLD ARCHIVE / DESKTOP</p><h1 id="app-page-title">Overview</h1></div>
+  <div class="app-topbar-tools"><span class="app-version-chip">DESKTOP 2.0.0</span><button id="lore-book-open" class="app-topbar-button" type="button">LORE BOOK ↗</button><button id="settings-open" class="app-topbar-button" type="button"><span class="settings-gear">⚙</span> SETTINGS</button></div>
+</header>
+<main id="app-main" class="app-main">
+<section id="home-screen" class="screen app-view app-home">
+  <div class="app-home-hero"><div class="app-home-hero-copy"><p class="app-eyebrow">UNA EADEMQUE ESSENTIA / DESKTOP ARCHIVE</p><h2>ONE AND THE<br><span>SAME ESSENCE.</span></h2><p>A dedicated workspace for creating, preserving, and exploring your Mirror World characters.</p><div class="app-home-actions"><button class="app-button app-button-primary" type="button" data-action="new-character">CREATE A CHARACTER ↗</button><button class="app-button app-button-secondary" type="button" data-view="archive">OPEN CHARACTER ARCHIVE →</button></div></div><div class="app-home-seal" aria-hidden="true"><span class="app-seal-orbit app-seal-orbit-a"></span><span class="app-seal-orbit app-seal-orbit-b"></span><img src="./assets/app-icon.svg" alt=""><small>U.E.E / REBUILT</small></div></div>
+  <div class="app-stat-grid"><article class="app-stat-card"><span>LOCAL CHARACTERS</span><strong id="home-stat-characters">0</strong><small>Saved in this desktop archive</small></article><article class="app-stat-card"><span>RECENTLY UPDATED</span><strong id="home-stat-recent">—</strong><small>Most recent record</small></article><article class="app-stat-card"><span>ARCHIVE STATUS</span><strong class="app-stat-online">ONLINE</strong><small>Stored locally on this device</small></article></div>
+  <section class="app-home-section"><div class="app-section-heading"><div><p class="app-eyebrow">LOCAL RECORDS / 01</p><h2>RECENT CHARACTERS</h2></div><button class="app-text-button" type="button" data-view="archive">VIEW ALL RECORDS ↗</button></div><div id="home-recent-list" class="app-recent-grid"></div></section>
+  <section class="app-home-section"><div class="app-section-heading"><div><p class="app-eyebrow">WORKSPACE DIRECTORY / 02</p><h2>OPEN A MODULE</h2></div></div><div class="app-module-grid">
+    <button class="app-module-card" data-action="new-character" type="button"><span>01 / CREATION</span><strong>Character Creator</strong><small>Build a new character profile from the ground up.</small><b>START CREATING →</b></button>
+    <button class="app-module-card" data-view="archive" type="button"><span>02 / PRESERVATION</span><strong>Character Archive</strong><small>Search, organize, review, and export saved records.</small><b>OPEN ARCHIVE →</b></button>
+    <button class="app-module-card" data-view="lore" type="button"><span>03 / REFERENCE</span><strong>Lore Book</strong><small>Browse the existing Project Moon reference volumes.</small><b>OPEN LORE BOOK →</b></button>
+    <button class="app-module-card" data-view="simulator" type="button"><span>04 / SIMULATION</span><strong>Mirror Arena</strong><small>Run fictional matchups using your new archive.</small><b>OPEN SIMULATOR →</b></button>
+    <button class="app-module-card" data-view="multiplayer" type="button"><span>05 / NETWORK</span><strong>Multiplayer Arena</strong><small>Connect to a shared room with your local characters.</small><b>OPEN MULTIPLAYER →</b></button>
+    <button class="app-module-card" data-view="observatory" type="button"><span>06 / ANALYSIS</span><strong>Mirror Observatory</strong><small>Back up, compare, inspect, and export your archive.</small><b>OPEN OBSERVATORY →</b></button>
+  </div></section>
+  <button id="open-simulator-button" type="button" class="app-hidden-helper" tabindex="-1" aria-hidden="true">OPEN SIMULATOR</button>
+</section>
+
+<section id="creator-screen" class="screen app-view hidden">
+  <div class="app-page-intro"><div><p class="app-eyebrow">IDENTITY REGISTRATION / REBUILT CREATOR</p><h2 id="creator-heading">CREATE A NEW CHARACTER</h2><p>Every field is editable. Build a complete dossier in a guided, section-based workspace.</p></div><button class="app-button app-button-secondary" type="button" data-view="archive">CANCEL / RETURN TO ARCHIVE</button></div>
+  <div class="creator-progress"><div class="creator-progress-copy"><span id="creator-step-label">SECTION 01 / 05</span><strong id="creator-step-name">IDENTITY</strong></div><div class="creator-progress-track"><span id="creator-progress-fill"></span></div></div>
+  <nav class="creator-step-nav" aria-label="Character creator sections"><button class="is-active" type="button" data-step-target="0"><span>01</span>Identity</button><button type="button" data-step-target="1"><span>02</span>Appearance & Origin</button><button type="button" data-step-target="2"><span>03</span>E.G.O.</button><button type="button" data-step-target="3"><span>04</span>Abilities</button><button type="button" data-step-target="4"><span>05</span>Personality & Story</button></nav>
+  <form id="creator-form" class="creator-form" novalidate>
+    <section class="creator-step-panel" data-creator-step="0"><div class="creator-panel-heading"><p class="app-eyebrow">CORE IDENTITY / 01</p><h3>Who is this character?</h3><p>Start with the details that define the character's place in their world.</p></div><div class="creator-field-grid">
+      <label class="creator-field creator-field-wide"><span>CHARACTER NAME <i>Required</i></span><input data-field="name" maxlength="80" required placeholder="Enter a character name"><small class="field-hint">Use the name that should appear at the top of the dossier.</small></label>
+      <label class="creator-field"><span>TITLE / EPITHET</span><input data-field="title" maxlength="100" placeholder="A title, alias, or epithet"></label>
+      <label class="creator-field"><span>RACE <i>Required</i></span><input data-field="race" maxlength="80" required placeholder="Human, Bloodfiend, custom race..."></label>
+      <label class="creator-field"><span>AFFILIATION</span><input data-field="affiliation" maxlength="120" placeholder="Association, Office, Wing, or custom"></label>
+      <label class="creator-field"><span>GRADE / RANK</span><input data-field="grade" maxlength="80" placeholder="Grade, section, rank, or designation"></label>
+    </div></section>
+    <section class="creator-step-panel hidden" data-creator-step="1"><div class="creator-panel-heading"><p class="app-eyebrow">VISUAL RECORD / 02</p><h3>Appearance & Origin</h3><p>Describe the character's visible features and the circumstances that shaped their origin.</p></div><div class="creator-field-grid">
+      <label class="creator-field creator-field-wide"><span>APPEARANCE</span><textarea data-field="appearance" rows="5" maxlength="3000" placeholder="Describe clothing, features, presentation, and distinguishing details..."></textarea></label>
+      <label class="creator-field"><span>ORIGIN</span><input data-field="origin" maxlength="140" placeholder="District, Nest, Backstreets, or custom origin"></label>
+      <label class="creator-field"><span>UPBRINGING / BACKGROUND</span><input data-field="upbringing" maxlength="180" placeholder="What shaped their early life?"></label>
+      <label class="creator-field creator-field-wide"><span>ADDITIONAL VISUAL DETAILS</span><textarea data-field="visual_details" rows="3" maxlength="1600" placeholder="Optional motifs, colors, or distinguishing traits..."></textarea></label>
+    </div></section>
+    <section class="creator-step-panel hidden" data-creator-step="2"><div class="creator-panel-heading"><p class="app-eyebrow">PERSONAL MANIFESTATION / 03</p><h3>E.G.O. Profile</h3><p>Record the character's manifestation, nature, and visual identity.</p></div><div class="creator-field-grid">
+      <label class="creator-field"><span>E.G.O. NAME</span><input data-field="ego_name" maxlength="120" placeholder="Name of the manifestation"></label>
+      <label class="creator-field"><span>E.G.O. TYPE</span><select data-field="ego_type"><option value="">Not specified</option><option>Personal E.G.O.</option><option>Abnormality-derived</option><option>Distortion</option><option>Artificial / refined</option><option>Other / custom</option><option>No known manifestation</option></select></label>
+      <label class="creator-field creator-field-wide"><span>APPEARANCE / MANIFESTATION</span><textarea data-field="ego_appearance" rows="4" maxlength="2400" placeholder="Describe its appearance and symbolic motifs..."></textarea></label>
+      <label class="creator-field creator-field-wide"><span>FUNCTION / THEMATIC MEANING</span><textarea data-field="ego_function" rows="3" maxlength="1800" placeholder="Describe its fictional role and how it reflects the character..."></textarea></label>
+    </div></section>
+    <section class="creator-step-panel hidden" data-creator-step="3"><div class="creator-panel-heading"><p class="app-eyebrow">CHARACTER CAPABILITIES / 04</p><h3>Abilities & Passives</h3><p>Write original, fictional ability concepts and their narrative effects.</p></div>
+      <div class="creator-ability-grid">
+        <fieldset class="creator-ability-card"><legend>ABILITY 1</legend><label class="creator-field"><span>NAME</span><input data-field="ability_1_name" maxlength="100" placeholder="Ability name"></label><label class="creator-field"><span>DESCRIPTION</span><textarea data-field="ability_1_description" rows="3" maxlength="1600" placeholder="Describe the fictional effect..."></textarea></label></fieldset>
+        <fieldset class="creator-ability-card"><legend>ABILITY 2</legend><label class="creator-field"><span>NAME</span><input data-field="ability_2_name" maxlength="100" placeholder="Ability name"></label><label class="creator-field"><span>DESCRIPTION</span><textarea data-field="ability_2_description" rows="3" maxlength="1600" placeholder="Describe the fictional effect..."></textarea></label></fieldset>
+        <fieldset class="creator-ability-card"><legend>ABILITY 3</legend><label class="creator-field"><span>NAME</span><input data-field="ability_3_name" maxlength="100" placeholder="Ability name"></label><label class="creator-field"><span>DESCRIPTION</span><textarea data-field="ability_3_description" rows="3" maxlength="1600" placeholder="Describe the fictional effect..."></textarea></label></fieldset>
+        <fieldset class="creator-ability-card"><legend>ABILITY 4</legend><label class="creator-field"><span>NAME</span><input data-field="ability_4_name" maxlength="100" placeholder="Ability name"></label><label class="creator-field"><span>DESCRIPTION</span><textarea data-field="ability_4_description" rows="3" maxlength="1600" placeholder="Describe the fictional effect..."></textarea></label></fieldset>
+      </div>
+      <div class="creator-field-grid creator-lower-fields"><label class="creator-field"><span>ULTIMATE ABILITY NAME</span><input data-field="ultimate_1_name" maxlength="100"></label><label class="creator-field"><span>PASSIVE ABILITY NAME</span><input data-field="passive_name" maxlength="100"></label><label class="creator-field creator-field-wide"><span>ULTIMATE ABILITY DESCRIPTION</span><textarea data-field="ultimate_1_description" rows="3" maxlength="1800"></textarea></label><label class="creator-field creator-field-wide"><span>PASSIVE ABILITY DESCRIPTION</span><textarea data-field="passive_description" rows="3" maxlength="1800"></textarea></label></div>
+    </section>
+    <section class="creator-step-panel hidden" data-creator-step="4"><div class="creator-panel-heading"><p class="app-eyebrow">INNER LIFE / 05</p><h3>Personality & Story</h3><p>Complete the character's voice, motivations, and personal history.</p></div><div class="creator-field-grid">
+      <label class="creator-field creator-field-wide"><span>PERSONALITY</span><textarea data-field="personality" rows="3" maxlength="2200" placeholder="Temperament, habits, values, contradictions..."></textarea></label>
+      <label class="creator-field creator-field-wide"><span>BACKSTORY</span><textarea data-field="backstory" rows="6" maxlength="5000" placeholder="Write the character's history..."></textarea></label>
+      <label class="creator-field"><span>LIKES</span><textarea data-field="likes" rows="3" maxlength="1200"></textarea></label>
+      <label class="creator-field"><span>DISLIKES</span><textarea data-field="dislikes" rows="3" maxlength="1200"></textarea></label>
+      <label class="creator-field creator-field-wide"><span>OVERALL SUMMARY</span><textarea data-field="overall" rows="3" maxlength="1800"></textarea></label>
+    </div></section>
+    <div class="creator-form-footer"><button type="button" id="creator-step-back" class="app-button app-button-secondary">← PREVIOUS</button><span id="creator-save-status" role="status">DRAFT IS LOCAL TO THIS DEVICE</span><button type="button" id="creator-step-next" class="app-button app-button-primary">NEXT SECTION →</button><button type="submit" id="creator-save-button" class="app-button app-button-primary hidden">SAVE CHARACTER ↗</button></div>
+  </form>
+</section>
+
+<section id="archive-screen" class="screen app-view hidden">
+  <div class="app-page-intro"><div><p class="app-eyebrow">LOCAL RECORDS / NEW ARCHIVE</p><h2>CHARACTER ARCHIVE</h2><p>A fresh archive for U.E.E Rebuilt. It starts independently and does not import records from the previous desktop or website creator.</p></div><button class="app-button app-button-primary" type="button" data-action="new-character">＋ NEW CHARACTER</button></div>
+  <div class="archive-toolbar"><label class="archive-search"><span>SEARCH RECORDS</span><input id="archive-search" type="search" placeholder="Search names, titles, origin, or dossier text..."></label><label><span>SORT BY</span><select id="archive-sort"><option value="recent">Recently updated</option><option value="name">Name A–Z</option><option value="oldest">Oldest first</option></select></label><button id="archive-clear" type="button" class="app-button app-button-secondary">CLEAR FILTERS</button></div>
+  <div class="archive-results-heading"><span id="archive-result-count">0 RECORDS</span><span>STORED LOCALLY / PRIVATE TO THIS DEVICE</span></div><div id="archive-list" class="archive-grid"></div>
+</section>
+
+<section id="lore-screen" class="screen app-view hidden"><div class="app-page-intro"><div><p class="app-eyebrow">PROJECT MOON REFERENCE / PRESERVED MODULE</p><h2>THE LORE BOOK</h2><p>The existing encyclopedia and its searchable volumes remain available in U.E.E Rebuilt.</p></div><button id="lore-book-launch" type="button" class="app-button app-button-primary">OPEN LORE BOOK ↗</button></div><div class="app-module-note"><strong>REFERENCE LIBRARY</strong><p>Browse the City Primer, Lobotomy Corporation, Library of Ruina, and Limbus Company volumes. Reference content remains separate from your personal character archive.</p></div></section>
+
+<section id="observatory-screen" class="screen app-view hidden">
+  <div class="app-page-intro"><div><p class="app-eyebrow">PRESERVATION / ANALYSIS / EXPORT</p><h2>MIRROR OBSERVATORY</h2><p>Tools for the new U.E.E Rebuilt character archive.</p></div></div>
+  <div class="observatory-tool-grid">
+    <article class="observatory-tool"><p class="app-eyebrow">01 / BACKUP</p><h3>Export Archive</h3><p>Download every U.E.E Rebuilt record as a JSON backup.</p><button id="obs-export" type="button" class="app-button app-button-primary">EXPORT BACKUP ↗</button></article>
+    <article class="observatory-tool"><p class="app-eyebrow">02 / RESTORE</p><h3>Import Backup</h3><p>Merge records from a U.E.E Rebuilt backup. Existing IDs are not duplicated.</p><input id="obs-import-file" type="file" accept="application/json,.json" hidden><button id="obs-import-open" type="button" class="app-button app-button-secondary">CHOOSE BACKUP</button><p id="obs-import-status" role="status"></p></article>
+    <article class="observatory-tool"><p class="app-eyebrow">03 / INTEGRITY</p><h3>Archive Health</h3><p>Check saved records for missing names, malformed fields, or duplicate IDs.</p><button id="obs-scan" type="button" class="app-button app-button-secondary">SCAN ARCHIVE</button><p id="obs-scan-status" role="status">No scan has been run.</p></article>
+    <article class="observatory-tool"><p class="app-eyebrow">04 / FINDER</p><h3>Archive Finder</h3><input id="obs-search" type="search" placeholder="Search your records..."><div id="obs-search-results"></div></article>
+  </div>
+</section>
+
+<section id="about-screen" class="screen app-view hidden"><div class="app-page-intro"><div><p class="app-eyebrow">PROJECT FILE / DESKTOP EDITION</p><h2>U.E.E REBUILT</h2><p>A new desktop-first application for the Una Eademque Essentia archive.</p></div></div><div class="app-module-note"><strong>ONE AND THE SAME ESSENCE.</strong><p>U.E.E Rebuilt has its own desktop entry point, layout, Character Creator, and Character Archive. The website remains a separate experience. Settings, visual effects, the Lore Book, Mirror Arena, Multiplayer, Mirror Observatory, and the hidden desktop gate remain desktop modules.</p></div></section>
+
+<section id="simulator-screen" class="screen app-view hidden simulator-screen" aria-labelledby="simulator-title">
+      <div class="simulator-topbar"><button id="simulator-back-button" class="text-button" type="button">← MAIN MENU</button><span class="simulator-record-tag">MIRROR MATCH ENGINE / SIMULATION ONLY</span></div>
+      <header class="simulator-heading"><p class="eyebrow">UNOFFICIAL COMBAT SANDBOX</p><h2 id="simulator-title">THE MIRROR ARENA</h2><p>Let your saved OCs meet in a fictional match. Turns use abstract stamina and momentum values, with character-driven dialogue and reactions.</p></header>
+      <section id="simulator-setup" class="simulator-setup">
+        <div class="simulator-section-heading"><span>01 / MATCH FORMAT</span><span>SELECT A MODE</span></div>
+        <div class="sim-mode-grid" role="group" aria-label="Match format">
+          <button class="sim-mode-card active" type="button" data-sim-mode="1v1"><strong>1V1</strong><small>ONE AGAINST ONE</small></button>
+          <button class="sim-mode-card" type="button" data-sim-mode="2v2"><strong>2V2</strong><small>TEAM AGAINST TEAM</small></button>
+          <button class="sim-mode-card" type="button" data-sim-mode="ffa"><strong>FREE FOR ALL</strong><small>UP TO FOUR OCS</small></button>
+        </div>
+        <p id="sim-mode-description" class="simulator-hint">Two saved OCs enter a one-on-one match.</p>
+        <div class="simulator-section-heading"><span>02 / PARTICIPANTS</span><span id="sim-participant-count">2 FIGHTERS</span></div>
+        <div id="sim-fighter-selectors" class="sim-fighter-selectors"></div>
+        <p id="sim-setup-message" class="simulator-hint" role="status"></p>
+        <div class="sim-setup-actions"><button id="sim-create-oc-button" class="text-button" type="button">CREATE AN OC FIRST</button><button id="sim-start-button" class="primary-button" type="button">INITIALIZE MATCH <span>↗</span></button></div>
+      </section>
+      <section id="sim-difficulty-panel" class="sim-difficulty-panel" aria-live="polite"><div class="sim-difficulty-top"><span class="sim-difficulty-label">MATCHUP DIFFICULTY</span><strong id="sim-difficulty-rating">AWAITING PARTICIPANTS</strong></div><p id="sim-one-sided-warning" class="sim-one-sided-warning hidden"></p></section>
+      <section id="simulator-match" class="simulator-match hidden" aria-label="Live match">
+        <div id="sim-hit-overlay" class="sim-hit-overlay" hidden aria-hidden="true" role="status" aria-live="polite"></div>
+        <div class="simulator-match-heading"><div><p class="eyebrow">LIVE MIRROR MATCH</p><h3 id="sim-match-title">1V1</h3></div><span id="sim-turn-count" class="simulator-turn-count">TURN 00</span></div>
+        <section id="sim-ability-controls" class="sim-ability-controls" aria-label="Manual character abilities">
+          <div class="sim-ability-heading"><p class="eyebrow">MANUAL ACTIONS</p><h3>CHOOSE AN ABILITY</h3><p>Pick an OC, select an opposing target, then use one of its four abilities.</p></div>
+          <div class="sim-ability-selectors">
+            <label>ACTING CHARACTER<select id="sim-action-actor" aria-label="Acting character"></select></label>
+            <label>TARGET<select id="sim-action-target" aria-label="Target character"></select></label>
+          </div>
+          <div class="sim-ability-buttons">
+            <button type="button" data-sim-ability="1">ABILITY 1 · LOW · 5</button>
+            <button type="button" data-sim-ability="2">ABILITY 2 · MEDIUM · 15</button>
+            <button type="button" data-sim-ability="3">ABILITY 3 · MEDIUM · 15</button>
+            <button type="button" data-sim-ability="4">ABILITY 4 · LARGE · 20</button>
+          </div>
+          <p class="sim-ability-note">Status potency is split evenly between two or three selected status effects. Ultimates inflict Massive potency · 30 in automatic simulation turns.</p>
+        </section>
+        <div class="simulator-battle-layout">
+          <section class="simulator-arena-panel" aria-label="Arena"><div id="sim-arena-cards" class="sim-arena-cards"></div><div id="sim-match-status" class="sim-match-status" role="status">MATCH READY.</div><div class="simulator-match-actions"><button id="sim-next-turn-button" class="primary-button" type="button">RUN NEXT TURN <span>→</span></button><button id="sim-run-all-button" class="secondary-button" type="button">SIMULATE MATCH</button><button id="sim-rematch-button" class="text-button hidden" type="button">REMATCH</button></div></section>
+          <aside class="simulator-commentary" aria-label="Character chats and interactions"><div class="sim-commentary-heading"><div><p class="eyebrow">LIVE TRANSCRIPT</p><h3>CHAT & INTERACTIONS</h3></div><span id="sim-feed-status">STANDBY</span></div><div id="sim-log" class="sim-log" aria-live="polite" aria-relevant="additions"></div></aside>
+        </div>
+      </section>
+      <p class="simulator-disclaimer">This is a lighthearted, fictional OC simulator. Outcomes are randomized for entertainment and do not represent canon power rankings.</p>
+    </section>
+</main>
+<footer class="app-footer"><span>U.E.E REBUILT / DESKTOP</span><span>ONE AND THE SAME ESSENCE</span><span id="app-footer-status">LOCAL ARCHIVE READY</span></footer>
+</div>
+
+<button id="desktop-sephrus-gate" type="button" aria-label="Open hidden archive gate" title=" "><span aria-hidden="true">⌑</span></button>
+<button id="desktop-sephrus-maker" type="button" hidden>SEPHRUS MAKER ↗</button>
+<dialog id="desktop-sephrus-prompt" class="desktop-sephrus-prompt" aria-labelledby="desktop-sephrus-title"><form method="dialog" class="desktop-sephrus-panel" id="desktop-sephrus-form"><p class="app-eyebrow">RESTRICTED ARCHIVE ACCESS</p><h2 id="desktop-sephrus-title">IDENTITY VERIFICATION</h2><p>State the name associated with this record.</p><input id="desktop-sephrus-answer" type="text" autocomplete="off" spellcheck="false" placeholder="Enter name..."><p id="desktop-sephrus-feedback" role="status" aria-live="polite"></p><div class="desktop-sephrus-actions"><button type="button" id="desktop-sephrus-cancel">CANCEL</button><button type="submit">VERIFY ↗</button></div></form></dialog>
+
+<dialog id="settings-overlay" class="settings-overlay" aria-labelledby="settings-title">
+    <section class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-panel-header">
+        <div>
+          <p class="settings-kicker">ARCHIVE CONFIGURATION / 01</p>
+          <h2 id="settings-title">SETTINGS</h2>
+          <p class="settings-intro">Customize appearance, effects, accessibility, performance, and creator defaults. Your choices are saved on this device.</p>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" aria-label="Close settings">×</button>
+      </div>
+      <div class="settings-tabs" role="tablist" aria-label="Settings categories">
+        <button id="settings-tab-appearance" class="settings-tab active" type="button" role="tab" aria-selected="true" aria-controls="settings-appearance" tabindex="0" data-settings-tab="appearance">APPEARANCE</button>
+        <button id="settings-tab-effects" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-effects" tabindex="-1" data-settings-tab="effects">EFFECTS <span class="settings-tab-count">20</span></button>
+        <button id="settings-tab-accessibility" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-accessibility" tabindex="-1" data-settings-tab="accessibility">ACCESSIBILITY</button>
+        <button id="settings-tab-creator" class="settings-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-creator" tabindex="-1" data-settings-tab="creator">CREATOR & ARCHIVE</button>
+      </div>
+      <section id="settings-appearance" class="settings-tab-panel" role="tabpanel" aria-labelledby="settings-tab-appearance" data-settings-panel="appearance">
+      <div class="ambient-music-setting">
+        <div class="ambient-music-copy"><strong>AMBIENT ARCHIVE MUSIC</strong><span>A livelier original soundtrack with layered melodies and a gentle pulse.</span><small id="ambient-music-status" aria-live="polite">AMBIENT MUSIC OFF</small></div>
+        <label class="ambient-music-switch" for="ambient-music-toggle"><input id="ambient-music-toggle" type="checkbox"><span class="ambient-music-track" aria-hidden="true"></span><span class="sr-only">Enable ambient music</span></label>
+      </div>
+      <section class="jukebox-panel" aria-labelledby="jukebox-title">
+        <div class="jukebox-heading"><div><span class="jukebox-kicker">PERSONAL SOUNDTRACK</span><h3 id="jukebox-title">THE JUKEBOX</h3></div><span class="jukebox-live">♪ ORIGINAL AUDIO</span></div>
+        <label class="jukebox-field" for="jukebox-track"><span>SELECT A SOUNDTRACK</span><select id="jukebox-track">
+          <option value="city">The City Never Sleeps — lively, rhythmic</option>
+          <option value="archive">Archive Drift — calm, atmospheric</option>
+          <option value="cathedral">Glass Cathedral — spacious, haunting</option>
+          <option value="backstreets">Backstreets Afterhours — mellow, pulsing</option>
+        </select></label>
+        <div class="jukebox-volume-row"><label for="jukebox-volume">MUSIC VOLUME</label><input id="jukebox-volume" type="range" min="0" max="100" value="68"><output id="jukebox-volume-value" for="jukebox-volume">68%</output></div>
+        <label class="jukebox-sfx-toggle" for="interface-sounds-toggle"><span><strong>INTERFACE SOUND DESIGN</strong><small>Button clicks, selections, opening, closing, and confirmation tones.</small></span><input id="interface-sounds-toggle" type="checkbox" checked></label>
+        <p class="jukebox-note">All tracks are generated in-browser and are original to this archive. Your choices are saved on this device. Audio begins after you interact with the page.</p>
+      </section>
+      <section class="background-upload-setting" aria-labelledby="background-upload-title">
+        <div class="background-upload-heading"><div><span class="effects-overline">PERSONALIZE THE ARCHIVE</span><h3 id="background-upload-title">CUSTOM BACKGROUND</h3></div><span id="background-upload-status" class="background-upload-status" aria-live="polite">NO IMAGE SELECTED</span></div>
+        <p class="background-upload-description">Drop an image here or choose a file. It is saved on this device and applied behind the interface.</p>
+        <label id="background-dropzone" class="background-dropzone" for="background-image-input" tabindex="0">
+          <input id="background-image-input" type="file" accept="image/*" hidden>
+          <span class="background-drop-icon" aria-hidden="true">＋</span>
+          <span class="background-accent-indicator" aria-hidden="true"></span>
+          <strong>DROP AN IMAGE HERE</strong>
+          <small>OR CLICK TO BROWSE · JPG, PNG, WEBP, GIF</small>
+        </label>
+        <div id="background-image-preview-wrap" class="background-image-preview-wrap" hidden><img id="background-image-preview" alt="Preview of your selected background"><button id="background-image-remove" class="text-button" type="button">REMOVE BACKGROUND</button></div>
+        <p class="background-upload-footnote">The image stays local to this browser and is not uploaded to the website. Very large images may take a moment to save.</p>
+      </section>
+      <div class="color-picker-section">
+        <div class="color-picker-heading">
+          <span>ACCENT COLOR</span>
+          <span>HUE · SATURATION · VALUE</span>
+        </div>
+        <div class="color-sv-field" id="color-sv-field" role="slider" tabindex="0"
+          aria-label="Color saturation and brightness" aria-valuemin="0" aria-valuemax="100"
+          aria-valuenow="68" aria-valuetext="Saturation 68 percent, brightness 86 percent">
+          <span id="sv-handle" class="sv-handle" aria-hidden="true"></span>
+        </div>
+        <div class="hue-control">
+          <label for="hue-slider">BASE HUE</label>
+          <input id="hue-slider" class="hue-slider" type="range" min="0" max="359" step="1" value="352" aria-label="Base hue">
+        </div>
+        <div class="color-preview-row">
+          <span id="color-preview-swatch" class="color-preview-swatch" aria-hidden="true"></span>
+          <div class="color-preview-copy">
+            <strong id="color-preview-hex">#D95E6A</strong>
+            <span id="color-preview-description">CUSTOM ARCHIVE ACCENT</span>
+          </div>
+          <button id="settings-reset" class="settings-reset" type="button">RESET COLOR</button>
+        </div>
+        <p class="picker-instructions">Drag inside the large square to adjust saturation and brightness. Drag the rainbow bar to change the base hue.</p>
+      </div>
+      </section>
+      <section id="settings-effects" class="settings-tab-panel effects-tab-panel" role="tabpanel" aria-labelledby="settings-tab-effects" data-settings-panel="effects" hidden>
+        <div class="effects-heading">
+          <div>
+            <span class="effects-overline">PERSONALIZE THE ARCHIVE</span>
+            <h3>VISUAL EFFECTS</h3>
+          </div>
+          <span class="effects-count">20 SWITCHES</span>
+        </div>
+        <p class="effects-description">Combine any of these effects, or leave them all off for a quieter page. Each switch is saved on this device.</p><div class="effects-bulk-actions"><button id="effects-apply-all" type="button" class="secondary-button">APPLY ALL EFFECTS</button><button id="effects-disable-all" type="button" class="text-button">DISABLE ALL EFFECTS</button></div>
+                <div class="effects-subheading"><strong>ATMOSPHERE / VISUAL EFFECTS</strong><span>10 OPTIONAL LAYERS</span></div>
+        <div class="effects-grid">
+          <label class="effect-card" for="effect-particles">
+            <span class="effect-symbol" aria-hidden="true">✧</span>
+            <span class="effect-copy"><strong>AMBIENT DUST</strong><small>Slow, drifting flecks of light across the archive.</small></span>
+            <input id="effect-particles" class="effect-switch" type="checkbox" data-effect-toggle="particles">
+          </label>
+          <label class="effect-card" for="effect-scanlines">
+            <span class="effect-symbol" aria-hidden="true">▤</span>
+            <span class="effect-copy"><strong>CRT SCANLINES</strong><small>A faint monitor texture for a terminal-like finish.</small></span>
+            <input id="effect-scanlines" class="effect-switch" type="checkbox" data-effect-toggle="scanlines">
+          </label>
+          <label class="effect-card" for="effect-glow">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>ACCENT PULSE</strong><small>A soft breathing glow that follows your chosen accent.</small></span>
+            <input id="effect-glow" class="effect-switch" type="checkbox" data-effect-toggle="glow">
+          </label>
+          <label class="effect-card" for="effect-glitch">
+            <span class="effect-symbol" aria-hidden="true">⌁</span>
+            <span class="effect-copy"><strong>GLITCH FLICKER</strong><small>Occasional, restrained signal distortion on archive details.</small></span>
+            <input id="effect-glitch" class="effect-switch" type="checkbox" data-effect-toggle="glitch">
+          </label>
+          <label class="effect-card" for="effect-embers">
+            <span class="effect-symbol" aria-hidden="true">✺</span>
+            <span class="effect-copy"><strong>FLOATING EMBERS</strong><small>Tiny warm specks drift through the archive.</small></span>
+            <input id="effect-embers" class="effect-switch" type="checkbox" data-effect-toggle="embers">
+          </label>
+          <label class="effect-card" for="effect-rain">
+            <span class="effect-symbol" aria-hidden="true">⋰</span>
+            <span class="effect-copy"><strong>ARCHIVE RAIN</strong><small>A faint curtain of diagonal rain across the screen.</small></span>
+            <input id="effect-rain" class="effect-switch" type="checkbox" data-effect-toggle="rain">
+          </label>
+          <label class="effect-card" for="effect-vignette">
+            <span class="effect-symbol" aria-hidden="true">◉</span>
+            <span class="effect-copy"><strong>THEATRICAL VIGNETTE</strong><small>Deepens the corners for a more cinematic frame.</small></span>
+            <input id="effect-vignette" class="effect-switch" type="checkbox" data-effect-toggle="vignette">
+          </label>
+          <label class="effect-card" for="effect-shimmer">
+            <span class="effect-symbol" aria-hidden="true">✧</span>
+            <span class="effect-copy"><strong>SILVER SHIMMER</strong><small>A slow, subtle light sweep across the page.</small></span>
+            <input id="effect-shimmer" class="effect-switch" type="checkbox" data-effect-toggle="shimmer">
+          </label>
+          <label class="effect-card" for="effect-orbit">
+            <span class="effect-symbol" aria-hidden="true">◎</span>
+            <span class="effect-copy"><strong>ORBITING SEAL</strong><small>Adds a more pronounced orbit to the archive seal.</small></span>
+            <input id="effect-orbit" class="effect-switch" type="checkbox" data-effect-toggle="orbit">
+          </label>
+          <label class="effect-card" for="effect-borderflow">
+            <span class="effect-symbol" aria-hidden="true">◇</span>
+            <span class="effect-copy"><strong>LIVING BORDERS</strong><small>A gentle accent pulse travels through cards on hover.</small></span>
+            <input id="effect-borderflow" class="effect-switch" type="checkbox" data-effect-toggle="borderflow">
+          </label>
+        </div>
+        <div class="effects-subheading"><strong>UNNECESSARY ANIMATIONS</strong><span>4 COMPLETELY OPTIONAL EXTRAS</span></div>
+        <div class="effects-grid">
+          <label class="effect-card" for="effect-idlefloat">
+            <span class="effect-symbol" aria-hidden="true">〰</span>
+            <span class="effect-copy"><strong>IDLE FLOAT</strong><small>The header tag gently bobs for absolutely no reason.</small></span>
+            <input id="effect-idlefloat" class="effect-switch" type="checkbox" data-effect-toggle="idlefloat">
+          </label>
+          <label class="effect-card" for="effect-buttonbounce">
+            <span class="effect-symbol" aria-hidden="true">↟</span>
+            <span class="effect-copy"><strong>BUTTON BOUNCE</strong><small>Buttons perform a tiny spring when hovered.</small></span>
+            <input id="effect-buttonbounce" class="effect-switch" type="checkbox" data-effect-toggle="buttonbounce">
+          </label>
+          <label class="effect-card" for="effect-hoverwiggle">
+            <span class="effect-symbol" aria-hidden="true">⌁</span>
+            <span class="effect-copy"><strong>UNNECESSARY WIGGLE</strong><small>Cards give a tiny wiggle when hovered.</small></span>
+            <input id="effect-hoverwiggle" class="effect-switch" type="checkbox" data-effect-toggle="hoverwiggle">
+          </label>
+          <label class="effect-card" for="effect-sparkle">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>DECORATIVE SPARKLE</strong><small>The Settings gear gets a pointless little twinkle.</small></span>
+            <input id="effect-sparkle" class="effect-switch" type="checkbox" data-effect-toggle="sparkle">
+          </label>
+        </div>
+        <div class="effects-subheading"><strong>OVER-THE-TOP EFFECTS</strong><span>6 UNREASONABLY EXTRA SETTINGS</span></div>
+        <div class="effects-grid overdrive-effects">
+          <label class="effect-card" for="effect-superbobble">
+            <span class="effect-symbol" aria-hidden="true">◉</span>
+            <span class="effect-copy"><strong>SUPER NECESSARY BOBBLE</strong><small>Every hovered button inflates, wobbles, and bounces dramatically.</small></span>
+            <input id="effect-superbobble" class="effect-switch" type="checkbox" data-effect-toggle="superbobble">
+          </label>
+          <label class="effect-card" for="effect-screenquake">
+            <span class="effect-symbol" aria-hidden="true">〽</span>
+            <span class="effect-copy"><strong>DRAMATIC SCREEN QUAKE</strong><small>Hover a button and the entire archive performs a theatrical earthquake.</small></span>
+            <input id="effect-screenquake" class="effect-switch" type="checkbox" data-effect-toggle="screenquake">
+          </label>
+          <label class="effect-card" for="effect-rainbowapocalypse">
+            <span class="effect-symbol" aria-hidden="true">🌈</span>
+            <span class="effect-copy"><strong>RAINBOW APOCALYPSE</strong><small>The whole interface cycles through an aggressively colorful spectrum.</small></span>
+            <input id="effect-rainbowapocalypse" class="effect-switch" type="checkbox" data-effect-toggle="rainbowapocalypse">
+          </label>
+          <label class="effect-card" for="effect-bossintro">
+            <span class="effect-symbol" aria-hidden="true">✦</span>
+            <span class="effect-copy"><strong>MAIN CHARACTER ENTRANCE</strong><small>Every screen and question arrives like a dramatic boss introduction.</small></span>
+            <input id="effect-bossintro" class="effect-switch" type="checkbox" data-effect-toggle="bossintro">
+          </label>
+          <label class="effect-card" for="effect-impactframe">
+            <span class="effect-symbol" aria-hidden="true">▣</span>
+            <span class="effect-copy"><strong>IMPACT FRAME</strong><small>Every click gets a dramatic monochrome comic-book impact flash.</small></span>
+            <input id="effect-impactframe" class="effect-switch" type="checkbox" data-effect-toggle="impactframe">
+          </label>
+          <label class="effect-card" for="effect-onepiecepacing">
+            <span class="effect-symbol" aria-hidden="true">⌛</span>
+            <span class="effect-copy"><strong>ONE PIECE PACING</strong><small>Everything moves in gloriously unnecessary slow motion.</small></span>
+            <input id="effect-onepiecepacing" class="effect-switch" type="checkbox" data-effect-toggle="onepiecepacing">
+          </label>
+        </div>
+        <p class="effects-footnote">Every switch is saved on this device. Animated effects respect your device's reduced-motion setting.</p>
+      <div class="flash-warning-settings"><p id="flash-warning-settings-status">Flashing-effects warning: shown when enabling Rainbow Apocalypse or Impact Frame.</p><button id="flash-warning-reset-button" class="secondary-button" type="button">RE-ENABLE FLASH WARNING</button></div>
+      </section>
+      
+      <section id="settings-accessibility" class="settings-tab-panel preference-tab-panel" role="tabpanel" aria-labelledby="settings-tab-accessibility" data-settings-panel="accessibility" hidden>
+        <div class="effects-heading"><div><span class="effects-overline">MAKE THE ARCHIVE COMFORTABLE</span><h3>ACCESSIBILITY & PERFORMANCE</h3></div><span class="effects-count">5 OPTIONS</span></div>
+        <p class="effects-description">Tune motion, legibility, spacing, and visual workload. These settings apply immediately and stay saved on this device.</p>
+        <div class="preference-grid">
+          <label class="preference-card" for="pref-reduce-motion"><span><strong>REDUCE MOTION</strong><small>Minimize transitions, screen movement, and animated effects.</small></span><input id="pref-reduce-motion" class="preference-switch" type="checkbox" data-interface-pref="reduceMotion"></label>
+          <label class="preference-card" for="pref-low-performance"><span><strong>LOW-PERFORMANCE MODE</strong><small>Disable decorative particle layers and expensive blur effects.</small></span><input id="pref-low-performance" class="preference-switch" type="checkbox" data-interface-pref="lowPerformance"></label>
+          <label class="preference-card" for="pref-high-contrast"><span><strong>HIGH CONTRAST</strong><small>Strengthen text and border contrast for easier reading.</small></span><input id="pref-high-contrast" class="preference-switch" type="checkbox" data-interface-pref="highContrast"></label>
+          <label class="preference-card" for="pref-large-text"><span><strong>LARGER TEXT</strong><small>Increase important reading and control text sizes.</small></span><input id="pref-large-text" class="preference-switch" type="checkbox" data-interface-pref="largeText"></label>
+          <label class="preference-card" for="pref-compact-layout"><span><strong>COMPACT LAYOUT</strong><small>Reduce excess spacing in cards, choices, and archive entries.</small></span><input id="pref-compact-layout" class="preference-switch" type="checkbox" data-interface-pref="compactLayout"></label>
+        </div>
+        <p class="effects-footnote">The operating system's reduced-motion preference is still respected. Low-performance mode does not change saved records or character data.</p>
+      </section>
+      <section id="settings-creator" class="settings-tab-panel preference-tab-panel" role="tabpanel" aria-labelledby="settings-tab-creator" data-settings-panel="creator" hidden>
+        <div class="effects-heading"><div><span class="effects-overline">PERSONAL WORKFLOW</span><h3>CREATOR & ARCHIVE</h3></div><span class="effects-count">4 PREFERENCES</span></div>
+        <p class="effects-description">Set the creator's starting behavior and organize the character archive the way you prefer.</p>
+        <div class="preference-grid">
+          <label class="preference-card" for="pref-show-hints"><span><strong>SHOW QUESTION HINTS</strong><small>Keep explanatory descriptions visible beneath each creator question.</small></span><input id="pref-show-hints" class="preference-switch" type="checkbox" data-interface-pref="showHints" checked></label>
+          <label class="preference-card" for="pref-confirm-delete"><span><strong>CONFIRM BEFORE DELETING</strong><small>Ask before permanently removing a saved character from this device.</small></span><input id="pref-confirm-delete" class="preference-switch" type="checkbox" data-interface-pref="confirmDelete" checked></label>
+          <label class="preference-card" for="pref-remember-mode"><span><strong>REMEMBER LAST CREATION MODE</strong><small>Mark the creation mode you used most recently when you return to the mode picker.</small></span><input id="pref-remember-mode" class="preference-switch" type="checkbox" data-interface-pref="rememberMode" checked></label>
+          <div class="preference-card preference-select-card"><label for="pref-archive-sort"><strong>DEFAULT ARCHIVE SORT</strong><small>Choose how saved characters are ordered when the archive opens.</small></label><select id="pref-archive-sort" data-interface-pref="archiveSort"><option value="recent">Recently updated</option><option value="name">Name A–Z</option><option value="oldest">Oldest first</option></select></div>
+        </div>
+        <div class="effects-bulk-actions"><button id="interface-preferences-reset" type="button" class="secondary-button">RESET WORKFLOW & INTERFACE PREFERENCES</button></div>
+        <p class="effects-footnote">These preferences are local to this device. They do not alter your saved character dossiers or shared archive records.</p>
+      </section>
+<div class="settings-panel-footer">
+        <span>CHANGES APPLY IMMEDIATELY</span>
+        <button id="settings-close-bottom" class="primary-button" type="button">DONE <span>✓</span></button>
+      </div>
+    </section>
+  </dialog>
+<dialog id="flash-warning-dialog" class="flash-warning-dialog" aria-labelledby="flash-warning-title">
+    <div class="flash-warning-panel"><p class="eyebrow">VISUAL EFFECTS / SAFETY NOTICE</p><h2 id="flash-warning-title">FLASHING CONTENT WARNING</h2><p>Rainbow Apocalypse can rapidly cycle colors. Impact Frame can create repeated high-contrast flashes. These effects may cause discomfort and may trigger seizures in people with photosensitive epilepsy.</p><p>Neither effect will turn on until you explicitly agree. You can leave them disabled and continue using the rest of the site.</p><label class="flash-warning-never"><input id="flash-warning-never" type="checkbox"> DON'T SHOW THIS POP-UP EVER AGAIN</label><div class="flash-warning-actions"><button id="flash-warning-cancel" class="text-button" type="button">DON'T ENABLE</button><button id="flash-warning-accept" class="primary-button" type="button">I AGREE — ENABLE <span>✓</span></button></div></div>
+  </dialog>
+<dialog id="lore-book-overlay" class="lore-book-overlay" aria-labelledby="lore-book-title">
+    <section class="lore-book-panel" role="dialog" aria-modal="true" aria-labelledby="lore-book-title">
+      <div class="lore-book-header">
+        <div>
+          <p class="lore-book-kicker">PROJECT MOON REFERENCE ARCHIVE</p>
+          <h2 id="lore-book-title">THE LORE BOOK</h2>
+          <p class="lore-book-intro">A general-purpose encyclopedia of the worlds, organizations, phenomena, and story concepts across Project Moon's three main games.</p>
+        </div>
+        <button id="lore-book-close" class="settings-close" type="button" aria-label="Close lore book">×</button>
+      </div>
+      <p class="lore-book-spoiler"><strong>SPOILER NOTICE:</strong> Entries may discuss major setting reveals and story concepts from all three games. Read at your own pace.</p>
+      <div class="lore-book-controls">
+        <label class="lore-book-search-label" for="lore-book-search">SEARCH THE ENCYCLOPEDIA</label>
+        <input id="lore-book-search" name="lore-book-search" type="search" maxlength="100" placeholder="Search locations, factions, people, or concepts…">
+      </div>
+      <nav class="lore-book-tabs" aria-label="Lore book volumes">
+        <button type="button" class="lore-book-tab is-active" data-lore-volume="city">CITY PRIMER</button>
+        <button type="button" class="lore-book-tab" data-lore-volume="lobotomy">LOBOTOMY CORPORATION</button>
+        <button type="button" class="lore-book-tab" data-lore-volume="ruina">LIBRARY OF RUINA</button>
+        <button type="button" class="lore-book-tab" data-lore-volume="limbus">LIMBUS COMPANY</button>
+      </nav>
+      <div id="lore-book-content" class="lore-book-content" aria-live="polite"></div>
+      <footer class="lore-book-sources">
+        <span>REFERENCE LINKS</span>
+        <a href="https://limbuscompany.com/" target="_blank" rel="noopener noreferrer">Official Limbus Company website</a>
+        <a href="https://lobotomycorp.fandom.com/wiki/Lobotomy_Corporation_Wiki" target="_blank" rel="noopener noreferrer">Lobotomy Corporation Wiki</a>
+        <a href="https://libraryofruina.wiki.gg/" target="_blank" rel="noopener noreferrer">Library of Ruina Wiki</a>
+        <a href="https://limbuscompany.wiki.gg/" target="_blank" rel="noopener noreferrer">Limbus Company Wiki</a>
+        <small>Unofficial fan reference. Summaries are written for this archive; Project Moon owns its original settings and characters. Entries may simplify details and can be expanded as the games develop.</small>
+      </footer>
+    </section>
+  </dialog>
+
+<button id="begin-button" type="button" class="app-hidden-helper" tabindex="-1" aria-hidden="true">BEGIN</button>
+<select id="oc-archive-sort" class="app-hidden-helper" tabindex="-1" aria-hidden="true"><option value="recent">Recently updated</option></select>
+<dialog id="character-preview" class="character-preview-dialog" aria-labelledby="character-preview-title"><section class="character-preview-panel"><div class="character-preview-heading"><div><p class="app-eyebrow">ARCHIVE RECORD / DETAIL VIEW</p><h2 id="character-preview-title">CHARACTER RECORD</h2></div><button type="button" id="character-preview-close" class="settings-close" aria-label="Close record">×</button></div><pre id="character-preview-text"></pre><div class="character-preview-actions"><button type="button" id="character-preview-edit" class="app-button app-button-primary">EDIT RECORD</button><button type="button" id="character-preview-copy" class="app-button app-button-secondary">COPY DOSSIER</button><button type="button" id="character-preview-delete" class="app-text-button">DELETE RECORD</button></div></section></dialog>
+
+<script src="./app.js"></script>
+<script src="./modules/legacy-ui.js"></script>
+<script src="./modules/simulator.js"></script>
+<script src="./vendor/multiplayer.js"></script>
+<script src="./vendor/lore-book.js"></script>
+</body></html>
