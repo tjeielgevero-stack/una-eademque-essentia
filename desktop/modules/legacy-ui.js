@@ -1,5 +1,6 @@
 /* Isolated settings, visual effects, accessibility preferences, audio, and background modules. */
 (() => {
+const $ = id => document.getElementById(id);
 // Settings dialog and custom two-dimensional HSV color picker.
 (function setupColorPicker(){
  const overlay=$("settings-overlay");
@@ -315,15 +316,13 @@
 // Local accessibility, performance, and creator workflow preferences.
 (function setupInterfacePreferences(){
  const storageKey="uee_interface_preferences_v1";
- const defaults={reduceMotion:false,lowPerformance:false,highContrast:false,largeText:false,compactLayout:false,showHints:true,confirmDelete:true,rememberMode:true,archiveSort:"recent",lastCreationMode:"simple"};
- const validModes=["simple","advanced","complex","laziness"];
+ const defaults={reduceMotion:false,lowPerformance:false,highContrast:false,largeText:false,compactLayout:false,showHints:true,confirmDelete:true,archiveSort:"recent"};
  let saved={...defaults};
  try{
   const parsed=JSON.parse(localStorage.getItem(storageKey)||"{}");
   if(parsed&&typeof parsed==="object"&&!Array.isArray(parsed))saved={...saved,...parsed};
  }catch{}
  if(!["recent","name","oldest"].includes(saved.archiveSort))saved.archiveSort=defaults.archiveSort;
- if(!validModes.includes(saved.lastCreationMode))saved.lastCreationMode=defaults.lastCreationMode;
  const controls=[...document.querySelectorAll("[data-interface-pref]")],root=document.documentElement;
  function persist(){try{localStorage.setItem(storageKey,JSON.stringify(saved));}catch{}}
  function read(key,fallback){return saved[key]===undefined?fallback:saved[key];}
@@ -341,11 +340,12 @@
   });
   const archiveSort=$("oc-archive-sort");
   if(archiveSort&&saved.archiveSort)archiveSort.value=saved.archiveSort;
+  const rebuiltArchiveSort=$("archive-sort");
+  if(rebuiltArchiveSort&&saved.archiveSort)rebuiltArchiveSort.value=saved.archiveSort;
   window.ueeRefreshOcArchive?.();
  }
  window.ueeReadPreference=read;
  window.ueeSavePreference=(key,value)=>{
-  if(key==="lastCreationMode"&&saved.rememberMode!==true)return;
   saved[key]=value;persist();apply();
  };
  controls.forEach(control=>control.addEventListener("change",()=>{
@@ -356,20 +356,6 @@
  $("interface-preferences-reset")?.addEventListener("click",()=>{
   saved={...defaults};persist();apply();window.ueeMarkLastMode?.();
  });
- window.ueeMarkLastMode=()=>{
-  const mode=saved.lastCreationMode;
-  const ids={simple:"mode-simple",advanced:"mode-advanced",complex:"mode-complex",laziness:"mode-laziness"};
-  Object.values(ids).forEach(id=>{
-   const button=$(id);if(!button)return;
-   button.classList.remove("mode-last-used");
-   button.querySelector(".mode-last-used-label")?.remove();
-  });
-  if(saved.rememberMode!==true)return;
-  const button=$(ids[mode]);if(!button)return;
-  button.classList.add("mode-last-used");
-  const label=document.createElement("span");label.className="mode-last-used-label";label.textContent="LAST USED";
-  button.insertBefore(label,button.firstElementChild?.nextSibling||null);
- };
  apply();
  $("begin-button")?.addEventListener("click",()=>requestAnimationFrame(()=>window.ueeMarkLastMode?.()));
 })();
