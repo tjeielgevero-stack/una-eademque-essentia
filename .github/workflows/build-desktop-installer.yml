@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - "src-tauri/**"
+      - "desktop/**"
       - "app-icon.svg"
       - "index.html"
       - "style.css"
@@ -44,8 +45,18 @@ jobs:
       - name: Prepare frontend bundle
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Get-ChildItem -Force | Where-Object { $_.Name -notin @('src-tauri', '.git', '.github', 'dist') } | Copy-Item -Destination dist -Recurse -Force
+          New-Item -ItemType Directory -Force -Path desktop/vendor, desktop/assets | Out-Null
+          Copy-Item style.css desktop/vendor/legacy.css -Force
+          Copy-Item multiplayer.js desktop/vendor/multiplayer.js -Force
+          Copy-Item lore-book.js desktop/vendor/lore-book.js -Force
+          Copy-Item app-icon.svg desktop/assets/app-icon.svg -Force
+          if (!(Test-Path desktop/index.html)) { throw "Dedicated desktop entry point is missing." }
+          node --check desktop/app.js
+          node --check desktop/modules/legacy-ui.js
+          node --check desktop/modules/simulator.js
+          node --check desktop/vendor/multiplayer.js
+          node --check desktop/vendor/lore-book.js
+          node desktop/smoke-test.mjs
 
       - name: Build and publish draft release
         uses: tauri-apps/tauri-action@v0
@@ -56,11 +67,11 @@ jobs:
         with:
           projectPath: src-tauri
           tagName: desktop-v__VERSION__
-          releaseName: "Una Eademque Essentia Desktop v__VERSION__"
+          releaseName: "U.E.E Rebuilt Desktop v__VERSION__"
           releaseBody: |
-            Windows installer for Una Eademque Essentia.
+            U.E.E Rebuilt — dedicated desktop application.
 
-            This is an automated desktop build. Please report bugs through the repository.
+            Major desktop rebuild with a separate desktop entry point, a new Character Creator and Archive, and preserved Settings, Effects, Lore Book, Mirror Arena, Multiplayer, Mirror Observatory, and hidden desktop gate.
           includeUpdaterJson: true
           releaseDraft: true
           prerelease: false
