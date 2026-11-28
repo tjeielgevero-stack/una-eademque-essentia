@@ -1,6 +1,6 @@
 # Una Eademque Essentia — Project Moon Character Archive
 
-An unofficial, community-made Project Moon character and Mirror World variant builder. Desktop v1.0.1 is a minor maintenance release correcting the archive change record, aligning desktop version labels and installer links, and refreshing the offline cache. It follows the v1.0.0 super-massive release.
+An unofficial, community-made Project Moon character and Mirror World variant builder. U.E.E Rebuilt is the v2.0.0 major desktop rebuild: it uses an independent desktop entry point, a new guided Character Creator, and a separate Character Archive. The website continues to use its own frontend.
 
 ## Character creation
 - Simple, Advanced, Complex, and one-page Laziness creation modes.
@@ -27,9 +27,10 @@ An unofficial, community-made Project Moon character and Mirror World variant bu
 - `multiplayer/smoke-test.mjs` — multiplayer integration smoke tests.
 - `data.js` and `lore-book.js` — character references and lore content.
 - `service-worker.js` — offline app shell and cache updates.
+- `desktop/` — independent U.E.E Rebuilt desktop frontend, new Creator and Archive, preserved desktop modules, and desktop smoke checks.
 - `src-tauri/` — Tauri desktop application and updater configuration.
 
 ## Deployment
-The website deploys from the repository's `main` branch through Cloudflare Pages. The desktop Windows installer is built from the same shared application source, with desktop-only features retained.
+The website deploys from the repository's `main` branch through Cloudflare Pages. The desktop Windows installer is built from `desktop/index.html` through Tauri. The new Character Archive uses its own local-storage namespace and does not automatically import older records.
 
 This is an unofficial fan-made project and is not affiliated with or endorsed by Project Moon.
