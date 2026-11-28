@@ -1,6 +1,6 @@
 # Una Eademque Essentia — Project Moon Character Archive
 
-An unofficial, community-made Project Moon character and Mirror World variant builder. The v1.0.0 super-massive release expands the creator, personalization, accessibility, and archive workflows.
+An unofficial, community-made Project Moon character and Mirror World variant builder. Desktop v1.0.1 is a minor maintenance release correcting the archive change record, aligning desktop version labels and installer links, and refreshing the offline cache. It follows the v1.0.0 super-massive release.
 
 ## Character creation
 - Simple, Advanced, Complex, and one-page Laziness creation modes.
