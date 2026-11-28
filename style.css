@@ -2781,3 +2781,6 @@ html.pref-low-performance .effect-bossintro *{animation:none!important;transitio
 .desktop-install-blocked-copy { margin: 20px 0 24px; color: #c9c0b6; font: 12px/1.75 'DM Mono',monospace; }
 .desktop-install-blocked-copy p { margin: 0 0 13px; }
 .desktop-install-blocked-copy strong { color: #eee4d5; }
+
+.desktop-download-blocked { cursor: pointer; font: inherit; }
+.desktop-download-blocked:hover { border-color: var(--accent, #c8ad88); color: var(--accent, #c8ad88); }
