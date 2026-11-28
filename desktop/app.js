@@ -17,7 +17,7 @@
   function readOcArchive(){
     try{
       const value=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
-      return Array.isArray(value)?value.filter(r=>r&&typeof r==="object"&&typeof r.id==="string"):[];
+      return Array.isArray(value)?value.filter(r=>r&&typeof r==="object"):[];
     }catch(error){console.warn("U.E.E Rebuilt archive read failed:",error);return[];}
   }
   function writeOcArchive(records){
@@ -265,10 +265,73 @@
     $("character-preview").showModal();
   }
   function renderObservatory(){
-    if(!$("obs-search"))return;
+    const rows=readOcArchive();
+    $("obs-dossier-count").textContent=rows.length+" RECORDS";
+    const left=$("obs-compare-left"),right=$("obs-compare-right");
+    const previousLeft=left.value,previousRight=right.value;
+    [left,right].forEach(select=>{
+      select.replaceChildren();
+      rows.forEach(record=>{
+        const option=document.createElement("option");
+        option.value=record.id;
+        option.textContent=(record.name||"Unnamed Character")+" · "+(answerValue(record,"title")||"Untitled");
+        select.append(option);
+      });
+    });
+    if(rows.some(record=>record.id===previousLeft))left.value=previousLeft;
+    if(rows.some(record=>record.id===previousRight))right.value=previousRight;
+    if(rows.length>1&&!right.value)right.selectedIndex=1;
+    if(rows.length<2){$("obs-compare").disabled=true;$("obs-compare-result").textContent="Save at least two characters to compare records.";}
+    else{$("obs-compare").disabled=false;}
     const query=$("obs-search").value.trim().toLowerCase();
-    const rows=readOcArchive().filter(record=>[record.name,record.profileSummary].join(" ").toLowerCase().includes(query)).slice(0,12);
-    $("obs-search-results").textContent=rows.length?rows.map(record=>record.name).join("\n"):"No matching records.";
+    const found=rows.filter(record=>[record.name,record.profileSummary,answerValue(record,"title"),answerValue(record,"origin"),answerValue(record,"affiliation")].join(" ").toLowerCase().includes(query));
+    const result=$("obs-search-results");result.replaceChildren();
+    if(!found.length){
+      const empty=document.createElement("p");empty.textContent="No matching records.";result.append(empty);
+    }else{
+      found.slice(0,12).forEach(record=>{
+        const row=document.createElement("div");row.className="obs-search-row";
+        const name=document.createElement("span");name.textContent=record.name||"Unnamed Character";
+        const open=document.createElement("button");open.type="button";open.textContent="OPEN";open.addEventListener("click",()=>showPreview(record.id));
+        row.append(name,open);result.append(row);
+      });
+    }
+    const countBy=key=>rows.reduce((counts,record)=>{
+      const value=answerValue(record,key)||"Unspecified";
+      counts[value]=(counts[value]||0)+1;return counts;
+    },{});
+    const origins=countBy("origin"),races=countBy("race");
+    const top=items=>Object.entries(items).sort((a,b)=>b[1]-a[1])[0]?.[0]||"—";
+    const insights=$("obs-insights");insights.replaceChildren();
+    [["TOTAL RECORDS",rows.length],["UNIQUE ORIGINS",Object.keys(origins).length],["UNIQUE RACES",Object.keys(races).length],["MOST COMMON ORIGIN",top(origins)],["MOST COMMON RACE",top(races)]].forEach(([label,value])=>{
+      const item=document.createElement("p");item.textContent=label+" · "+value;insights.append(item);
+    });
+  }
+  function compareRecords(){
+    const rows=readOcArchive();
+    const left=rows.find(record=>record.id===$("obs-compare-left").value);
+    const right=rows.find(record=>record.id===$("obs-compare-right").value);
+    const output=$("obs-compare-result");output.replaceChildren();
+    if(!left||!right||left.id===right.id){
+      const note=document.createElement("p");note.textContent="Choose two different characters to compare.";output.append(note);return;
+    }
+    const fields=[
+      ["NAME",record=>record.name],
+      ["TITLE",record=>answerValue(record,"title")],
+      ["RACE",record=>answerValue(record,"race")],
+      ["ORIGIN",record=>answerValue(record,"origin")],
+      ["AFFILIATION",record=>answerValue(record,"affiliation")],
+      ["GRADE",record=>answerValue(record,"grade")],
+      ["E.G.O.",record=>[answerValue(record,"ego_name"),answerValue(record,"ego_type")].filter(Boolean).join(" · ")],
+      ["PERSONALITY",record=>answerValue(record,"personality")]
+    ];
+    fields.forEach(([label,read])=>{
+      const line=document.createElement("div");line.className="obs-compare-row";
+      [label,read(left)||"Not specified",read(right)||"Not specified"].forEach(value=>{
+        const cell=document.createElement("span");cell.textContent=value;line.append(cell);
+      });
+      output.append(line);
+    });
   }
   function exportBackup(){
     const data={format:"uee-rebuilt-archive-backup",version:1,exportedAt:new Date().toISOString(),records:readOcArchive()};
@@ -281,19 +344,75 @@
     reader.onload=()=>{
       try{
         const parsed=JSON.parse(String(reader.result||""));
-        if(parsed?.format!=="uee-rebuilt-archive-backup"||!Array.isArray(parsed.records))throw new Error("That file is not a U.E.E Rebuilt backup.");
-        const old=readOcArchive(),ids=new Set(old.map(record=>record.id));
-        const incoming=parsed.records.filter(record=>record&&typeof record.id==="string"&&record.answers&&typeof record.answers==="object"&&!ids.has(record.id));
-        writeOcArchive(old.concat(incoming));$("obs-import-status").textContent=incoming.length+" new records imported; matching IDs skipped.";
+        if(parsed?.format!=="uee-rebuilt-archive-backup"||!Array.isArray(parsed.records))throw new Error("That file is not a U.E.E Rebuilt archive backup.");
+        const clean=[],incomingIds=new Set();
+        parsed.records.forEach(item=>{
+          if(!item||typeof item!=="object"||!item.answers||typeof item.answers!=="object"||Array.isArray(item.answers))return;
+          const record=JSON.parse(JSON.stringify(item));
+          let id=typeof record.id==="string"?record.id.trim():"";
+          if(!id||incomingIds.has(id))id="rebuilt_import_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);
+          while(incomingIds.has(id))id+="_x";
+          incomingIds.add(id);
+          record.id=id;record.name=String(record.name||"Imported Character");
+          record.mode="rebuilt";record.schema="uee-rebuilt-character-v1";
+          record.createdAt=String(record.createdAt||new Date().toISOString());
+          record.updatedAt=String(record.updatedAt||new Date().toISOString());
+          record.profileSummary=String(record.profileSummary||formatCharacterDossier(record));
+          clean.push(record);
+        });
+        if(!clean.length)throw new Error("No valid character records were found in that backup.");
+        const old=readOcArchive();
+        let next,added;
+        if($("obs-restore-mode").value==="replace"){
+          if(!window.confirm("Replace the entire U.E.E Rebuilt archive with "+clean.length+" imported records?"))return;
+          next=clean;added=clean.length;
+        }else{
+          const existingIds=new Set(old.map(record=>record.id));
+          const unique=clean.filter(record=>!existingIds.has(record.id));
+          next=old.concat(unique);added=unique.length;
+        }
+        if(!writeOcArchive(next))throw new Error("Could not save the restored archive.");
+        $("obs-import-status").textContent=$("obs-restore-mode").value==="replace"
+          ?added+" records restored."
+          :added+" added; "+(clean.length-added)+" matching IDs skipped.";
       }catch(error){$("obs-import-status").textContent=error.message||"IMPORT FAILED";}
     };
     reader.onerror=()=>{$("obs-import-status").textContent="COULD NOT READ THE SELECTED FILE";};
     reader.readAsText(file);
   }
   function scanArchive(){
-    const rows=readOcArchive(),ids=new Set();let duplicate=0,missing=0,invalid=0;
-    rows.forEach(record=>{if(!record.id||!record.name)missing++;if(!record.answers||typeof record.answers!=="object"||!record.profileSummary)invalid++;if(ids.has(record.id))duplicate++;ids.add(record.id);});
-    $("obs-scan-status").textContent=rows.length+" checked · "+duplicate+" duplicate IDs · "+missing+" incomplete identities · "+invalid+" malformed records.";
+    const rows=readOcArchive(),seen=new Set();let duplicate=0,missing=0,invalid=0;
+    rows.forEach(record=>{
+      if(!record.id)missing++;
+      else if(seen.has(record.id))duplicate++;
+      else seen.add(record.id);
+      if(!record.name||!record.answers||typeof record.answers!=="object"||!record.profileSummary)invalid++;
+    });
+    const issueCount=duplicate+missing;
+    $("obs-repair").disabled=issueCount===0;
+    $("obs-scan-status").textContent=rows.length+" checked · "+duplicate+" duplicate IDs · "+missing+" missing IDs · "+invalid+" incomplete records.";
+  }
+  function repairArchiveIds(){
+    const rows=readOcArchive(),seen=new Set();let repaired=0;
+    rows.forEach(record=>{
+      let id=typeof record.id==="string"?record.id.trim():"";
+      if(!id||seen.has(id)){
+        id="rebuilt_repair_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8);
+        while(seen.has(id))id+="_x";
+        record.id=id;repaired++;
+      }
+      seen.add(id);
+    });
+    writeOcArchive(rows);
+    $("obs-scan-status").textContent=repaired+" record IDs repaired. Run the scan again.";
+    $("obs-repair").disabled=true;
+  }
+  function exportDossiers(){
+    const records=readOcArchive();
+    if(!records.length){$("obs-scan-status").textContent="NO DOSSIERS TO EXPORT";return;}
+    const text=records.map(record=>record.profileSummary||formatCharacterDossier(record)).join("\n\n"+"═".repeat(54)+"\n\n");
+    const url=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));
+    const link=document.createElement("a");link.href=url;link.download="UEE-Rebuilt-Character-Dossiers.txt";link.click();URL.revokeObjectURL(url);
   }
 
   document.querySelectorAll("[data-view]").forEach(button=>button.addEventListener("click",event=>{
@@ -318,6 +437,9 @@
   $("character-preview-copy").addEventListener("click",()=>{const record=readOcArchive().find(item=>item.id===previewId);if(record)copyText(record.profileSummary);});
   $("character-preview-delete").addEventListener("click",()=>deleteRecord(previewId));
   $("obs-export").addEventListener("click",exportBackup);
+  $("obs-compare").addEventListener("click",compareRecords);
+  $("obs-dossier-export").addEventListener("click",exportDossiers);
+  $("obs-repair").addEventListener("click",repairArchive);
   $("obs-import-open").addEventListener("click",()=>$("obs-import-file").click());
   $("obs-import-file").addEventListener("change",event=>{const file=event.target.files?.[0];event.target.value="";importBackup(file);});
   $("obs-scan").addEventListener("click",scanArchive);
