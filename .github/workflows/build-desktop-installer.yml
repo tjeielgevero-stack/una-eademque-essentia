@@ -51,6 +51,8 @@ jobs:
         run: node desktop/smoke-test.mjs
 
   build-windows:
+    if: github.event_name != 'pull_request'
+    needs: validate-desktop
     name: Build Windows installer
     runs-on: windows-latest
     timeout-minutes: 45
