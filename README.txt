@@ -1,4 +1,4 @@
-UNA EADEMQUE ESSENTIA — v1.0.0 SUPER-MASSIVE RELEASE
+UNA EADEMQUE ESSENTIA — DESKTOP v1.0.1 MINOR UPDATE
 
 An unofficial, community-made Project Moon character and Mirror World variant builder.
 
@@ -7,7 +7,8 @@ WHAT'S NEW
 - Saved-character archive search, creation-mode filters, and sorting.
 - New accessibility, performance, creator, and archive preferences.
 - Better parry timing and corrected three-step multiplayer regression tests.
-- Updated desktop installer links and offline cache versions.
+- Corrected the archive change record and release labels.
+- Updated desktop installer links and refreshed offline cache versions.
 
 MAIN FILES
 - index.html — app interface, Settings, creation screens, archive and release notes.
