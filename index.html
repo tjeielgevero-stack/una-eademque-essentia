@@ -159,11 +159,11 @@
         <p>Choose how you want to access the archive.</p>
       </div>
       <div class="app-install-choice-options">
-        <a class="app-install-option app-install-desktop" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v1.0.1/Una.Eademque.Essentia_1.0.1_x64-setup.exe" target="_blank" rel="noopener noreferrer">
+        <button class="app-install-option app-install-desktop app-install-blocked" id="app-install-desktop-blocked" type="button" aria-haspopup="dialog" aria-controls="desktop-install-blocked-dialog">
           <span class="app-install-option-icon" aria-hidden="true">▣</span>
-          <span><strong>DESKTOP APP</strong><small>Windows installer · Dedicated desktop experience</small></span>
-          <span class="app-install-option-arrow" aria-hidden="true">↗</span>
-        </a>
+          <span><strong>DESKTOP APP · TEMPORARILY BLOCKED</strong><small>Installation paused while the desktop app is being rebuilt</small></span>
+          <span class="app-install-option-arrow" aria-hidden="true">ⓘ</span>
+        </button>
         <button class="app-install-option app-install-website" id="app-install-website" type="button">
           <span class="app-install-option-icon" aria-hidden="true">⌂</span>
           <span><strong>WEBSITE APP</strong><small>Install in your browser · Works like an app</small></span>
@@ -171,6 +171,23 @@
         </button>
       </div>
       <button class="app-install-choice-close" id="app-install-choice-close" type="button">CLOSE</button>
+    </section>
+  </dialog>
+
+  <dialog id="desktop-install-blocked-dialog" class="app-install-choice desktop-install-blocked-dialog" aria-labelledby="desktop-install-blocked-title">
+    <section class="app-install-choice-panel" role="document">
+      <div class="app-install-choice-heading">
+        <p class="eyebrow">INSTALLATION UNAVAILABLE</p>
+        <h2 id="desktop-install-blocked-title">DESKTOP APP TEMPORARILY BLOCKED</h2>
+        <p>The desktop installer is intentionally unavailable for now.</p>
+      </div>
+      <div class="desktop-install-blocked-copy">
+        <p><strong>Why is it blocked?</strong></p>
+        <p>The latest desktop build opened the wrong interface: it displayed the old website-style experience instead of the dedicated rebuilt desktop app.</p>
+        <p>Desktop development is paused while the website remains the active project. The installer is being kept unavailable so visitors do not download an app that is known to have a broken experience.</p>
+        <p><strong>What can I use instead?</strong> The website and its browser-based installation option remain available. This block affects only the separate Windows desktop installer.</p>
+      </div>
+      <button class="app-install-choice-close" id="desktop-install-blocked-close" type="button">UNDERSTOOD</button>
     </section>
   </dialog>
 
@@ -679,9 +696,9 @@
       <p class="eyebrow">NATIVE WINDOWS APPLICATION</p>
       <h2 id="desktop-download-title">TAKE THE ARCHIVE <span>WITH YOU.</span></h2>
       <p>Prefer a dedicated desktop experience? Download the native Windows edition and explore the archive in its own desktop dashboard.</p>
-      <p class="desktop-download-status" role="status">WINDOWS INSTALLER AVAILABLE · VERSION 1.0.1</p>
+      <p class="desktop-download-status" role="status">WINDOWS INSTALLER TEMPORARILY BLOCKED · DESKTOP DEVELOPMENT ON HOLD</p>
     </div>
-    <a class="desktop-download-link" href="https://github.com/tjeielgevero-stack/una-eademque-essentia/releases/download/desktop-v1.0.1/Una.Eademque.Essentia_1.0.1_x64-setup.exe" target="_blank" rel="noopener noreferrer">DOWNLOAD WINDOWS INSTALLER <span>↗</span></a>
+    <button class="desktop-download-link desktop-download-blocked" id="desktop-download-blocked" type="button">WHY IS INSTALLATION BLOCKED? <span>ⓘ</span></button>
   </section>
   <footer>
     <span>PROJECT MOON CHARACTER ARCHIVE</span>
@@ -721,7 +738,18 @@
       const choiceDialog = document.getElementById("app-install-choice");
       const websiteButton = document.getElementById("app-install-website");
       const closeButton = document.getElementById("app-install-choice-close");
+      const desktopBlockedButton = document.getElementById("app-install-desktop-blocked");
+      const desktopBlockedDialog = document.getElementById("desktop-install-blocked-dialog");
+      const desktopBlockedClose = document.getElementById("desktop-install-blocked-close");
       if (!installButton || !choiceDialog || !websiteButton) return;
+      desktopBlockedButton?.addEventListener("click", () => desktopBlockedDialog?.showModal());
+      document.addEventListener("click", event => {
+        if (event.target.closest("#desktop-download-blocked")) desktopBlockedDialog?.showModal();
+      });
+      desktopBlockedClose?.addEventListener("click", () => desktopBlockedDialog?.close());
+      desktopBlockedDialog?.addEventListener("click", event => {
+        if (event.target === desktopBlockedDialog) desktopBlockedDialog.close();
+      });
       let installPrompt = null;
       const isAppleMobile = /iphone|ipad|ipod/i.test(navigator.userAgent)
         || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
