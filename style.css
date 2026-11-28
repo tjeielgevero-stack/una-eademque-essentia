@@ -2771,3 +2771,13 @@ html.pref-low-performance .effect-bossintro *{animation:none!important;transitio
 }
 
 .update-log-entry + .update-log-entry{margin-top:20px;padding-top:20px;border-top:1px solid rgba(188,164,124,.2)}
+
+
+/* Explain why the desktop installer is unavailable while desktop development is paused. */
+.app-install-blocked { cursor: pointer; border-color: rgba(190,145,105,.48); }
+.app-install-blocked:hover { border-color: #c8ad88; background: rgba(190,145,105,.10); }
+.app-install-blocked .app-install-option-arrow { color: #d0a77f; font-size: 18px; }
+.desktop-install-blocked-dialog { z-index: 1002; }
+.desktop-install-blocked-copy { margin: 20px 0 24px; color: #c9c0b6; font: 12px/1.75 'DM Mono',monospace; }
+.desktop-install-blocked-copy p { margin: 0 0 13px; }
+.desktop-install-blocked-copy strong { color: #eee4d5; }
